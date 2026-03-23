@@ -78,7 +78,6 @@ public class ListActivity extends AppCompatActivity {
         btnAddProduct.setOnClickListener(v -> startActivity(new Intent(this, AddProductActivity.class)));
         btnCart.setOnClickListener(v -> startActivity(new Intent(this, CartActivity.class)));
         btnNotification.setOnClickListener(v -> {
-            // Nếu là admin, bấm vào chuông sẽ mở danh sách đơn hàng để xử lý luôn cho tiện
             if ("admin".equals(userRole)) {
                 startActivity(new Intent(this, OrderListActivity.class));
             } else {
@@ -110,14 +109,12 @@ public class ListActivity extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottomNav);
 
         btnAddProduct.setVisibility(userRole.equals("admin") ? View.VISIBLE : View.GONE);
-        // Admin không cần giỏ hàng
         btnCart.setVisibility(userRole.equals("admin") ? View.GONE : View.VISIBLE);
     }
 
     private void observeBadges() {
         if (userEmail.isEmpty()) return;
 
-        // 1. Lắng nghe giỏ hàng (Chỉ cho User)
         if (cartListener != null) cartListener.remove();
         if (!"admin".equals(userRole)) {
             cartListener = firestore.collection("cart")
@@ -134,12 +131,9 @@ public class ListActivity extends AppCompatActivity {
                     });
         }
 
-        // 2. Lắng nghe thông báo
         if (notificationListener != null) notificationListener.remove();
         
         if ("admin".equals(userRole)) {
-            // ĐỐI VỚI ADMIN: Chuông thông báo sẽ đếm số lượng đơn hàng đang ở trạng thái "Chờ xác nhận"
-            // Cách này đảm bảo tất cả đơn hàng cũ đang tồn tại đều được hiện số thông báo.
             notificationListener = firestore.collection("orders")
                     .whereEqualTo("status", "Chờ xác nhận")
                     .addSnapshotListener((value, error) -> {
@@ -148,7 +142,6 @@ public class ListActivity extends AppCompatActivity {
                         updateBadge(tvNotifBadge, value.size());
                     });
         } else {
-            // ĐỐI VỚI USER: Lắng nghe thông báo cá nhân chưa đọc
             notificationListener = firestore.collection("notifications")
                     .whereEqualTo("userEmail", userEmail)
                     .whereEqualTo("read", false)

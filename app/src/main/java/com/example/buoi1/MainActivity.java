@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // Tìm user trong collection "users" theo email (ID)
         db.collection("users").document(email).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -57,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
                         if (document != null && document.exists()) {
                             User user = document.toObject(User.class);
                             if (user != null && user.getPassword().equals(password)) {
-                                // Lưu Role và Email vào SharedPreferences
                                 SharedPreferences sharedPref = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPref.edit();
                                 editor.putString("user_role", user.getRole());

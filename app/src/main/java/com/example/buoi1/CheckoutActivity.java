@@ -386,7 +386,6 @@ public class CheckoutActivity extends AppCompatActivity {
 
         String dateStr = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date());
         
-        // 1. Thông báo cho USER
         Map<String, Object> userNotif = new HashMap<>();
         userNotif.put("userEmail", userEmail);
         userNotif.put("title", "Đặt hàng thành công");
@@ -396,7 +395,6 @@ public class CheckoutActivity extends AppCompatActivity {
         userNotif.put("timestamp", FieldValue.serverTimestamp());
         batch.set(db.collection("notifications").document(), userNotif);
 
-        // 2. Thông báo cho ADMIN
         Map<String, Object> adminNotif = new HashMap<>();
         adminNotif.put("userEmail", "admin");
         adminNotif.put("title", "Đơn hàng mới chờ duyệt");
