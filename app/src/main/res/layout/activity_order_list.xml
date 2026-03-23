@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    android:orientation="vertical">
+
+    <!-- Toolbar -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="#01579B"
+        android:paddingHorizontal="16dp">
+
+        <ImageView
+            android:id="@+id/btnBackOrderList"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:padding="4dp"
+            android:src="@drawable/ic_arrow_right"
+            android:rotation="180"
+            app:tint="#FFFFFF" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Đơn mua của tôi"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <!-- TabLayout -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutOrders"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:elevation="1dp"
+        app:tabIndicatorColor="#01579B"
+        app:tabSelectedTextColor="#01579B"
+        app:tabTextColor="#757575"
+        app:tabMode="scrollable">
+        <com.google.android.material.tabs.TabItem android:text="Tất cả" />
+        <com.google.android.material.tabs.TabItem android:text="Chờ xác nhận" />
+        <com.google.android.material.tabs.TabItem android:text="Chờ lấy hàng" />
+        <com.google.android.material.tabs.TabItem android:text="Đang giao" />
+        <com.google.android.material.tabs.TabItem android:text="Đã giao" />
+        <com.google.android.material.tabs.TabItem android:text="Đã hủy" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <!-- ListView với divider 8dp để khoảng cách vừa phải -->
+    <ListView
+        android:id="@+id/lvOrderList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="8dp"
+        android:padding="8dp"
+        android:clipToPadding="false" />
+
+</LinearLayout>

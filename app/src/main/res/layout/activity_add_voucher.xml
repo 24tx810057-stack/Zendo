@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#FFFFFF">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TẠO VOUCHER MỚI"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#01579B"
+        android:gravity="center"
+        android:layout_marginBottom="24dp"/>
+
+    <EditText
+        android:id="@+id/etVoucherTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tên chương trình (VD: Giảm giá mùa hè)"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/etVoucherCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Mã Voucher (VD: SUMMER50)"
+        android:textAllCaps="true"
+        android:layout_marginBottom="12dp"/>
+
+    <Spinner
+        android:id="@+id/spVoucherType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/etVoucherValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Giá trị giảm (VD: 10 hoặc 50000)"
+        android:inputType="numberDecimal"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/etMinOrder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Đơn hàng tối thiểu (VD: 100000)"
+        android:inputType="numberDecimal"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/btnSaveVoucher"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="LƯU VOUCHER"
+        android:backgroundTint="#01579B"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"/>
+
+</LinearLayout>

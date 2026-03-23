@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivReviewProductImg"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/RoundedImage"
+                android:src="@drawable/ic_launcher_background" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tvReviewProductName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="Tên sản phẩm"
+                    android:textColor="#212121"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/tvReviewUser"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Người mua: ..."
+                    android:textSize="12sp"
+                    android:textColor="#757575" />
+            </LinearLayout>
+            <RatingBar
+                android:id="@+id/rbReviewStars"
+                style="?android:attr/ratingBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numStars="5"
+                android:progressTint="#FFD600" />
+        </LinearLayout>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" android:layout_marginVertical="8dp"/>
+
+        <TextView
+            android:id="@+id/tvReviewContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nội dung đánh giá của khách hàng..."
+            android:textColor="#424242"
+            android:textSize="14sp" />
+
+        <!-- Phần hiển thị phản hồi của Shop -->
+        <LinearLayout
+            android:id="@+id/layoutSellerReply"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#F9F9F9"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phản hồi của Shop:"
+                android:textColor="#01579B"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvSellerReplyContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Cảm ơn bạn đã ủng hộ shop!"
+                android:textColor="#616161"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+            <TextView
+                android:id="@+id/tvReviewDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="Ngày: 01/01/2024"
+                android:textColor="#BDBDBD"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/btnReplyReview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="?attr/selectableItemBackground"
+                android:padding="4dp"
+                android:text="TRẢ LỜI"
+                android:textColor="#01579B"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

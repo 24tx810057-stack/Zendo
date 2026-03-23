@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:orientation="vertical"
+        android:paddingBottom="10dp">
+
+        <!-- Ảnh sản phẩm -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="160dp">
+            <ImageView
+                android:id="@+id/ivProductImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside"
+                android:padding="8dp"
+                android:src="@drawable/ic_launcher_background" />
+            <ImageView
+                android:id="@+id/btnLike"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="8dp"
+                android:src="@drawable/ic_heart_outline"
+                app:tint="#BDBDBD" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp">
+
+            <!-- Tên sản phẩm cố định 2 dòng -->
+            <TextView
+                android:id="@+id/tvProductName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:minLines="2"
+                android:text="Tên sản phẩm Zendo"
+                android:textColor="#212121"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <!-- Khối giá -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:layout_marginTop="4dp">
+
+                <TextView
+                    android:id="@+id/tvProductOldPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0đ"
+                    android:textColor="#9E9E9E"
+                    android:textSize="11sp"
+                    android:visibility="invisible" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvProductPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0đ"
+                        android:textColor="#EE4D2D"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvProductDiscount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:background="@drawable/bg_discount_tag"
+                        android:paddingHorizontal="3dp"
+                        android:paddingVertical="1dp"
+                        android:text="-0%"
+                        android:textColor="#FFFFFF"
+                        android:textSize="8sp"
+                        android:textStyle="bold"
+                        android:visibility="invisible" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginVertical="6dp"
+                android:background="#F0F0F0" />
+
+            <!-- Phần đánh giá và đã bán -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ivProductStar"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:src="@android:drawable/btn_star_big_on"
+                    app:tint="#FFC107"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvProductRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:text=""
+                    android:textColor="#FFC107"
+                    android:textSize="10sp"
+                    android:visibility="gone" />
+
+                <View
+                    android:id="@+id/vProductRatingDivider"
+                    android:layout_width="1dp"
+                    android:layout_height="8dp"
+                    android:layout_marginHorizontal="6dp"
+                    android:background="#E0E0E0"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvProductSold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="Đã bán 0"
+                    android:textColor="#757575"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

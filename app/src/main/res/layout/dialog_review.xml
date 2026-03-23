@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#FFFFFF">
+
+        <!-- Header: Thông tin sản phẩm -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="20dp">
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#EEEEEE"
+                app:strokeWidth="1dp">
+                <ImageView
+                    android:id="@+id/ivReviewProduct"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_launcher_background" />
+            </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/tvReviewProductName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="Tên sản phẩm Zendo"
+                android:textColor="#212121"
+                android:textSize="14sp"
+                android:ellipsize="end"
+                android:maxLines="2" />
+        </LinearLayout>
+
+        <!-- Đánh giá 5 sao cho 3 mục -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Chất lượng sản phẩm" android:textColor="#424242" android:textSize="14sp" android:layout_gravity="center"/>
+        <RatingBar
+            android:id="@+id/rbQuality"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="1.0"
+            android:progressTint="#EE4D2D"
+            android:layout_gravity="center"
+            android:layout_marginVertical="8dp"
+            android:rating="0" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dịch vụ người bán" android:textColor="#424242" android:textSize="14sp" android:layout_gravity="center" android:layout_marginTop="12dp"/>
+        <RatingBar
+            android:id="@+id/rbSeller"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="1.0"
+            android:progressTint="#EE4D2D"
+            android:layout_gravity="center"
+            android:layout_marginVertical="8dp"
+            android:rating="0" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dịch vụ vận chuyển" android:textColor="#424242" android:textSize="14sp" android:layout_gravity="center" android:layout_marginTop="12dp"/>
+        <RatingBar
+            android:id="@+id/rbShipping"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="1.0"
+            android:progressTint="#EE4D2D"
+            android:layout_gravity="center"
+            android:layout_marginVertical="8dp"
+            android:rating="0" />
+
+        <!-- Tag đánh giá nhanh -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:chipSpacing="8dp">
+            <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Đúng mô tả" app:chipBackgroundColor="#F5F5F5" android:textSize="12sp"/>
+            <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Giá rẻ" app:chipBackgroundColor="#F5F5F5" android:textSize="12sp"/>
+            <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Giao nhanh" app:chipBackgroundColor="#F5F5F5" android:textSize="12sp"/>
+            <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Đóng gói kỹ" app:chipBackgroundColor="#F5F5F5" android:textSize="12sp"/>
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Nhập nội dung -->
+        <EditText
+            android:id="@+id/etReviewComment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rounded_edittext"
+            android:gravity="top"
+            android:hint="Hãy chia sẻ cảm nhận về sản phẩm nhé..."
+            android:lines="5"
+            android:padding="12dp"
+            android:textSize="14sp" />
+
+        <!-- Footer: Ẩn danh -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+            <CheckBox
+                android:id="@+id/cbAnonymous"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đánh giá ẩn danh"
+                android:textSize="13sp"
+                android:textColor="#757575"
+                android:buttonTint="#EE4D2D" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/cbAnonymous"
+                android:layout_marginStart="32dp"
+                android:text="Tên tài khoản sẽ hiển thị dạng n***n"
+                android:textColor="#9E9E9E"
+                android:textSize="11sp" />
+        </RelativeLayout>
+
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Họ tên người nhận"
+        android:textColor="#757575"
+        android:textSize="12sp" />
+
+    <EditText
+        android:id="@+id/etEditName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nhập họ tên"
+        android:inputType="textPersonName"
+        android:textSize="14sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Số điện thoại"
+        android:textColor="#757575"
+        android:textSize="12sp" />
+
+    <EditText
+        android:id="@+id/etEditPhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nhập số điện thoại"
+        android:inputType="phone"
+        android:textSize="14sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Địa chỉ chi tiết"
+        android:textColor="#757575"
+        android:textSize="12sp" />
+
+    <EditText
+        android:id="@+id/etEditAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Số nhà, tên đường, phường/xã..."
+        android:inputType="textMultiLine"
+        android:lines="2"
+        android:textSize="14sp" />
+
+</LinearLayout>

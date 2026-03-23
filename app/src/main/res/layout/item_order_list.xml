@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardOrder"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="1dp"
+    app:strokeColor="#EEEEEE"
+    app:strokeWidth="1dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <!-- Header -->
+        <ImageView
+            android:id="@+id/ivStoreIcon"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:src="@drawable/ic_home"
+            app:layout_constraintBottom_toBottomOf="@id/tvStoreName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvStoreName"
+            app:tint="#757575" />
+
+        <TextView
+            android:id="@+id/tvStoreName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="Zendo Official Store"
+            android:textColor="#757575"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="@id/tvOrderListStatus"
+            app:layout_constraintStart_toEndOf="@id/ivStoreIcon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvOrderListStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đang giao"
+            android:textColor="#01579B"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/divider1"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_marginTop="8dp"
+            android:background="#EEEEEE"
+            app:layout_constraintTop_toBottomOf="@id/tvStoreName" />
+
+        <!-- Product -->
+        <ImageView
+            android:id="@+id/ivOrderFirstProduct"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="12dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_background"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider1" />
+
+        <TextView
+            android:id="@+id/tvOrderFirstProductName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="Tên sản phẩm"
+            android:textColor="#212121"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ivOrderFirstProduct"
+            app:layout_constraintTop_toTopOf="@id/ivOrderFirstProduct" />
+
+        <TextView
+            android:id="@+id/tvOrderTotalQuantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="x1 sản phẩm"
+            android:textColor="#9E9E9E"
+            android:textSize="11sp"
+            app:layout_constraintStart_toStartOf="@id/tvOrderFirstProductName"
+            app:layout_constraintTop_toBottomOf="@id/tvOrderFirstProductName" />
+
+        <!-- Nút hành động -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnOrderAction"
+            android:layout_width="85dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_filter_chip"
+            android:text="Đánh giá"
+            android:textAllCaps="false"
+            android:textColor="#212121"
+            android:textSize="11sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvOrderTotalQuantity" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnOrderDetail"
+            android:layout_width="85dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_filter_chip"
+            android:text="Chi tiết"
+            android:textAllCaps="false"
+            android:textColor="#212121"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="@id/btnOrderAction"
+            app:layout_constraintEnd_toStartOf="@id/btnOrderAction"
+            app:layout_constraintTop_toTopOf="@id/btnOrderAction" />
+
+        <!-- Footer -->
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_marginTop="12dp"
+            android:background="#EEEEEE"
+            app:layout_constraintTop_toBottomOf="@id/ivOrderFirstProduct" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider2">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tổng thanh toán: "
+                android:textColor="#757575"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvOrderListTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0đ"
+                android:textColor="#212121"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

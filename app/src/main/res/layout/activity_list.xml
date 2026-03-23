@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottomNav"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@drawable/bg"
+            android:paddingHorizontal="12dp"
+            android:paddingTop="25dp"
+            android:paddingBottom="12dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_alignParentBottom="true"
+                android:layout_toStartOf="@+id/layoutCartIcon"
+                android:background="@drawable/bg_search_bar"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@android:drawable/ic_menu_search"
+                    app:tint="#29B6F6" />
+
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:background="@android:color/transparent"
+                    android:hint="Tìm kiếm sản phẩm Zendo..."
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutCartIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:clipChildren="false"
+                android:clipToPadding="false">
+
+                <RelativeLayout
+                    android:id="@+id/btnCartContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false">
+
+                    <ImageView
+                        android:id="@+id/btnCart"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/ic_cart_logo"
+                        app:tint="#FFFFFF" />
+
+                    <TextView
+                        android:id="@+id/tvCartBadgeList"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_alignTop="@id/btnCart"
+                        android:layout_alignEnd="@id/btnCart"
+                        android:layout_marginTop="-6dp"
+                        android:layout_marginEnd="-6dp"
+                        android:background="@drawable/bg_circle_red_badge"
+                        android:gravity="center"
+                        android:text="0"
+                        android:textColor="#FFFFFF"
+                        android:textSize="8sp"
+                        android:textStyle="bold"
+                        android:elevation="4dp"
+                        android:visibility="gone" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/btnNotificationContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false">
+
+                    <ImageView
+                        android:id="@+id/btnNotification"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_notifications"
+                        app:tint="#FFFFFF" />
+
+                    <TextView
+                        android:id="@+id/tvNotifBadgeList"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_alignTop="@id/btnNotification"
+                        android:layout_alignEnd="@id/btnNotification"
+                        android:layout_marginTop="-6dp"
+                        android:layout_marginEnd="-6dp"
+                        android:background="@drawable/bg_circle_red_badge"
+                        android:gravity="center"
+                        android:text="0"
+                        android:textColor="#FFFFFF"
+                        android:textSize="8sp"
+                        android:textStyle="bold"
+                        android:elevation="4dp"
+                        android:visibility="gone" />
+                </RelativeLayout>
+
+                <ImageView
+                    android:id="@+id/btnAddProduct"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="12dp"
+                    android:src="@android:drawable/ic_menu_add"
+                    android:visibility="gone"
+                    app:tint="#FFFFFF" />
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <!-- Thanh chọn hãng -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:paddingVertical="8dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/layoutBrandFilter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="8dp">
+
+                <TextView
+                    android:id="@+id/tvFilterAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:background="@drawable/bg_filter_chip_selected"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="6dp"
+                    android:text="Tất cả"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvFilterIphone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:background="@drawable/bg_filter_chip"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="6dp"
+                    android:text="iPhone"
+                    android:textColor="#757575"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/tvFilterSamsung"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:background="@drawable/bg_filter_chip"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="6dp"
+                    android:text="Samsung"
+                    android:textColor="#757575"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/tvFilterOppo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:background="@drawable/bg_filter_chip"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="6dp"
+                    android:text="Oppo"
+                    android:textColor="#757575"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/tvFilterXiaomi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:background="@drawable/bg_filter_chip"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="6dp"
+                    android:text="Xiaomi"
+                    android:textColor="#757575"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- Sắp xếp -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:elevation="1dp"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:id="@+id/tvBestSelling"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Bán chạy"
+                android:textColor="#757575"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvNewArrival"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Mới nhất"
+                android:textColor="#757575"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:id="@+id/llSortPrice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvSortPriceLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Giá"
+                    android:textColor="#757575"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/ivSortPriceIcon"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_marginStart="4dp"
+                    android:src="@android:drawable/arrow_up_float"
+                    app:tint="#757575" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <GridView
+            android:id="@+id/gridViewProducts"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:horizontalSpacing="10dp"
+            android:numColumns="2"
+            android:padding="10dp"
+            android:scrollbarStyle="outsideOverlay"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="10dp" />
+
+    </LinearLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#FFFFFF"
+        app:itemIconTint="@color/selector_nav_color"
+        app:itemTextColor="@color/selector_nav_color"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu" />
+
+</RelativeLayout>
