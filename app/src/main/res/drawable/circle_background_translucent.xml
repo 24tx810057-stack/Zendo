@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
+    <!-- Màu nền vòng tròn xám mờ giống Shopee (khoảng 40% độ trong suốt) -->
     <solid android:color="#66000000" />
+    <!-- Bạn có thể điều chỉnh kích thước ở đây nếu muốn cố định, nhưng thường sẽ dùng size của View -->
 </shape>

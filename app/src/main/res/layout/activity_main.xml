@@ -7,20 +7,21 @@
     android:background="#FFFFFF"
     tools:context=".MainActivity">
 
-    <!-- Header dùng hình nền bg -->
-    <View
+    <!-- Header Background -->
+    <ImageView
         android:id="@+id/orangeHeader"
         android:layout_width="match_parent"
         android:layout_height="320dp"
-        android:background="@drawable/bg"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Logo Brand mới - Tăng size cực đại và độ nổi bật -->
+    <!-- Logo Section -->
     <LinearLayout
         android:id="@+id/llLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="60dp"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,19 +29,19 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:layout_width="350dp"
-            android:layout_height="220dp"
-            android:elevation="15dp"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:elevation="10dp"
             android:scaleType="fitCenter"
             android:src="@drawable/logo_zendo" />
 
-        <!-- Tagline được làm nổi bật mạnh mẽ -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-35dp"
-            android:fontFamily="sans-serif-medium"
-            android:letterSpacing="0.2"
+            android:layout_marginTop="-30dp"
+            android:fontFamily="sans-serif-black"
+            android:letterSpacing="0.4"
             android:text="MUA SẮM DỄ DÀNG"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
@@ -48,99 +49,104 @@
             android:shadowColor="#CC000000"
             android:shadowDx="0"
             android:shadowDy="4"
-            android:shadowRadius="10" />
+            android:shadowRadius="8" />
     </LinearLayout>
 
-    <!-- Khối đăng nhập -->
-    <LinearLayout
+    <!-- Login Card -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-40dp"
         android:layout_marginHorizontal="28dp"
-        android:background="@drawable/rounded_login_container"
-        android:elevation="15dp"
-        android:orientation="vertical"
-        android:padding="32dp"
+        android:layout_marginTop="-30dp"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="20dp"
         app:layout_constraintTop_toBottomOf="@id/orangeHeader">
 
-        <EditText
-            android:id="@+id/etUsername"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:background="@android:color/transparent"
-            android:drawableStart="@drawable/ic_person"
-            android:drawablePadding="16dp"
-            android:hint="Email hoặc Số điện thoại"
-            android:inputType="text"
-            android:paddingVertical="15dp"
-            android:textSize="15sp"
-            app:drawableTint="#757575" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#F0F0F0" />
-
-        <EditText
-            android:id="@+id/etPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@android:color/transparent"
-            android:drawableStart="@android:drawable/ic_lock_idle_lock"
-            android:drawablePadding="16dp"
-            android:hint="Mật khẩu"
-            android:inputType="textPassword"
-            android:paddingVertical="15dp"
-            android:textSize="15sp"
-            app:drawableTint="#757575" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#F0F0F0" />
-
-        <!-- Nút Đăng nhập -->
-        <Button
-            android:id="@+id/button"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="35dp"
-            android:backgroundTint="#01579B"
-            android:text="ĐĂNG NHẬP"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:cornerRadius="12dp"
-            android:elevation="6dp" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp">
+            android:orientation="vertical"
+            android:padding="28dp">
 
             <TextView
-                android:id="@+id/tvForgotPassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Quên mật khẩu?"
-                android:textColor="#757575"
-                android:clickable="true"
-                android:focusable="true"
-                android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/tvSignUp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:text="Đăng ký ngay"
+                android:text="Chào mừng!"
                 android:textColor="#01579B"
-                android:textStyle="bold"
-                android:textSize="13sp" />
-        </RelativeLayout>
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:text="Vui lòng đăng nhập để tiếp tục"
+                android:textColor="#757575"
+                android:textSize="13sp" />
+
+            <EditText
+                android:id="@+id/etUsername"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:background="@drawable/rounded_edittext"
+                android:drawableStart="@drawable/ic_person"
+                android:drawablePadding="12dp"
+                android:hint="Email hoặc Số điện thoại"
+                android:inputType="text"
+                android:paddingHorizontal="16dp"
+                android:textSize="14sp"
+                app:drawableTint="#01579B" />
+
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/rounded_edittext"
+                android:drawableStart="@android:drawable/ic_lock_idle_lock"
+                android:drawablePadding="12dp"
+                android:hint="Mật khẩu"
+                android:inputType="textPassword"
+                android:paddingHorizontal="16dp"
+                android:textSize="14sp"
+                app:drawableTint="#01579B" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="28dp"
+                android:background="@drawable/bg_sky_blue_gradient"
+                android:text="ĐĂNG NHẬP"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
+
+                <TextView
+                    android:id="@+id/tvForgotPassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quên mật khẩu?"
+                    android:textColor="#757575"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/tvSignUp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="Đăng ký ngay"
+                    android:textColor="#01579B"
+                    android:textStyle="bold"
+                    android:textSize="13sp" />
+            </RelativeLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

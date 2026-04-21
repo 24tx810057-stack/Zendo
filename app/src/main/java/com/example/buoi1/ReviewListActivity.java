@@ -7,12 +7,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -23,8 +22,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public class ReviewListActivity extends AppCompatActivity {
                         reviewList.clear();
                         for (QueryDocumentSnapshot doc : value) {
                             Review review = doc.toObject(Review.class);
-                            review.setId(doc.getId()); // GÁN ID Ở ĐÂY
+                            review.setId(doc.getId());
                             reviewList.add(review);
                         }
                         adapter.notifyDataSetChanged();
@@ -109,7 +108,6 @@ public class ReviewListActivity extends AppCompatActivity {
             TextView tvReplyContent = view.findViewById(R.id.tvReviewReplyContent);
             TextView btnReply = view.findViewById(R.id.btnReplyReviewList);
 
-            // 1. Hiển thị thông tin User
             ivAvatar.setImageResource(R.drawable.ic_launcher_background);
             tvName.setText(review.getUserName() != null ? review.getUserName() : "Người dùng Zendo");
 
@@ -142,7 +140,6 @@ public class ReviewListActivity extends AppCompatActivity {
             tvDate.setText(sdf.format(new Date(review.getTimestamp())));
             tvComment.setText(review.getComment());
 
-            // 2. Hiển thị Phản hồi của Shop
             if (review.getSellerReply() != null && !review.getSellerReply().isEmpty()) {
                 layoutReply.setVisibility(View.VISIBLE);
                 tvReplyContent.setText(review.getSellerReply());
@@ -150,7 +147,6 @@ public class ReviewListActivity extends AppCompatActivity {
                 layoutReply.setVisibility(View.GONE);
             }
 
-            // 3. Xử lý nút Trả lời cho Admin
             if ("admin".equals(userRole)) {
                 btnReply.setVisibility(View.VISIBLE);
                 btnReply.setText(review.getSellerReply() == null ? "TRẢ LỜI" : "SỬA PHẢN HỒI");
@@ -190,17 +186,40 @@ public class ReviewListActivity extends AppCompatActivity {
         }
 
         private void showReplyDialog(Review review) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(ReviewListActivity.this);
-            builder.setTitle("Phản hồi đánh giá");
-            final EditText input = new EditText(ReviewListActivity.this);
-            input.setHint("Nhập nội dung...");
-            if (review.getSellerReply() != null) input.setText(review.getSellerReply());
-            builder.setView(input);
+            View dialogView = LayoutInflater.from(ReviewListActivity.this).inflate(R.layout.dialog_reply_review, null);
+            AlertDialog dialog = new AlertDialog.Builder(ReviewListActivity.this, R.style.CustomDialogTheme).setView(dialogView).create();
 
-            builder.setPositiveButton("Gửi", (dialog, which) -> {
-                String reply = input.getText().toString().trim();
-                if (reply.isEmpty()) return;
-                
+            TextView tvOriginal = dialogView.findViewById(R.id.tvOriginalReview);
+            TextInputEditText etReply = dialogView.findViewById(R.id.etReplyContent);
+            Button btnCancel = dialogView.findViewById(R.id.btnCancel);
+            Button btnSend = dialogView.findViewById(R.id.btnSend);
+            ChipGroup cgQuickReplies = dialogView.findViewById(R.id.cgQuickReplies);
+
+            tvOriginal.setText(review.getComment());
+            if (review.getSellerReply() != null) {
+                etReply.setText(review.getSellerReply());
+            }
+
+            for (int i = 0; i < cgQuickReplies.getChildCount(); i++) {
+                View child = cgQuickReplies.getChildAt(i);
+                if (child instanceof Chip) {
+                    Chip chip = (Chip) child;
+                    chip.setOnClickListener(v -> {
+                        etReply.setText(chip.getText());
+                        etReply.setSelection(etReply.getText().length());
+                    });
+                }
+            }
+
+            btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+            btnSend.setOnClickListener(v -> {
+                String reply = etReply.getText().toString().trim();
+                if (reply.isEmpty()) {
+                    Toast.makeText(ReviewListActivity.this, "Vui lòng nhập nội dung", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 if (review.getId() == null) {
                     Toast.makeText(ReviewListActivity.this, "Lỗi: Không tìm thấy ID đánh giá", Toast.LENGTH_SHORT).show();
                     return;
@@ -211,11 +230,19 @@ public class ReviewListActivity extends AppCompatActivity {
                 updates.put("replyTimestamp", System.currentTimeMillis());
                 
                 db.collection("reviews").document(review.getId()).update(updates)
-                        .addOnSuccessListener(aVoid -> Toast.makeText(ReviewListActivity.this, "Đã gửi phản hồi thành công", Toast.LENGTH_SHORT).show())
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(ReviewListActivity.this, "Đã gửi phản hồi thành công", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                        })
                         .addOnFailureListener(e -> Toast.makeText(ReviewListActivity.this, "Lỗi khi gửi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             });
-            builder.setNegativeButton("Hủy", null);
-            builder.show();
+
+            dialog.show();
+
+            if (dialog.getWindow() != null) {
+                int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.90);
+                dialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
         }
     }
 }

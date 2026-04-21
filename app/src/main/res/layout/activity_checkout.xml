@@ -22,7 +22,7 @@
             android:padding="4dp"
             android:src="@drawable/ic_arrow_right"
             android:rotation="180"
-            app:tint="#01579B" />
+            app:tint="@color/blue_main" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -72,7 +72,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_dialog_map"
-                            app:tint="#01579B" />
+                            app:tint="@color/blue_main" />
 
                         <TextView
                             android:id="@+id/tvLabelAdd"
@@ -81,7 +81,7 @@
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@id/ivLoc"
                             android:text="Địa chỉ nhận hàng"
-                            android:textColor="#01579B"
+                            android:textColor="@color/blue_main"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -91,7 +91,7 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:text="Thay đổi"
-                            android:textColor="#29B6F6"
+                            android:textColor="@color/blue_main"
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
@@ -173,7 +173,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_circle_red_badge"
-                            android:backgroundTint="#01579B"
+                            android:backgroundTint="@color/blue_main"
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="3dp"
                             android:text="FREESHIP"
@@ -205,7 +205,7 @@
                                 android:id="@+id/rbFast"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:buttonTint="#01579B"
+                                android:buttonTint="@color/blue_main"
                                 android:text="Hỏa tốc"
                                 android:textSize="14sp"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -232,7 +232,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="8dp"
                                     android:text="30.000đ"
-                                    android:textColor="#01579B"
+                                    android:textColor="@color/blue_main"
                                     android:textStyle="bold"
                                     android:textSize="14sp"/>
                             </LinearLayout>
@@ -249,7 +249,7 @@
                                 android:id="@+id/rbStandard"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:buttonTint="#01579B"
+                                android:buttonTint="@color/blue_main"
                                 android:text="Tiêu chuẩn"
                                 android:textSize="14sp"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -276,7 +276,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="8dp"
                                     android:text="15.000đ"
-                                    android:textColor="#01579B"
+                                    android:textColor="@color/blue_main"
                                     android:textStyle="bold"
                                     android:textSize="14sp"/>
                             </LinearLayout>
@@ -298,7 +298,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_menu_agenda"
-                            app:tint="#01579B" />
+                            app:tint="@color/blue_main" />
                         <TextView
                             android:id="@+id/tvVoucherLabel"
                             android:layout_width="wrap_content"
@@ -315,7 +315,7 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:text="Chọn mã giảm giá >"
-                            android:textColor="#29B6F6"
+                            android:textColor="@color/blue_main"
                             android:textSize="13sp" />
                     </RelativeLayout>
 
@@ -339,7 +339,7 @@
                             android:id="@+id/rbCash"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:buttonTint="#01579B"
+                            android:buttonTint="@color/blue_main"
                             android:checked="true"
                             android:text="Thanh toán khi nhận hàng (COD)"
                             android:textSize="14sp" />
@@ -347,14 +347,14 @@
                             android:id="@+id/rbBank"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:buttonTint="#01579B"
+                            android:buttonTint="@color/blue_main"
                             android:text="Chuyển khoản ngân hàng"
                             android:textSize="14sp" />
                         <RadioButton
                             android:id="@+id/rbBeepay"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:buttonTint="#01579B"
+                            android:buttonTint="@color/blue_main"
                             android:text="Ví ZendoPay"
                             android:textSize="14sp" />
                     </RadioGroup>
@@ -412,7 +412,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Tổng thanh toán" android:textColor="#212121" android:textSize="16sp" android:textStyle="bold" />
-                        <TextView android:id="@+id/tvSummaryTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0đ" android:textColor="#01579B" android:textSize="18sp" android:textStyle="bold" />
+                        <TextView android:id="@+id/tvSummaryTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0đ" android:textColor="@color/blue_main" android:textSize="18sp" android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -438,7 +438,7 @@
             android:layout_weight="1"
             android:orientation="vertical">
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tổng thanh toán" android:textColor="#757575" android:textSize="12sp" />
-            <TextView android:id="@+id/tvSummaryTotalSticky" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0đ" android:textColor="#01579B" android:textSize="18sp" android:textStyle="bold" />
+            <TextView android:id="@+id/tvSummaryTotalSticky" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0đ" android:textColor="@color/blue_main" android:textSize="18sp" android:textStyle="bold" />
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatButton

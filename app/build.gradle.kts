@@ -47,6 +47,9 @@ dependencies {
     implementation(libs.glide)
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
+    // MPAndroidChart for statistics
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

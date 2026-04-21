@@ -1,90 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardVoucher"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="6dp"
     app:cardCornerRadius="12dp"
     app:cardElevation="2dp"
     app:strokeWidth="0dp">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:orientation="horizontal"
+        android:background="#FFFFFF">
 
+        <!-- Left side: Icon & Value -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="114dp"
+            android:layout_height="match_parent"
+            android:background="@color/blue_main"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_voucher_shopee"
+                app:tint="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/tvVoucherValueItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="10%"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GIẢM GIÁ"
+                android:textColor="#CCFFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Divider line (dashed look) -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="#EEEEEE" />
+
+        <!-- Right side: Details -->
+        <RelativeLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_toStartOf="@+id/layoutActions"
-            android:orientation="vertical">
+            android:layout_weight="1"
+            android:padding="12dp">
 
             <TextView
                 android:id="@+id/tvVoucherTitleItem"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tên Voucher"
+                android:layout_toStartOf="@+id/swVoucherActive"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Giảm giá mùa hè"
                 android:textColor="#212121"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvVoucherCodeItem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/tvVoucherTitleItem"
                 android:layout_marginTop="4dp"
-                android:background="#E3F2FD"
-                android:paddingHorizontal="8dp"
+                android:background="@color/blue_voucher_bg"
+                android:paddingHorizontal="6dp"
                 android:paddingVertical="2dp"
-                android:text="Mã: CODE123"
-                android:textColor="#01579B"
-                android:textSize="12sp"
+                android:text="SUMMER2"
+                android:textColor="@color/blue_main"
+                android:textSize="11sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tvVoucherValueItem"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Giảm: 10%"
-                android:textColor="#EE4D2D"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:layout_below="@id/tvVoucherCodeItem"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvVoucherMinOrderItem"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Đơn tối thiểu: 100.000đ"
-                android:textColor="#757575"
-                android:textSize="12sp" />
-        </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_shipping_truck"
+                        app:tint="#757575" />
+                    <TextView
+                        android:id="@+id/tvVoucherMinOrderItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="Đơn tối thiểu: 20tr"
+                        android:textColor="#757575"
+                        android:textSize="11sp" />
+                </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/layoutActions"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:gravity="center"
-            android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@android:drawable/ic_menu_recent_history"
+                        app:tint="#9E9E9E" />
+                    <TextView
+                        android:id="@+id/tvVoucherExpiryItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="Hết hạn: 21/04/2026"
+                        android:textColor="#9E9E9E"
+                        android:textSize="11sp" />
+                </LinearLayout>
+            </LinearLayout>
 
+            <!-- Actions -->
             <Switch
                 android:id="@+id/swVoucherActive"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:thumbTint="#01579B"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:scaleX="0.8"
+                android:scaleY="0.8"
+                android:thumbTint="@color/blue_main"
                 android:trackTint="#B3E5FC" />
 
             <ImageView
                 android:id="@+id/btnDeleteVoucher"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginTop="8dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:padding="6dp"
                 android:src="@android:drawable/ic_menu_delete"
                 app:tint="#D32F2F" />
-        </LinearLayout>
-
-    </RelativeLayout>
+        </RelativeLayout>
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

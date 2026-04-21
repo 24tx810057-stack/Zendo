@@ -6,7 +6,6 @@
 
     <style name="Theme.Buoi1" parent="Base.Theme.Buoi1" />
 
-    <!-- Theme đặc biệt cho màn hình Splash để hết bị trắng khi vừa mở -->
     <style name="Theme.Zendo.Splash" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowBackground">@drawable/bg</item>
         <item name="android:windowFullscreen">true</item>
@@ -20,5 +19,10 @@
     <style name="RoundedImage">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="CustomDialogTheme" parent="Theme.Material3.Light.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
     </style>
 </resources>

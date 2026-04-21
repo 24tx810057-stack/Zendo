@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/bg_dialog_white">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Phản hồi đánh giá"
+        android:textColor="#212121"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvOriginalReview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="#F5F5F5"
+        android:padding="12dp"
+        android:text="Nội dung đánh giá của khách..."
+        android:textColor="#757575"
+        android:textSize="13sp"
+        android:maxLines="3"
+        android:ellipsize="end" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Gợi ý nhanh:"
+        android:textSize="12sp"
+        android:textColor="#9E9E9E" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:layout_marginTop="4dp">
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cgQuickReplies"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleLine="true">
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cảm ơn bạn đã ủng hộ shop!"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:textSize="11sp"/>
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rất tiếc về trải nghiệm này, shop sẽ liên hệ bạn ngay."
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:textSize="11sp"/>
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chào bạn nha!"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:textSize="11sp"/>
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Nội dung phản hồi"
+        app:boxStrokeColor="#2196F3"
+        app:hintTextColor="#2196F3"
+        app:counterEnabled="true"
+        app:counterMaxLength="500">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etReplyContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:minLines="3"
+            android:textSize="14sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnCancel"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HỦY"
+            android:textColor="#757575" />
+
+        <Button
+            android:id="@+id/btnSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="#2196F3"
+            android:text="GỬI PHẢN HỒI"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="8dp" />
+    </LinearLayout>
+
+</LinearLayout>

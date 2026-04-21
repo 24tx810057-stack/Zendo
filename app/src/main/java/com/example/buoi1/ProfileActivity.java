@@ -9,6 +9,8 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Base64;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,11 +22,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,9 +38,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private TextView tvName, tvRole, tvCartBadge, tvAdminOrderBadge;
+    private TextView tvName, tvRole, tvCartBadge, tvAdminOrderBadge, tvNotifBadge;
+    private TextView tvTotalRevenue, tvCompletedOrders;
+    private View btnRevenueStats;
     private ImageView btnSetting;
-    private View btnCart, layoutUserMenu, layoutAdminMenu, sectionSuggestion, btnChangePassword;
+    private View btnCart, layoutUserMenu, layoutAdminMenu, sectionSuggestion, btnChangePassword, btnNotification, sectionFavorite;
     private ShapeableImageView ivAvatar;
     private View btnAdminOrders, btnAdminProducts, btnAdminVouchers, btnAdminReviews;
     private Button btnLogout;
@@ -45,6 +53,8 @@ public class ProfileActivity extends AppCompatActivity {
     private String userEmail, userRole;
     private List<Product> suggestionList = new ArrayList<>();
     private ProductAdapter suggestionAdapter;
+    private DecimalFormat formatter = new DecimalFormat("###,###,###");
+    private ListenerRegistration notificationListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +82,13 @@ public class ProfileActivity extends AppCompatActivity {
         btnCart = findViewById(R.id.layoutCartProfile);
         tvCartBadge = findViewById(R.id.tvCartBadge);
         tvAdminOrderBadge = findViewById(R.id.tvAdminOrderBadge);
+        tvNotifBadge = findViewById(R.id.tvNotifBadgeProfile);
+        btnNotification = findViewById(R.id.btnNotificationProfile);
         btnSetting = findViewById(R.id.btnSetting);
+        
+        tvTotalRevenue = findViewById(R.id.tvTotalRevenue);
+        tvCompletedOrders = findViewById(R.id.tvCompletedOrders);
+        btnRevenueStats = findViewById(R.id.btnRevenueStats);
         
         layoutUserMenu = findViewById(R.id.layoutUserMenu);
         layoutAdminMenu = findViewById(R.id.layoutAdminMenu);
@@ -83,6 +99,7 @@ public class ProfileActivity extends AppCompatActivity {
         btnAdminVouchers = findViewById(R.id.btnAdminVouchers);
         btnAdminReviews = findViewById(R.id.btnAdminReviews);
         btnChangePassword = findViewById(R.id.btnChangePassword);
+        sectionFavorite = findViewById(R.id.sectionFavorite);
         
         gvSuggestions = findViewById(R.id.gvSuggestions);
         btnLogout = findViewById(R.id.btnLogout);
@@ -94,6 +111,12 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void setupUIByRole() {
         boolean isAdmin = "admin".equals(userRole);
+        
+        // LUÔN hiển thị mục yêu thích cho cả 2 role
+        if (sectionFavorite != null) {
+            sectionFavorite.setVisibility(View.VISIBLE);
+        }
+        
         if (isAdmin) {
             if (layoutUserMenu != null) layoutUserMenu.setVisibility(View.GONE);
             if (layoutAdminMenu != null) layoutAdminMenu.setVisibility(View.VISIBLE);
@@ -120,6 +143,10 @@ public class ProfileActivity extends AppCompatActivity {
             });
         }
         
+        if (btnNotification != null) {
+            btnNotification.setOnClickListener(v -> startActivity(new Intent(this, NotificationActivity.class)));
+        }
+        
         if (btnSetting != null) btnSetting.setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
         
         findViewById(R.id.sectionChat).setOnClickListener(v -> startActivity(new Intent(this, ChatActivity.class)));
@@ -128,15 +155,25 @@ public class ProfileActivity extends AppCompatActivity {
             btnChangePassword.setOnClickListener(v -> showChangePasswordDialog());
         }
 
+        // Click để mở trang yêu thích
+        if (sectionFavorite != null) {
+            sectionFavorite.setOnClickListener(v -> startActivity(new Intent(this, FavoriteActivity.class)));
+        }
+
         if (btnAdminOrders != null) btnAdminOrders.setOnClickListener(v -> startActivity(new Intent(this, OrderListActivity.class)));
         if (btnAdminProducts != null) btnAdminProducts.setOnClickListener(v -> {
             Intent intent = new Intent(this, ListActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
-            Toast.makeText(this, "Chạm vào sản phẩm để sửa", Toast.LENGTH_SHORT).show();
         });
         if (btnAdminVouchers != null) btnAdminVouchers.setOnClickListener(v -> startActivity(new Intent(this, VoucherManagementActivity.class)));
         if (btnAdminReviews != null) btnAdminReviews.setOnClickListener(v -> startActivity(new Intent(this, AdminReviewsActivity.class)));
+
+        if (btnRevenueStats != null) {
+            btnRevenueStats.setOnClickListener(v -> {
+                startActivity(new Intent(this, RevenueActivity.class));
+            });
+        }
 
         View btnOrderHistory = findViewById(R.id.btnOrderHistory);
         if (btnOrderHistory != null) btnOrderHistory.setOnClickListener(v -> startActivity(new Intent(this, OrderListActivity.class)));
@@ -173,28 +210,12 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void showChangePasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Đổi mật khẩu");
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_change_password, null);
+        builder.setView(dialogView);
 
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(50, 40, 50, 10);
-
-        final EditText etOldPass = new EditText(this);
-        etOldPass.setHint("Mật khẩu hiện tại");
-        etOldPass.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        layout.addView(etOldPass);
-
-        final EditText etNewPass = new EditText(this);
-        etNewPass.setHint("Mật khẩu mới");
-        etNewPass.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        layout.addView(etNewPass);
-
-        final EditText etConfirmPass = new EditText(this);
-        etConfirmPass.setHint("Xác nhận mật khẩu mới");
-        etConfirmPass.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        layout.addView(etConfirmPass);
-
-        builder.setView(layout);
+        final EditText etOldPass = dialogView.findViewById(R.id.etOldPass);
+        final EditText etNewPass = dialogView.findViewById(R.id.etNewPass);
+        final EditText etConfirmPass = dialogView.findViewById(R.id.etConfirmPass);
 
         builder.setPositiveButton("Cập nhật", (dialog, which) -> {
             String oldPass = etOldPass.getText().toString().trim();
@@ -205,32 +226,23 @@ public class ProfileActivity extends AppCompatActivity {
                 Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             if (!newPass.equals(confirmPass)) {
                 Toast.makeText(this, "Mật khẩu mới không khớp", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             db.collection("users").whereEqualTo("email", userEmail).get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         if (!queryDocumentSnapshots.isEmpty()) {
                             QueryDocumentSnapshot doc = (QueryDocumentSnapshot) queryDocumentSnapshots.getDocuments().get(0);
                             String currentPassOnDb = doc.getString("password");
-
                             if (oldPass.equals(currentPassOnDb)) {
                                 db.collection("users").document(doc.getId())
                                         .update("password", newPass)
-                                        .addOnSuccessListener(aVoid -> {
-                                            Toast.makeText(this, "Đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show();
-                                        })
-                                        .addOnFailureListener(e -> Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-                            } else {
-                                Toast.makeText(this, "Mật khẩu hiện tại không đúng", Toast.LENGTH_SHORT).show();
-                            }
+                                        .addOnSuccessListener(aVoid -> Toast.makeText(this, "Đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show());
+                            } else { Toast.makeText(this, "Mật khẩu hiện tại không đúng", Toast.LENGTH_SHORT).show(); }
                         }
                     });
         });
-
         builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
         builder.show();
     }
@@ -239,14 +251,12 @@ public class ProfileActivity extends AppCompatActivity {
         if (gvSuggestions == null) return;
         suggestionAdapter = new ProductAdapter(this, suggestionList);
         gvSuggestions.setAdapter(suggestionAdapter);
-        
         gvSuggestions.setOnItemClickListener((parent, view, position, id) -> {
             Product selectedProduct = suggestionList.get(position);
             Intent intent = new Intent(this, DetailActivity.class);
             intent.putExtra("product_data", selectedProduct);
             startActivity(intent);
         });
-
         loadSuggestions();
     }
 
@@ -282,13 +292,11 @@ public class ProfileActivity extends AppCompatActivity {
                         product.setId(document.getId());
                         allProducts.add(product);
                     }
-
                     Collections.sort(allProducts, (p1, p2) -> {
                         int score1 = calculateScore(p1, favoriteBrands);
                         int score2 = calculateScore(p2, favoriteBrands);
                         return Integer.compare(score2, score1);
                     });
-
                     suggestionList.clear();
                     suggestionList.addAll(allProducts);
                     if (suggestionAdapter != null) suggestionAdapter.notifyDataSetChanged();
@@ -299,7 +307,6 @@ public class ProfileActivity extends AppCompatActivity {
         int score = 0;
         String name = product.getName().toLowerCase();
         String brand = product.getBrand() != null ? product.getBrand().toLowerCase() : "";
-
         for (String fav : favoriteBrands) {
             if (name.contains(fav)) score += 10;
             if (brand.equals(fav)) score += 20;
@@ -312,8 +319,10 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadUserInfoFromFirestore();
+        observeNotificationBadge();
         if ("admin".equals(userRole)) {
             updateAdminOrderBadge();
+            updateRevenueStats();
         } else {
             updateCartBadge();
             updateOrderBadges();
@@ -321,8 +330,51 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    private void observeNotificationBadge() {
+        if (notificationListener != null) notificationListener.remove();
+        
+        String targetEmail = "admin".equals(userRole) ? "admin" : userEmail;
+        
+        notificationListener = db.collection("notifications")
+                .whereEqualTo("userEmail", targetEmail)
+                .whereEqualTo("read", false)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) return;
+                    if (value == null) return;
+                    updateBadge(tvNotifBadge, value.size());
+                });
+    }
+
+    private void updateRevenueStats() {
+        // Lấy thời điểm bắt đầu của tháng hiện tại
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date startOfMonth = cal.getTime();
+
+        db.collection("orders")
+                .whereEqualTo("status", "Đã giao")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    double totalRevenue = 0;
+                    int completedCount = 0;
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        Order order = doc.toObject(Order.class);
+                        if (order.getTimestamp() != null && !order.getTimestamp().before(startOfMonth)) {
+                            totalRevenue += order.getTotalAmount();
+                            completedCount++;
+                        }
+                    }
+                    if (tvTotalRevenue != null) tvTotalRevenue.setText(formatter.format(totalRevenue) + "đ");
+                    if (tvCompletedOrders != null) tvCompletedOrders.setText(completedCount + " đơn");
+                })
+                .addOnFailureListener(e -> Log.e("ProfileActivity", "Error updating stats: ", e));
+    }
+
     private void updateAdminOrderBadge() {
-        // Admin đếm tất cả đơn hàng có trạng thái "Chờ xác nhận"
         db.collection("orders")
                 .whereEqualTo("status", "Chờ xác nhận")
                 .get()
@@ -332,9 +384,7 @@ public class ProfileActivity extends AppCompatActivity {
                         if (count > 0) {
                             tvAdminOrderBadge.setText(String.valueOf(count));
                             tvAdminOrderBadge.setVisibility(View.VISIBLE);
-                        } else {
-                            tvAdminOrderBadge.setVisibility(View.GONE);
-                        }
+                        } else { tvAdminOrderBadge.setVisibility(View.GONE); }
                     }
                 });
     }
@@ -348,7 +398,7 @@ public class ProfileActivity extends AppCompatActivity {
                         Long quantity = doc.getLong("quantity");
                         if (quantity != null) totalCount += quantity.intValue();
                     }
-                    updateBadge(R.id.tvCartBadge, totalCount);
+                    updateBadge(tvCartBadge, totalCount);
                 });
     }
 
@@ -366,9 +416,7 @@ public class ProfileActivity extends AppCompatActivity {
                                     byte[] decodedString = Base64.decode(base64Avatar, Base64.DEFAULT);
                                     Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                                     ivAvatar.setImageBitmap(decodedByte);
-                                } catch (Exception e) {
-                                    ivAvatar.setImageResource(R.drawable.ic_person);
-                                }
+                                } catch (Exception e) { ivAvatar.setImageResource(R.drawable.ic_person); }
                             } else if (ivAvatar != null) ivAvatar.setImageResource(R.drawable.ic_person);
                         }
                     }
@@ -380,7 +428,6 @@ public class ProfileActivity extends AppCompatActivity {
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 int pending = 0, pickup = 0, shipping = 0;
                 List<String> deliveredOrderIds = new ArrayList<>();
-                
                 for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                     String status = doc.getString("status");
                     if (status == null) continue;
@@ -391,47 +438,42 @@ public class ProfileActivity extends AppCompatActivity {
                         case "Đã giao": deliveredOrderIds.add(doc.getId()); break;
                     }
                 }
-                
-                updateBadge(R.id.badgePending, pending);
-                updateBadge(R.id.badgePickup, pickup);
-                updateBadge(R.id.badgeShipping, shipping);
+                updateBadge(findViewById(R.id.badgePending), pending);
+                updateBadge(findViewById(R.id.badgePickup), pickup);
+                updateBadge(findViewById(R.id.badgeShipping), shipping);
                 checkUnreviewedOrders(deliveredOrderIds);
             });
     }
 
     private void checkUnreviewedOrders(List<String> orderIds) {
-        if (orderIds.isEmpty()) {
-            updateBadge(R.id.badgeReview, 0);
-            return;
-        }
-
+        if (orderIds.isEmpty()) { updateBadge(findViewById(R.id.badgeReview), 0); return; }
         AtomicInteger unreviewedCount = new AtomicInteger(0);
         AtomicInteger processedOrders = new AtomicInteger(0);
-
         for (String orderId : orderIds) {
             db.collection("reviews").whereEqualTo("orderId", orderId).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
-                        if (task.getResult().isEmpty()) {
-                            unreviewedCount.incrementAndGet();
-                        }
+                        if (task.getResult().isEmpty()) unreviewedCount.incrementAndGet();
                     }
                     if (processedOrders.incrementAndGet() == orderIds.size()) {
-                        updateBadge(R.id.badgeReview, unreviewedCount.get());
+                        updateBadge(findViewById(R.id.badgeReview), unreviewedCount.get());
                     }
                 });
         }
     }
 
-    private void updateBadge(int badgeId, int count) {
-        TextView badge = findViewById(badgeId);
+    private void updateBadge(TextView badge, int count) {
         if (badge != null) {
             if (count > 0) {
                 badge.setText(String.valueOf(count));
                 badge.setVisibility(View.VISIBLE);
-            } else {
-                badge.setVisibility(View.GONE);
-            }
+            } else { badge.setVisibility(View.GONE); }
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (notificationListener != null) notificationListener.remove();
     }
 }

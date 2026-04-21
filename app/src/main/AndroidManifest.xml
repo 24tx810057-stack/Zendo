@@ -41,6 +41,9 @@
         <activity android:name=".ChatActivity" />
         <activity android:name=".ForgotPasswordActivity" />
 
+        <!-- QUAN TRỌNG: KHAI BÁO REVENUE ACTIVITY Ở ĐÂY -->
+        <activity android:name=".RevenueActivity" />
+
     </application>
 
 </manifest>

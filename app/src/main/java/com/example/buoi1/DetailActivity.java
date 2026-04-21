@@ -7,6 +7,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.UnderlineSpan;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +18,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -28,12 +33,14 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -44,18 +51,20 @@ public class DetailActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String productId;
     private Product product;
-    private String userEmail;
+    private String userEmail, userRole;
 
     private TextView tvSpecChip, tvSpecScreen, tvSpecRam, tvSpecRom, tvSpecPin, tvSpecCamera, tvSpecOs;
     private ImageView ivArrowSpecs, ivArrowDesc;
-    private TextView tvPrice, tvOldPrice, tvName, tvDesc, tvRating, tvSold, tvStock;
+    private TextView tvPrice, tvOldPrice, tvDiscountTag, tvName, tvDesc, tvRating, tvSold, tvStock, tvShippingTime, tvPriceBottom;
     private LinearLayout layoutContentSpecs, layoutContentDesc;
     
-    private TextView tvBigRating, tvReviewCountSubtitle, tvTotalReviewsCount, tvViewAllReviews, tvImageIndicator;
+    private TextView tvBigRating, tvReviewCountSubtitle, tvTotalReviewsCount, tvViewAllReviews, tvImageIndicator, tvCartBadge;
     private RatingBar rbSmallSummary;
     private ViewPager2 vpImages;
-    private LinearLayout llTopReviewsContainer;
+    private LinearLayout llTopReviewsContainer, llImagePreviews;
     private ProgressBar pb5, pb4, pb3, pb2, pb1;
+    private ImageView ivFavorite;
+    private ListenerRegistration cartListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,18 +74,42 @@ public class DetailActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         SharedPreferences sharedPref = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
         userEmail = sharedPref.getString("user_email", "");
+        userRole = sharedPref.getString("user_role", "user");
 
+        initViews();
+        setupHeaderActions();
+        
+        product = (Product) getIntent().getSerializableExtra("product_data");
+        if (product != null) {
+            productId = product.getId();
+            displayData();
+            checkIfLiked();
+        }
+
+        if (tvViewAllReviews != null) {
+            tvViewAllReviews.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ReviewListActivity.class);
+                intent.putExtra("product_id", productId);
+                startActivity(intent);
+            });
+        }
+    }
+
+    private void initViews() {
         vpImages = findViewById(R.id.vpProductDetailImages);
         tvImageIndicator = findViewById(R.id.tvImageIndicator);
+        tvCartBadge = findViewById(R.id.tvCartBadgeDetail);
+        llImagePreviews = findViewById(R.id.llImagePreviews);
         
         tvPrice = findViewById(R.id.tvProductDetailPrice);
-        tvOldPrice = findViewById(R.id.tvProductDetailOldPrice);
+        tvOldPrice = findViewById(R.id.tvOldPrice);
+        tvDiscountTag = findViewById(R.id.tvDiscountTag);
         tvName = findViewById(R.id.tvProductDetailName);
         tvDesc = findViewById(R.id.tvProductDetailDesc);
-        tvRating = findViewById(R.id.tvProductDetailRating);
         tvSold = findViewById(R.id.tvProductDetailSold);
-        tvStock = findViewById(R.id.tvProductDetailStock);
-        ImageButton btnBack = findViewById(R.id.btnBackDetail);
+        ivFavorite = findViewById(R.id.ivFavorite);
+        tvShippingTime = findViewById(R.id.tvShippingTime);
+        tvPriceBottom = findViewById(R.id.tvPriceBottom);
         
         tvBigRating = findViewById(R.id.tvBigRating);
         tvReviewCountSubtitle = findViewById(R.id.tvReviewCountSubtitle);
@@ -106,49 +139,166 @@ public class DetailActivity extends AppCompatActivity {
         LinearLayout layoutHeaderSpecs = findViewById(R.id.layoutHeaderSpecs);
         LinearLayout layoutHeaderDesc = findViewById(R.id.layoutHeaderDesc);
         
-        layoutHeaderSpecs.setOnClickListener(v -> toggleCollapse(layoutContentSpecs, ivArrowSpecs));
-        layoutHeaderDesc.setOnClickListener(v -> toggleCollapse(layoutContentDesc, ivArrowDesc));
+        if (layoutHeaderSpecs != null) {
+            layoutHeaderSpecs.setOnClickListener(v -> toggleCollapse(layoutContentSpecs, ivArrowSpecs));
+        }
+        if (layoutHeaderDesc != null) {
+            layoutHeaderDesc.setOnClickListener(v -> toggleCollapse(layoutContentDesc, ivArrowDesc));
+        }
 
         LinearLayout layoutUser = findViewById(R.id.layoutUserActions);
         LinearLayout layoutAdmin = findViewById(R.id.layoutAdminActions);
         
-        Button btnBuyNow = findViewById(R.id.btnBuyNow);
-        Button btnAddToCart = findViewById(R.id.btnAddToCart);
+        if ("admin".equals(userRole)) {
+            if (layoutAdmin != null) layoutAdmin.setVisibility(View.VISIBLE);
+            if (layoutUser != null) layoutUser.setVisibility(View.GONE);
+        } else {
+            if (layoutAdmin != null) layoutAdmin.setVisibility(View.GONE);
+            if (layoutUser != null) layoutUser.setVisibility(View.VISIBLE);
+        }
+
         Button btnEdit = findViewById(R.id.btnEditProduct);
         Button btnDelete = findViewById(R.id.btnDeleteProduct);
-
-        String role = sharedPref.getString("user_role", "user");
-
-        if (role != null && role.equals("admin")) {
-            layoutAdmin.setVisibility(View.VISIBLE);
-            layoutUser.setVisibility(View.GONE);
-        } else {
-            layoutAdmin.setVisibility(View.GONE);
-            layoutUser.setVisibility(View.VISIBLE);
-        }
-
-        product = (Product) getIntent().getSerializableExtra("product_data");
-        if (product != null) {
-            productId = product.getId();
-        }
-
-        btnBack.setOnClickListener(v -> finish());
-        btnBuyNow.setOnClickListener(v -> handleBuyNow());
-        btnAddToCart.setOnClickListener(v -> addToCart());
-        btnDelete.setOnClickListener(v -> showDeleteDialog());
-        btnEdit.setOnClickListener(v -> {
-            Intent intent = new Intent(this, AddProductActivity.class);
-            intent.putExtra("edit_product", product);
-            startActivity(intent);
-        });
-
-        if (tvViewAllReviews != null) {
-            tvViewAllReviews.setOnClickListener(v -> {
-                Intent intent = new Intent(this, ReviewListActivity.class);
-                intent.putExtra("product_id", productId);
+        if (btnEdit != null) {
+            btnEdit.setOnClickListener(v -> {
+                Intent intent = new Intent(this, AddProductActivity.class);
+                intent.putExtra("edit_product", product);
                 startActivity(intent);
             });
         }
+        if (btnDelete != null) {
+            btnDelete.setOnClickListener(v -> showDeleteDialog());
+        }
+
+        View btnBuyNow = findViewById(R.id.btnBuyNow);
+        View btnAddToCart = findViewById(R.id.btnAddToCart);
+        View btnChatNow = findViewById(R.id.btnChatNowDetail);
+
+        if (btnBuyNow != null) btnBuyNow.setOnClickListener(v -> handleBuyNow());
+        if (btnAddToCart != null) btnAddToCart.setOnClickListener(v -> addToCart());
+        if (btnChatNow != null) {
+            btnChatNow.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ChatActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        if (ivFavorite != null) {
+            ivFavorite.setOnClickListener(v -> toggleFavorite());
+        }
+    }
+
+    private void checkIfLiked() {
+        if (product != null && userEmail != null && ivFavorite != null) {
+            if (product.getLikedBy() != null && product.getLikedBy().contains(userEmail)) {
+                ivFavorite.setImageResource(R.drawable.ic_heart_filled);
+                ivFavorite.setColorFilter(getResources().getColor(R.color.pink_heart));
+            } else {
+                ivFavorite.setImageResource(R.drawable.ic_heart_outline);
+                ivFavorite.setColorFilter(getResources().getColor(R.color.gray_inactive));
+            }
+        }
+    }
+
+    private void toggleFavorite() {
+        if (productId == null || userEmail == null || userEmail.isEmpty()) {
+            Toast.makeText(this, "Vui lòng đăng nhập để thực hiện!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        boolean currentlyLiked = product.getLikedBy() != null && product.getLikedBy().contains(userEmail);
+
+        if (currentlyLiked) {
+            db.collection("products").document(productId)
+                    .update("likedBy", FieldValue.arrayRemove(userEmail))
+                    .addOnSuccessListener(aVoid -> {
+                        product.getLikedBy().remove(userEmail);
+                        checkIfLiked();
+                        Toast.makeText(this, "Đã bỏ yêu thích", Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            db.collection("products").document(productId)
+                    .update("likedBy", FieldValue.arrayUnion(userEmail))
+                    .addOnSuccessListener(aVoid -> {
+                        if (product.getLikedBy() == null) product.setLikedBy(new ArrayList<>());
+                        product.getLikedBy().add(userEmail);
+                        checkIfLiked();
+                        Toast.makeText(this, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+
+    private void setupHeaderActions() {
+        ImageButton btnBack = findViewById(R.id.btnBackDetail);
+        ImageButton btnShare = findViewById(R.id.btnShareProduct);
+        ImageButton btnGoToCart = findViewById(R.id.btnGoToCart);
+        ImageButton btnMore = findViewById(R.id.btnMoreDetail);
+        View layoutCart = findViewById(R.id.layoutCartShortcut);
+
+        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
+        if (btnShare != null) btnShare.setOnClickListener(v -> shareProduct());
+        
+        if (btnMore != null) {
+            btnMore.setOnClickListener(v -> {
+                PopupMenu popup = new PopupMenu(this, v);
+                popup.getMenu().add("Quay về trang chủ");
+                popup.getMenu().add("Tố cáo sản phẩm");
+                popup.setOnMenuItemClickListener(item -> {
+                    if (item.getTitle().equals("Quay về trang chủ")) {
+                        Intent intent = new Intent(this, ListActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(this, "Đã gửi báo cáo sản phẩm này", Toast.LENGTH_SHORT).show();
+                    }
+                    return true;
+                });
+                popup.show();
+            });
+        }
+
+        if ("admin".equals(userRole)) {
+            if (layoutCart != null) layoutCart.setVisibility(View.GONE);
+        } else {
+            if (layoutCart != null) {
+                layoutCart.setVisibility(View.VISIBLE);
+                btnGoToCart.setOnClickListener(v -> startActivity(new Intent(this, CartActivity.class)));
+                observeCartBadge();
+            }
+        }
+    }
+
+    private void observeCartBadge() {
+        if (userEmail == null || userEmail.isEmpty()) return;
+        cartListener = db.collection("cart")
+                .whereEqualTo("userEmail", userEmail)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null || value == null) return;
+                    int count = 0;
+                    for (QueryDocumentSnapshot doc : value) {
+                        Long qty = doc.getLong("quantity");
+                        if (qty != null) count += qty.intValue();
+                    }
+                    if (count > 0) {
+                        tvCartBadge.setText(String.valueOf(count));
+                        tvCartBadge.setVisibility(View.VISIBLE);
+                    } else {
+                        tvCartBadge.setVisibility(View.GONE);
+                    }
+                });
+    }
+
+    private void shareProduct() {
+        if (product == null) return;
+        String shareBody = "Zendo Store - Sản phẩm: " + product.getName() + 
+                "\nGiá chỉ: " + formatter.format(product.getPrice()) + "đ" +
+                "\nXem ngay tại ứng dụng Zendo!";
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Chia sẻ sản phẩm Zendo");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+        startActivity(Intent.createChooser(sharingIntent, "Chia sẻ qua:"));
     }
 
     @Override
@@ -158,6 +308,12 @@ public class DetailActivity extends AppCompatActivity {
         loadProductReviews(); 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (cartListener != null) cartListener.remove();
+    }
+
     private void loadProductDetails() {
         if (productId == null) return;
         db.collection("products").document(productId).get()
@@ -165,6 +321,7 @@ public class DetailActivity extends AppCompatActivity {
                     product = documentSnapshot.toObject(Product.class);
                     if (product != null) {
                         displayData();
+                        checkIfLiked();
                     }
                 });
     }
@@ -176,7 +333,7 @@ public class DetailActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     int count = queryDocumentSnapshots.size();
-                    llTopReviewsContainer.removeAllViews();
+                    if (llTopReviewsContainer != null) llTopReviewsContainer.removeAllViews();
                     
                     int s5 = 0, s4 = 0, s3 = 0, s2 = 0, s1 = 0;
                     
@@ -212,18 +369,16 @@ public class DetailActivity extends AppCompatActivity {
                         float average = totalRating / count;
                         String ratingText = String.format(Locale.getDefault(), "%.1f", average);
                         
-                        if (tvRating != null) tvRating.setText(ratingText);
                         if (tvBigRating != null) tvBigRating.setText(ratingText);
                         if (tvReviewCountSubtitle != null) tvReviewCountSubtitle.setText(count + " đánh giá");
                         if (tvTotalReviewsCount != null) tvTotalReviewsCount.setText(count + " đánh giá");
                         if (rbSmallSummary != null) rbSmallSummary.setRating(average);
-                    } else {
-                        // ... code logic khi không có đánh giá
                     }
                 });
     }
 
     private void addReviewToLayout(Review review) {
+        if (llTopReviewsContainer == null) return;
         View reviewView = LayoutInflater.from(this).inflate(R.layout.item_review, llTopReviewsContainer, false);
         
         ShapeableImageView ivAvatar = reviewView.findViewById(R.id.ivReviewUserAvatar);
@@ -233,21 +388,18 @@ public class DetailActivity extends AppCompatActivity {
         TextView tvComment = reviewView.findViewById(R.id.tvReviewComment);
         ChipGroup cgTags = reviewView.findViewById(R.id.cgReviewTags);
 
-        // LOGIC MỚI: Truy vấn thông tin user mới nhất thay vì dùng dữ liệu cũ trong review
         if (review.getUserEmail() != null) {
             db.collection("users").whereEqualTo("email", review.getUserEmail()).get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
                         User user = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
                         if (user != null) {
-                            // Hiển thị tên mới nhất
                             String displayName = user.getFullName();
                             if (review.isAnonymous() && displayName != null && displayName.length() > 2) {
                                 displayName = displayName.charAt(0) + "***" + displayName.charAt(displayName.length() - 1);
                             }
-                            tvName.setText(displayName != null ? displayName : "Người dùng Zendo");
+                            if (tvName != null) tvName.setText(displayName != null ? displayName : "Người dùng Zendo");
 
-                            // Hiển thị avatar mới nhất
                             String avatarData = user.getAvatar();
                             if (avatarData != null && !avatarData.isEmpty()) {
                                 if (avatarData.startsWith("http")) {
@@ -256,13 +408,13 @@ public class DetailActivity extends AppCompatActivity {
                                     try {
                                         byte[] decodedString = Base64.decode(avatarData, Base64.DEFAULT);
                                         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                                        ivAvatar.setImageBitmap(decodedByte);
+                                        if (ivAvatar != null) ivAvatar.setImageBitmap(decodedByte);
                                     } catch (Exception e) {
-                                        ivAvatar.setImageResource(R.drawable.ic_person);
+                                        if (ivAvatar != null) ivAvatar.setImageResource(R.drawable.ic_person);
                                     }
                                 }
                             } else {
-                                ivAvatar.setImageResource(R.drawable.ic_person);
+                                if (ivAvatar != null) ivAvatar.setImageResource(R.drawable.ic_person);
                             }
                         }
                     }
@@ -286,7 +438,7 @@ public class DetailActivity extends AppCompatActivity {
                     Chip chip = new Chip(this);
                     chip.setText(tag);
                     chip.setChipMinHeight(20f);
-                    chip.setTextSize(10f);
+                    chip.setTextSize(10);
                     cgTags.addView(chip);
                 }
             }
@@ -296,21 +448,45 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void displayData() {
-        tvName.setText(product.getName());
-        tvPrice.setText(formatter.format(product.getPrice()) + "đ");
+        if (tvName != null) tvName.setText(product.getName());
+        
+        if (tvPrice != null) tvPrice.setText(formatPrice(product.getPrice()));
+        if (tvPriceBottom != null) tvPriceBottom.setText(formatPrice(product.getPrice()));
         
         if (product.getOldPrice() > 0 && product.getOldPrice() > product.getPrice()) {
-            tvOldPrice.setVisibility(View.VISIBLE);
-            tvOldPrice.setText(formatter.format(product.getOldPrice()) + "đ");
-            tvOldPrice.setPaintFlags(tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            if (tvOldPrice != null) {
+                tvOldPrice.setText(formatter.format(product.getOldPrice()) + "đ");
+                tvOldPrice.setPaintFlags(tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                tvOldPrice.setVisibility(View.VISIBLE);
+            }
+            
+            int discount = (int) ((1 - (product.getPrice() / (float)product.getOldPrice())) * 100);
+            if (discount > 0) {
+                if (tvDiscountTag != null) {
+                    tvDiscountTag.setText("-" + discount + "%");
+                    tvDiscountTag.setVisibility(View.VISIBLE);
+                }
+            } else {
+                if (tvDiscountTag != null) tvDiscountTag.setVisibility(View.GONE);
+            }
         } else {
-            tvOldPrice.setVisibility(View.GONE);
+            if (tvOldPrice != null) tvOldPrice.setVisibility(View.GONE);
+            if (tvDiscountTag != null) tvDiscountTag.setVisibility(View.GONE);
         }
 
-        parseDescription(product.getDescription(), tvDesc);
-        tvSold.setText("Đã bán " + (product.getSoldCount() > 0 ? product.getSoldCount() : "0"));
-        tvStock.setText("Kho: " + product.getStock());
+        if (tvDesc != null) parseDescription(product.getDescription(), tvDesc);
+        if (tvSold != null) tvSold.setText("Đã bán " + (product.getSoldCount() > 0 ? product.getSoldCount() : "0"));
         
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat dayMonthFormat = new SimpleDateFormat("dd 'Th'MM", new Locale("vi", "VN"));
+        cal.add(Calendar.DAY_OF_YEAR, 3);
+        String dateStart = dayMonthFormat.format(cal.getTime());
+        cal.add(Calendar.DAY_OF_YEAR, 2);
+        String dateEnd = dayMonthFormat.format(cal.getTime());
+        if (tvShippingTime != null) {
+            tvShippingTime.setText("Nhận từ " + dateStart + " - " + dateEnd);
+        }
+
         List<String> imageList = new ArrayList<>();
         if (product.getImages() != null && !product.getImages().isEmpty()) {
             imageList.addAll(product.getImages());
@@ -318,39 +494,88 @@ public class DetailActivity extends AppCompatActivity {
             imageList.add(product.getImageUrl());
         }
 
-        ImageSliderAdapter adapter = new ImageSliderAdapter(imageList);
-        vpImages.setAdapter(adapter);
-        
-        if (tvImageIndicator != null) tvImageIndicator.setText("1/" + imageList.size());
-        vpImages.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                if (tvImageIndicator != null) tvImageIndicator.setText((position + 1) + "/" + imageList.size());
+        if (vpImages != null) {
+            ImageSliderAdapter adapter = new ImageSliderAdapter(imageList);
+            vpImages.setAdapter(adapter);
+            
+            if (tvImageIndicator != null) tvImageIndicator.setText("1/" + imageList.size());
+            vpImages.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+                @Override
+                public void onPageSelected(int position) {
+                    super.onPageSelected(position);
+                    if (tvImageIndicator != null) tvImageIndicator.setText((position + 1) + "/" + imageList.size());
+                }
+            });
+        }
+
+        if (llImagePreviews != null) {
+            llImagePreviews.removeAllViews();
+            float density = getResources().getDisplayMetrics().density;
+            int sizePx = (int) (60 * density);
+            int marginPx = (int) (8 * density);
+
+            for (int i = 0; i < imageList.size(); i++) {
+                ImageView iv = new ImageView(this);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(sizePx, sizePx);
+                lp.setMargins(0, 0, marginPx, 0);
+                iv.setLayoutParams(lp);
+                iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                iv.setBackgroundResource(R.drawable.bg_border_gray_light);
+                iv.setPadding(2, 2, 2, 2);
+                
+                String imgData = imageList.get(i);
+                if (imgData != null) {
+                    if (imgData.startsWith("http")) {
+                        Glide.with(this).load(imgData).into(iv);
+                    } else {
+                        try {
+                            byte[] decodedString = Base64.decode(imgData, Base64.DEFAULT);
+                            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                            if (iv != null) iv.setImageBitmap(decodedByte);
+                        } catch (Exception e) {
+                            if (iv != null) iv.setImageResource(R.drawable.logo_zendo);
+                        }
+                    }
+                }
+                
+                int finalI = i;
+                iv.setOnClickListener(v -> vpImages.setCurrentItem(finalI, true));
+                llImagePreviews.addView(iv);
             }
-        });
+        }
+    }
+
+    private SpannableString formatPrice(double price) {
+        String raw = formatter.format(price);
+        String full = raw + "đ";
+        SpannableString ss = new SpannableString(full);
+        ss.setSpan(new RelativeSizeSpan(0.6f), raw.length(), full.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(new UnderlineSpan(), raw.length(), full.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return ss;
     }
 
     private void toggleCollapse(LinearLayout content, ImageView arrow) {
-        if (content.getVisibility() == View.VISIBLE) {
-            content.setVisibility(View.GONE);
-            arrow.setImageResource(android.R.drawable.arrow_down_float);
-        } else {
-            content.setVisibility(View.VISIBLE);
-            arrow.setImageResource(android.R.drawable.arrow_up_float);
+        if (content != null) {
+            if (content.getVisibility() == View.VISIBLE) {
+                content.setVisibility(View.GONE);
+                if (arrow != null) arrow.setImageResource(android.R.drawable.arrow_down_float);
+            } else {
+                content.setVisibility(View.VISIBLE);
+                if (arrow != null) arrow.setImageResource(android.R.drawable.arrow_up_float);
+            }
         }
     }
 
     private void parseDescription(String desc, TextView tvGeneralDesc) {
         if (desc == null || desc.isEmpty()) return;
         
-        tvSpecChip.setText("Đang cập nhật");
-        tvSpecScreen.setText("Đang cập nhật");
-        tvSpecRam.setText("Đang cập nhật");
-        tvSpecRom.setText("Đang cập nhật");
-        tvSpecPin.setText("Đang cập nhật");
-        tvSpecCamera.setText("Đang cập nhật");
-        tvSpecOs.setText("Đang cập nhật");
+        if (tvSpecChip != null) tvSpecChip.setText("Đang cập nhật");
+        if (tvSpecScreen != null) tvSpecScreen.setText("Đang cập nhật");
+        if (tvSpecRam != null) tvSpecRam.setText("Đang cập nhật");
+        if (tvSpecRom != null) tvSpecRom.setText("Đang cập nhật");
+        if (tvSpecPin != null) tvSpecPin.setText("Đang cập nhật");
+        if (tvSpecCamera != null) tvSpecCamera.setText("Đang cập nhật");
+        if (tvSpecOs != null) tvSpecOs.setText("Đang cập nhật");
 
         String[] lines = desc.split("\\r?\\n");
         StringBuilder generalDesc = new StringBuilder();
@@ -360,24 +585,24 @@ public class DetailActivity extends AppCompatActivity {
             String lowerLine = trimmedLine.toLowerCase();
 
             if (lowerLine.startsWith("chip:")) {
-                tvSpecChip.setText(trimmedLine.substring(5).trim());
+                if (tvSpecChip != null) tvSpecChip.setText(trimmedLine.substring(5).trim());
             } else if (lowerLine.startsWith("màn hình:")) {
-                tvSpecScreen.setText(trimmedLine.substring(9).trim());
+                if (tvSpecScreen != null) tvSpecScreen.setText(trimmedLine.substring(9).trim());
             } else if (lowerLine.startsWith("ram:")) {
-                tvSpecRam.setText(trimmedLine.substring(4).trim());
+                if (tvSpecRam != null) tvSpecRam.setText(trimmedLine.substring(4).trim());
             } else if (lowerLine.startsWith("bộ nhớ trong:")) {
-                tvSpecRom.setText(trimmedLine.substring(13).trim());
+                if (tvSpecRom != null) tvSpecRom.setText(trimmedLine.substring(13).trim());
             } else if (lowerLine.startsWith("pin:")) {
-                tvSpecPin.setText(trimmedLine.substring(4).trim());
+                if (tvSpecPin != null) tvSpecPin.setText(trimmedLine.substring(4).trim());
             } else if (lowerLine.startsWith("camera:")) {
-                tvSpecCamera.setText(trimmedLine.substring(7).trim());
+                if (tvSpecCamera != null) tvSpecCamera.setText(trimmedLine.substring(7).trim());
             } else if (lowerLine.startsWith("hệ điều hành:")) {
-                tvSpecOs.setText(trimmedLine.substring(13).trim());
+                if (tvSpecOs != null) tvSpecOs.setText(trimmedLine.substring(13).trim());
             } else if (!trimmedLine.isEmpty()) {
                 generalDesc.append(trimmedLine).append("\n");
             }
         }
-        tvGeneralDesc.setText(generalDesc.length() > 0 ? generalDesc.toString().trim() : "Không có mô tả.");
+        if (tvGeneralDesc != null) tvGeneralDesc.setText(generalDesc.length() > 0 ? generalDesc.toString().trim() : "Không có mô tả.");
     }
 
     private void handleBuyNow() {

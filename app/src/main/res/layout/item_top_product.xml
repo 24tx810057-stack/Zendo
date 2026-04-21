@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#F0F0F0"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <!-- Thứ hạng với nền tròn mờ -->
+        <TextView
+            android:id="@+id/tvRank"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_circle_light_blue"
+            android:gravity="center"
+            android:text="1"
+            android:textColor="#01579B"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivProductTop"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="12dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_launcher_background"
+            app:shapeAppearanceOverlay="@style/CircleImage"
+            app:strokeColor="#F5F5F5"
+            app:strokeWidth="1dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvProductNameTop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Tên sản phẩm"
+                android:textColor="#212121"
+                android:textStyle="bold"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvSoldTop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="7 đơn | 12 cái"
+                android:textColor="#757575"
+                android:textSize="11sp" />
+
+            <!-- ProgressBar thể hiện % doanh thu -->
+            <ProgressBar
+                android:id="@+id/pbRevenueShare"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_marginTop="8dp"
+                android:progress="50"
+                android:progressDrawable="@drawable/custom_progress_blue" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:gravity="end"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvRevenueTop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0đ"
+                android:textColor="#01579B"
+                android:textStyle="bold"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvPercentTop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="25%"
+                android:textColor="#9E9E9E"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

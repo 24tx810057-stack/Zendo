@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,7 +33,7 @@ public class ListActivity extends AppCompatActivity {
     private List<Product> fullProductList = new ArrayList<>();
     private ProductAdapter adapter;
     private GridView gridViewProducts;
-    private ImageView btnAddProduct;
+    private ImageView btnAddProduct, ivCartIcon;
     private View btnCart, btnNotification;
     private TextView tvCartBadge, tvNotifBadge;
     private EditText etSearch;
@@ -46,6 +47,7 @@ public class ListActivity extends AppCompatActivity {
     private TextView tvBestSelling, tvNewArrival, tvSortPriceLabel;
     private ImageView ivSortPriceIcon;
     private LinearLayout llSortPrice;
+    private HorizontalScrollView hsvBrandFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,25 +78,35 @@ public class ListActivity extends AppCompatActivity {
         });
 
         btnAddProduct.setOnClickListener(v -> startActivity(new Intent(this, AddProductActivity.class)));
-        btnCart.setOnClickListener(v -> startActivity(new Intent(this, CartActivity.class)));
-        btnNotification.setOnClickListener(v -> {
+        
+        btnCart.setOnClickListener(v -> {
             if ("admin".equals(userRole)) {
                 startActivity(new Intent(this, OrderListActivity.class));
             } else {
-                startActivity(new Intent(this, NotificationActivity.class));
+                startActivity(new Intent(this, CartActivity.class));
             }
+        });
+
+        btnNotification.setOnClickListener(v -> {
+            startActivity(new Intent(this, NotificationActivity.class));
         });
 
         bottomNav.setSelectedItemId(R.id.nav_home);
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                if (gridViewProducts != null) {
+                    gridViewProducts.smoothScrollToPosition(0);
+                }
+                return true;
+            }
             if (id == R.id.nav_me) {
                 startActivity(new Intent(this, ProfileActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
             }
-            return id == R.id.nav_home;
+            return false;
         });
     }
 
@@ -102,55 +114,69 @@ public class ListActivity extends AppCompatActivity {
         gridViewProducts = findViewById(R.id.gridViewProducts);
         btnAddProduct = findViewById(R.id.btnAddProduct);
         btnCart = findViewById(R.id.btnCartContainer);
+        ivCartIcon = findViewById(R.id.btnCart);
         btnNotification = findViewById(R.id.btnNotificationContainer);
         tvCartBadge = findViewById(R.id.tvCartBadgeList);
         tvNotifBadge = findViewById(R.id.tvNotifBadgeList);
         etSearch = findViewById(R.id.etSearch);
         bottomNav = findViewById(R.id.bottomNav);
+        hsvBrandFilter = findViewById(R.id.hsvBrandFilter);
 
-        btnAddProduct.setVisibility(userRole.equals("admin") ? View.VISIBLE : View.GONE);
-        btnCart.setVisibility(userRole.equals("admin") ? View.GONE : View.VISIBLE);
+        if ("admin".equals(userRole)) {
+            btnAddProduct.setVisibility(View.VISIBLE);
+            btnCart.setVisibility(View.VISIBLE);
+            if (ivCartIcon != null) {
+                ivCartIcon.setImageResource(R.drawable.ic_receipt_admin);
+            }
+        } else {
+            btnAddProduct.setVisibility(View.GONE);
+            btnCart.setVisibility(View.VISIBLE);
+            if (ivCartIcon != null) {
+                ivCartIcon.setImageResource(R.drawable.ic_cart_logo);
+            }
+        }
     }
 
     private void observeBadges() {
         if (userEmail.isEmpty()) return;
 
         if (cartListener != null) cartListener.remove();
-        if (!"admin".equals(userRole)) {
+        if ("admin".equals(userRole)) {
+            cartListener = firestore.collection("orders")
+                    .whereEqualTo("status", "Chờ xác nhận")
+                    .addSnapshotListener((value, error) -> {
+                        if (error != null) return;
+                        updateBadge(tvCartBadge, value != null ? value.size() : 0);
+                    });
+        } else {
             cartListener = firestore.collection("cart")
                     .whereEqualTo("userEmail", userEmail)
                     .addSnapshotListener((value, error) -> {
                         if (error != null) return;
-                        if (value == null) return;
                         int count = 0;
-                        for (QueryDocumentSnapshot doc : value) {
-                            Long qty = doc.getLong("quantity");
-                            if (qty != null) count += qty.intValue();
+                        if (value != null) {
+                            for (QueryDocumentSnapshot doc : value) {
+                                Long qty = doc.getLong("quantity");
+                                if (qty != null) count += qty.intValue();
+                            }
                         }
                         updateBadge(tvCartBadge, count);
                     });
         }
 
         if (notificationListener != null) notificationListener.remove();
+        String targetEmail = "admin".equals(userRole) ? "admin" : userEmail;
         
-        if ("admin".equals(userRole)) {
-            notificationListener = firestore.collection("orders")
-                    .whereEqualTo("status", "Chờ xác nhận")
-                    .addSnapshotListener((value, error) -> {
-                        if (error != null) return;
-                        if (value == null) return;
-                        updateBadge(tvNotifBadge, value.size());
-                    });
-        } else {
-            notificationListener = firestore.collection("notifications")
-                    .whereEqualTo("userEmail", userEmail)
-                    .whereEqualTo("read", false)
-                    .addSnapshotListener((value, error) -> {
-                        if (error != null) return;
-                        if (value == null) return;
-                        updateBadge(tvNotifBadge, value.size());
-                    });
-        }
+        notificationListener = firestore.collection("notifications")
+                .whereEqualTo("userEmail", targetEmail)
+                .whereEqualTo("read", false)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e("ListActivity", "Notif Error: " + error.getMessage());
+                        return;
+                    }
+                    updateBadge(tvNotifBadge, value != null ? value.size() : 0);
+                });
     }
 
     private void updateBadge(TextView badge, int count) {
@@ -207,6 +233,19 @@ public class ListActivity extends AppCompatActivity {
                 updateBrandFilterUI(tv);
                 currentBrand = tv.getText().toString();
                 listenToProductChanges();
+                scrollToSelectedBrand(tv);
+            });
+        }
+    }
+
+    private void scrollToSelectedBrand(View view) {
+        if (hsvBrandFilter != null && view != null) {
+            hsvBrandFilter.post(() -> {
+                int screenWidth = hsvBrandFilter.getWidth();
+                int viewWidth = view.getWidth();
+                int viewLeft = view.getLeft();
+                int scrollX = viewLeft - (screenWidth / 2) + (viewWidth / 2);
+                hsvBrandFilter.smoothScrollTo(scrollX, 0);
             });
         }
     }
@@ -299,6 +338,9 @@ public class ListActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         observeBadges();
+        if (bottomNav != null) {
+            bottomNav.setSelectedItemId(R.id.nav_home);
+        }
     }
 
     @Override

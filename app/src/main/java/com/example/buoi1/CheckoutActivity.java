@@ -169,7 +169,7 @@ public class CheckoutActivity extends AppCompatActivity {
                             if (isNotExpired && isMinOrderMet) {
                                 availableVouchers.add(voucher);
                                 
-                                String valueStr = "percent".equals(voucher.getType()) ? 
+                                String valueStr = "PERCENT".equalsIgnoreCase(voucher.getType()) ? 
                                         (int)voucher.getValue() + "%" : formatter.format(voucher.getValue()) + "đ";
                                 String vTitle = (voucher.getTitle() != null && !voucher.getTitle().isEmpty()) ? voucher.getTitle() : "Ưu đãi hấp dẫn";
                                 String info = voucher.getCode() + " - " + vTitle + " (Giảm " + valueStr + ")";
@@ -201,8 +201,11 @@ public class CheckoutActivity extends AppCompatActivity {
     private void applyVoucherObject(Voucher voucher) {
         selectedVoucherCode = voucher.getCode();
         double amount = 0;
-        if ("percent".equals(voucher.getType())) {
+        if ("PERCENT".equalsIgnoreCase(voucher.getType())) {
             amount = subtotal * (voucher.getValue() / 100.0);
+            if (voucher.getMaxDiscount() > 0 && amount > voucher.getMaxDiscount()) {
+                amount = voucher.getMaxDiscount();
+            }
         } else {
             amount = voucher.getValue();
         }

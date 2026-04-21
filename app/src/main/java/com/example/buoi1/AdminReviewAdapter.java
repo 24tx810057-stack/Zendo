@@ -8,8 +8,7 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.FrameLayout;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -17,7 +16,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -90,26 +92,36 @@ public class AdminReviewAdapter extends RecyclerView.Adapter<AdminReviewAdapter.
     }
 
     private void showReplyDialog(Review review) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Phản hồi đánh giá");
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_reply_review, null);
+        AlertDialog dialog = new AlertDialog.Builder(context, R.style.CustomDialogTheme).setView(dialogView).create();
 
-        final EditText input = new EditText(context);
-        input.setHint("Nhập nội dung phản hồi...");
+        TextView tvOriginal = dialogView.findViewById(R.id.tvOriginalReview);
+        TextInputEditText etReply = dialogView.findViewById(R.id.etReplyContent);
+        Button btnCancel = dialogView.findViewById(R.id.btnCancel);
+        Button btnSend = dialogView.findViewById(R.id.btnSend);
+        ChipGroup cgQuickReplies = dialogView.findViewById(R.id.cgQuickReplies);
+
+        tvOriginal.setText(review.getComment());
         if (review.getSellerReply() != null) {
-            input.setText(review.getSellerReply());
+            etReply.setText(review.getSellerReply());
         }
-        
-        // Dùng FrameLayout để thêm padding cho EditText trong Dialog (tránh dính lề)
-        FrameLayout container = new FrameLayout(context);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.leftMargin = 50;
-        params.rightMargin = 50;
-        input.setLayoutParams(params);
-        container.addView(input);
-        builder.setView(container);
 
-        builder.setPositiveButton("Gửi", (dialog, which) -> {
-            String reply = input.getText().toString().trim();
+        // Xử lý khi bấm vào các mẫu trả lời nhanh
+        for (int i = 0; i < cgQuickReplies.getChildCount(); i++) {
+            View child = cgQuickReplies.getChildAt(i);
+            if (child instanceof Chip) {
+                Chip chip = (Chip) child;
+                chip.setOnClickListener(v -> {
+                    etReply.setText(chip.getText());
+                    etReply.setSelection(etReply.getText().length());
+                });
+            }
+        }
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnSend.setOnClickListener(v -> {
+            String reply = etReply.getText().toString().trim();
             if (reply.isEmpty()) {
                 Toast.makeText(context, "Vui lòng nhập nội dung", Toast.LENGTH_SHORT).show();
                 return;
@@ -122,20 +134,21 @@ public class AdminReviewAdapter extends RecyclerView.Adapter<AdminReviewAdapter.
             db.collection("reviews").document(review.getId())
                     .update(updates)
                     .addOnSuccessListener(aVoid -> {
-                        if (context != null) {
-                            Toast.makeText(context, "Đã gửi phản hồi", Toast.LENGTH_SHORT).show();
-                        }
+                        Toast.makeText(context, "Đã gửi phản hồi", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
                     })
                     .addOnFailureListener(e -> {
-                        if (context != null) {
-                            Toast.makeText(context, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
+                        Toast.makeText(context, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         });
 
-        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
-
-        builder.show();
+        dialog.show();
+        
+        // Ép Dialog rộng ra 90% màn hình
+        if (dialog.getWindow() != null) {
+            int width = (int) (context.getResources().getDisplayMetrics().widthPixels * 0.90);
+            dialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
     }
 
     @Override

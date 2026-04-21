@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,7 +75,7 @@ public class ProductAdapter extends BaseAdapter {
 
         tvProductName.setText(product.getName());
         
-        // Hiển thị giá và giảm giá
+        // Hiển thị giá và giảm giá dựa trên sự chênh lệch Giá Gốc và Giá Hiện Tại của Sản phẩm
         tvProductPrice.setText(formatter.format(product.getPrice()) + "đ");
         
         if (product.getOldPrice() > 0 && product.getOldPrice() > product.getPrice()) {
@@ -85,22 +84,17 @@ public class ProductAdapter extends BaseAdapter {
             tvProductOldPrice.setPaintFlags(tvProductOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             
             tvProductDiscount.setVisibility(View.VISIBLE);
-            int discount = product.getDiscountPercent();
-            if (discount <= 0) {
-                discount = (int) ((product.getOldPrice() - product.getPrice()) / product.getOldPrice() * 100);
-            }
+            int discount = (int) ((1 - (product.getPrice() / (float)product.getOldPrice())) * 100);
             tvProductDiscount.setText("-" + discount + "%");
         } else {
             tvProductOldPrice.setVisibility(View.INVISIBLE);
             tvProductDiscount.setVisibility(View.INVISIBLE);
         }
         
-        // Mặc định ẩn rating đi, sẽ hiện khi load xong data thực tế
         ivProductStar.setVisibility(View.GONE);
         tvRating.setVisibility(View.GONE);
         vRatingDivider.setVisibility(View.GONE);
 
-        // TÍNH TOÁN RATING THỰC TẾ TỪ FIREBASE
         if (product.getId() != null) {
             db.collection("reviews")
                     .whereEqualTo("productId", product.getId())
@@ -115,7 +109,6 @@ public class ProductAdapter extends BaseAdapter {
                             }
                             double average = totalRating / count;
                             
-                            // Hiển thị rating thực tế
                             ivProductStar.setVisibility(View.VISIBLE);
                             tvRating.setVisibility(View.VISIBLE);
                             vRatingDivider.setVisibility(View.VISIBLE);
@@ -126,7 +119,6 @@ public class ProductAdapter extends BaseAdapter {
 
         tvSold.setText("Đã bán " + (product.getSoldCount() >= 0 ? product.getSoldCount() : "0"));
 
-        // Xử lý icon Like
         boolean isLiked = product.isLiked(userEmail);
         btnLike.setImageResource(isLiked ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline);
         btnLike.setColorFilter(ContextCompat.getColor(context, isLiked ? android.R.color.holo_red_light : android.R.color.darker_gray));

@@ -1,15 +1,17 @@
 package com.example.buoi1;
 
+import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,13 +32,13 @@ import java.util.Random;
 
 public class AddProductActivity extends AppCompatActivity {
 
-    private TextView tvAutoId, tvTitle;
+    private TextView tvAutoId, tvTitle, btnSave, btnAddMoreSpec;
     private EditText etName, etPrice, etOldPrice, etStock, etDesc;
-    private EditText etSpecChip, etSpecScreen, etSpecRam, etSpecRom, etSpecPin, etSpecCamera, etSpecOs;
+    private EditText etSpecChip, etSpecScreen, etSpecRam, etSpecRom, etSpecPin, etSpecOs, etSpecCameraRear, etSpecCameraFront;
+    private LinearLayout layoutDynamicSpecs;
     private RecyclerView rvImages;
-    private View layoutPlaceholder;
+    private View layoutPlaceholder, btnCancel;
     private Spinner spCategory, spBrand;
-    private Button btnSave, btnCancel;
     private FirebaseFirestore db;
     
     private List<String> base64Images = new ArrayList<>();
@@ -44,20 +46,20 @@ public class AddProductActivity extends AppCompatActivity {
     private boolean isEditMode = false;
     private Product existingProduct; 
 
-    private String[] categories = {"Điện thoại"};
-    private String[] brands = {"iPhone", "Samsung", "Oppo", "Xiaomi"};
+    private String[] categories = {"Điện thoại", "Laptop", "Phụ kiện", "Máy tính bảng"};
+    private String[] brands = {"iPhone", "Samsung", "Oppo", "Xiaomi", "Realme", "Vivo"};
     private String selectedPrefix = "SP";
 
     private final ActivityResultLauncher<String> pickImagesLauncher = registerForActivityResult(
             new ActivityResultContracts.GetMultipleContents(),
             uris -> {
-                if (uriListValid(uris)) {
+                if (uris != null && !uris.isEmpty()) {
                     for (Uri uri : uris) {
+                        if (base64Images.size() >= 15) break;
                         String base64 = convertUriToBase64(uri);
                         if (base64 != null) base64Images.add(base64);
                     }
                     adapter.notifyDataSetChanged();
-                    checkPlaceholder();
                 }
             }
     );
@@ -69,8 +71,12 @@ public class AddProductActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
+        // Bind views
         tvTitle = findViewById(R.id.textViewTitle);
+        btnSave = findViewById(R.id.btnSaveProduct);
+        btnCancel = findViewById(R.id.btnCancelAddProduct);
         tvAutoId = findViewById(R.id.tvAutoProductId);
+        
         etName = findViewById(R.id.etAddProductName);
         spCategory = findViewById(R.id.spAddProductCategory);
         spBrand = findViewById(R.id.spAddProductBrand); 
@@ -84,22 +90,25 @@ public class AddProductActivity extends AppCompatActivity {
         etSpecRam = findViewById(R.id.etSpecRam);
         etSpecRom = findViewById(R.id.etSpecRom);
         etSpecPin = findViewById(R.id.etSpecPin);
-        etSpecCamera = findViewById(R.id.etSpecCamera);
         etSpecOs = findViewById(R.id.etSpecOs);
+        etSpecCameraRear = findViewById(R.id.etSpecCameraRear);
+        etSpecCameraFront = findViewById(R.id.etSpecCameraFront);
+        
+        layoutDynamicSpecs = findViewById(R.id.layoutDynamicSpecs);
+        btnAddMoreSpec = findViewById(R.id.btnAddMoreSpec);
 
         rvImages = findViewById(R.id.rvAddProductImages);
         layoutPlaceholder = findViewById(R.id.layoutPlaceholder);
-        btnSave = findViewById(R.id.btnSaveProduct);
-        btnCancel = findViewById(R.id.btnCancelAddProduct);
 
+        // Setup RecyclerView for Images
         adapter = new ImagePreviewAdapter(base64Images, position -> {
             base64Images.remove(position);
             adapter.notifyDataSetChanged();
-            checkPlaceholder();
         });
         rvImages.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rvImages.setAdapter(adapter);
 
+        // Spinners
         ArrayAdapter<String> catAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
         catAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spCategory.setAdapter(catAdapter);
@@ -108,9 +117,26 @@ public class AddProductActivity extends AppCompatActivity {
         brandAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spBrand.setAdapter(brandAdapter);
 
-        layoutPlaceholder.setOnClickListener(v -> pickImagesLauncher.launch("image/*"));
-        rvImages.setOnClickListener(v -> pickImagesLauncher.launch("image/*"));
+        // Listeners
+        layoutPlaceholder.setOnClickListener(v -> {
+            if (base64Images.size() < 15) pickImagesLauncher.launch("image/*");
+            else Toast.makeText(this, "Tối đa 15 ảnh", Toast.LENGTH_SHORT).show();
+        });
 
+        btnAddMoreSpec.setOnClickListener(v -> showAddSpecDialog());
+
+        btnCancel.setOnClickListener(v -> finish());
+        btnSave.setOnClickListener(v -> {
+            if (base64Images.isEmpty()) {
+                Toast.makeText(this, "Vui lòng chọn ít nhất một ảnh", Toast.LENGTH_SHORT).show();
+            } else if (TextUtils.isEmpty(etName.getText()) || TextUtils.isEmpty(etPrice.getText())) {
+                Toast.makeText(this, "Vui lòng nhập Tên và Giá", Toast.LENGTH_SHORT).show();
+            } else {
+                saveProduct();
+            }
+        });
+
+        // Edit mode check
         existingProduct = (Product) getIntent().getSerializableExtra("edit_product");
         if (existingProduct != null) {
             isEditMode = true;
@@ -118,29 +144,38 @@ public class AddProductActivity extends AppCompatActivity {
         } else {
             generateRandomId();
         }
-
-        btnCancel.setOnClickListener(v -> finish());
-        btnSave.setOnClickListener(v -> {
-            if (base64Images.isEmpty()) {
-                Toast.makeText(this, "Vui lòng chọn ít nhất một ảnh", Toast.LENGTH_SHORT).show();
-            } else {
-                saveProduct();
-            }
-        });
     }
 
-    private boolean uriListValid(List<Uri> uris) {
-        return uris != null && !uris.isEmpty();
+    private void showAddSpecDialog() {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_spec, null);
+        EditText etSpecName = dialogView.findViewById(R.id.etDialogSpecName);
+        EditText etSpecValue = dialogView.findViewById(R.id.etDialogSpecValue);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Thêm thông số kỹ thuật")
+                .setView(dialogView)
+                .setPositiveButton("Thêm", (dialog, which) -> {
+                    String name = etSpecName.getText().toString().trim();
+                    String value = etSpecValue.getText().toString().trim();
+                    if (!name.isEmpty() && !value.isEmpty()) {
+                        addDynamicSpecView(name, value);
+                    }
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 
-    private void checkPlaceholder() {
-        if (base64Images.isEmpty()) {
-            rvImages.setVisibility(View.GONE);
-            layoutPlaceholder.setVisibility(View.VISIBLE);
-        } else {
-            rvImages.setVisibility(View.VISIBLE);
-            layoutPlaceholder.setVisibility(View.VISIBLE);
-        }
+    private void addDynamicSpecView(String name, String value) {
+        View specView = LayoutInflater.from(this).inflate(R.layout.item_dynamic_spec, null);
+        EditText etName = specView.findViewById(R.id.etDynamicSpecName);
+        EditText etValue = specView.findViewById(R.id.etDynamicSpecValue);
+        View btnRemove = specView.findViewById(R.id.btnRemoveSpec);
+
+        etName.setText(name);
+        etValue.setText(value);
+        btnRemove.setOnClickListener(v -> layoutDynamicSpecs.removeView(specView));
+
+        layoutDynamicSpecs.addView(specView);
     }
 
     private String convertUriToBase64(Uri uri) {
@@ -148,7 +183,7 @@ public class AddProductActivity extends AppCompatActivity {
             InputStream stream = getContentResolver().openInputStream(uri);
             Bitmap bitmap = BitmapFactory.decodeStream(stream);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 40, baos); 
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 60, baos); 
             byte[] data = baos.toByteArray();
             return Base64.encodeToString(data, Base64.DEFAULT);
         } catch (Exception e) {
@@ -157,16 +192,12 @@ public class AddProductActivity extends AppCompatActivity {
     }
 
     private void fillData(Product product) {
-        tvTitle.setText("CẬP NHẬT SẢN PHẨM");
-        btnSave.setText("CẬP NHẬT");
+        tvTitle.setText("Cập nhật sản phẩm");
+        btnSave.setText("Lưu");
         tvAutoId.setText(product.getId());
         etName.setText(product.getName());
         etPrice.setText(String.valueOf((long)product.getPrice()));
-        if (product.getOldPrice() > 0) {
-            etOldPrice.setText(String.valueOf((long)product.getOldPrice()));
-        } else {
-            etOldPrice.setText("");
-        }
+        if (product.getOldPrice() > 0) etOldPrice.setText(String.valueOf((long)product.getOldPrice()));
         etStock.setText(String.valueOf(product.getStock()));
         
         String desc = product.getDescription();
@@ -174,49 +205,36 @@ public class AddProductActivity extends AppCompatActivity {
             String[] lines = desc.split("\n");
             StringBuilder additionalDesc = new StringBuilder();
             for (String line : lines) {
-                String lower = line.toLowerCase();
-                if (lower.startsWith("chip:")) etSpecChip.setText(line.substring(5).trim());
-                else if (lower.startsWith("màn hình:")) etSpecScreen.setText(line.substring(9).trim());
-                else if (lower.startsWith("ram:")) etSpecRam.setText(line.substring(4).trim());
-                else if (lower.startsWith("bộ nhớ trong:")) etSpecRom.setText(line.substring(13).trim());
-                else if (lower.startsWith("pin:")) etSpecPin.setText(line.substring(4).trim());
-                else if (lower.startsWith("camera:")) etSpecCamera.setText(line.substring(7).trim());
-                else if (lower.startsWith("hệ điều hành:")) etSpecOs.setText(line.substring(13).trim());
-                else additionalDesc.append(line).append("\n");
+                if (line.contains(": ")) {
+                    String[] parts = line.split(": ", 2);
+                    String key = parts[0].trim();
+                    String val = parts[1].trim();
+                    
+                    if (key.equalsIgnoreCase("Chip")) etSpecChip.setText(val);
+                    else if (key.equalsIgnoreCase("Màn hình")) etSpecScreen.setText(val);
+                    else if (key.equalsIgnoreCase("RAM")) etSpecRam.setText(val);
+                    else if (key.equalsIgnoreCase("Bộ nhớ trong")) etSpecRom.setText(val);
+                    else if (key.equalsIgnoreCase("Pin")) etSpecPin.setText(val);
+                    else if (key.equalsIgnoreCase("Hệ điều hành")) etSpecOs.setText(val);
+                    else if (key.equalsIgnoreCase("Camera sau")) etSpecCameraRear.setText(val);
+                    else if (key.equalsIgnoreCase("Camera trước")) etSpecCameraFront.setText(val);
+                    else addDynamicSpecView(key, val);
+                } else {
+                    additionalDesc.append(line).append("\n");
+                }
             }
             etDesc.setText(additionalDesc.toString().trim());
         }
         
-        if (product.getImages() != null && !product.getImages().isEmpty()) {
+        if (product.getImages() != null) {
             base64Images.clear();
             base64Images.addAll(product.getImages());
             adapter.notifyDataSetChanged();
-            checkPlaceholder();
-        } else if (product.getImageUrl() != null) {
-            base64Images.clear();
-            base64Images.add(product.getImageUrl());
-            adapter.notifyDataSetChanged();
-            checkPlaceholder();
-        }
-
-        for (int i = 0; i < brands.length; i++) {
-            if (brands[i].equals(product.getBrand())) {
-                spBrand.setSelection(i);
-                break;
-            }
-        }
-        
-        for (int i = 0; i < categories.length; i++) {
-            if (categories[i].equals(product.getCategory())) {
-                spCategory.setSelection(i);
-                break;
-            }
         }
     }
 
     private void generateRandomId() {
-        int randomNumber = new Random().nextInt(9000) + 1000;
-        tvAutoId.setText(selectedPrefix + randomNumber);
+        tvAutoId.setText(selectedPrefix + (new Random().nextInt(9000) + 1000));
     }
 
     private void saveProduct() {
@@ -224,60 +242,37 @@ public class AddProductActivity extends AppCompatActivity {
         String name = etName.getText().toString().trim();
         String category = spCategory.getSelectedItem().toString();
         String brand = spBrand.getSelectedItem().toString();
-        String priceStr = etPrice.getText().toString().trim();
-        String oldPriceStr = etOldPrice.getText().toString().trim();
-        String stockStr = etStock.getText().toString().trim();
+        double price = Double.parseDouble(etPrice.getText().toString());
+        double oldPrice = etOldPrice.getText().toString().isEmpty() ? 0 : Double.parseDouble(etOldPrice.getText().toString());
+        int stock = etStock.getText().toString().isEmpty() ? 0 : Integer.parseInt(etStock.getText().toString());
         
         StringBuilder fullDesc = new StringBuilder();
+        // Add default specs
         if (!etSpecChip.getText().toString().isEmpty()) fullDesc.append("Chip: ").append(etSpecChip.getText().toString()).append("\n");
         if (!etSpecScreen.getText().toString().isEmpty()) fullDesc.append("Màn hình: ").append(etSpecScreen.getText().toString()).append("\n");
         if (!etSpecRam.getText().toString().isEmpty()) fullDesc.append("RAM: ").append(etSpecRam.getText().toString()).append("\n");
         if (!etSpecRom.getText().toString().isEmpty()) fullDesc.append("Bộ nhớ trong: ").append(etSpecRom.getText().toString()).append("\n");
         if (!etSpecPin.getText().toString().isEmpty()) fullDesc.append("Pin: ").append(etSpecPin.getText().toString()).append("\n");
-        if (!etSpecCamera.getText().toString().isEmpty()) fullDesc.append("Camera: ").append(etSpecCamera.getText().toString()).append("\n");
         if (!etSpecOs.getText().toString().isEmpty()) fullDesc.append("Hệ điều hành: ").append(etSpecOs.getText().toString()).append("\n");
+        if (!etSpecCameraRear.getText().toString().isEmpty()) fullDesc.append("Camera sau: ").append(etSpecCameraRear.getText().toString()).append("\n");
+        if (!etSpecCameraFront.getText().toString().isEmpty()) fullDesc.append("Camera trước: ").append(etSpecCameraFront.getText().toString()).append("\n");
+        
+        // Add dynamic specs
+        for (int i = 0; i < layoutDynamicSpecs.getChildCount(); i++) {
+            View v = layoutDynamicSpecs.getChildAt(i);
+            EditText dName = v.findViewById(R.id.etDynamicSpecName);
+            EditText dValue = v.findViewById(R.id.etDynamicSpecValue);
+            fullDesc.append(dName.getText().toString()).append(": ").append(dValue.getText().toString()).append("\n");
+        }
         
         fullDesc.append(etDesc.getText().toString().trim());
 
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(priceStr)) {
-            Toast.makeText(this, "Vui lòng nhập Tên và Giá", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        double price = Double.parseDouble(priceStr);
-        double oldPrice = oldPriceStr.isEmpty() ? 0 : Double.parseDouble(oldPriceStr);
-        int stock = stockStr.isEmpty() ? 0 : Integer.parseInt(stockStr);
-        
-        int discount = 0;
-        if (oldPrice > price) {
-            discount = (int) Math.round(((oldPrice - price) / oldPrice) * 100);
-        } else if (oldPrice > 0 && oldPrice <= price) {
-            // Trường hợp nhập sai, giá cũ lại thấp hơn giá mới, ta coi như không có giá cũ
-            oldPrice = 0;
-            discount = 0;
-        }
-        
-        long currentTime = System.currentTimeMillis();
-        String mainImage = base64Images.get(0);
-
-        int currentSoldCount = 0;
-        double currentRating = 4.8; 
-        if (isEditMode && existingProduct != null) {
-            currentSoldCount = existingProduct.getSoldCount();
-            currentRating = existingProduct.getRating();
-            currentTime = existingProduct.getCreatedAt();
-        }
-
-        Product product = new Product(id, name, fullDesc.toString().trim(), price, mainImage, category, stock, "N/A", brand, currentRating, currentSoldCount, currentTime);
+        Product product = new Product(id, name, fullDesc.toString().trim(), price, base64Images.get(0), category, stock, "N/A", brand, 4.8, 0, System.currentTimeMillis());
         product.setOldPrice(oldPrice);
-        product.setDiscountPercent(discount);
         product.setImages(base64Images);
 
         db.collection("products").document(id).set(product)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Thành công!", Toast.LENGTH_SHORT).show();
-                    finish();
-                })
+                .addOnSuccessListener(aVoid -> finish())
                 .addOnFailureListener(e -> Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 }

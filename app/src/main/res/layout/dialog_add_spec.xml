@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/etDialogSpecName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tên thông số (VD: Pin, Màu sắc...)"
+        android:textSize="14sp"
+        android:inputType="textCapWords" />
+
+    <EditText
+        android:id="@+id/etDialogSpecValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Giá trị (VD: 5000mAh, Xanh...)"
+        android:textSize="14sp" />
+
+</LinearLayout>

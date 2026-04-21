@@ -1,5 +1,6 @@
 package com.example.buoi1;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,7 +19,6 @@ import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
@@ -64,7 +64,6 @@ public class OrderDetailActivity extends AppCompatActivity {
         initViews();
         displayOrderDetails();
 
-        // Kiểm tra nếu được yêu cầu mở form đánh giá ngay lập tức
         boolean triggerReview = getIntent().getBooleanExtra("trigger_review", false);
         if (triggerReview && order != null && "Đã giao".equals(order.getStatus())) {
             if (order.getItems() != null && !order.getItems().isEmpty()) {
@@ -141,7 +140,6 @@ public class OrderDetailActivity extends AppCompatActivity {
                 }
             }
 
-            // Click vào sản phẩm để xem chi tiết
             view.setOnClickListener(v -> {
                 db.collection("products").document(item.getProductId()).get()
                         .addOnSuccessListener(documentSnapshot -> {
@@ -162,9 +160,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         String status = order.getStatus();
         if (status == null) status = "";
         
-        // LOGIC CHO ADMIN
         if ("admin".equals(userRole)) {
-            // Nếu đã giao thì ẩn nút xóa đơn
             if (status.equals("Đã giao")) {
                 btnContact.setVisibility(View.GONE);
             } else {
@@ -182,7 +178,7 @@ public class OrderDetailActivity extends AppCompatActivity {
                     btnMainAction.setText("Đồng ý hủy đơn");
                     btnMainAction.setOnClickListener(v -> updateStatusByAdmin("Đã hủy"));
                     
-                    btnContact.setVisibility(View.VISIBLE); // Phải hiện lại nếu là Yêu cầu hủy
+                    btnContact.setVisibility(View.VISIBLE);
                     btnContact.setText("Từ chối hủy");
                     btnContact.setBackgroundTintList(getColorStateList(android.R.color.holo_orange_dark));
                     btnContact.setOnClickListener(v -> updateStatusByAdmin("Chờ xác nhận"));
@@ -202,13 +198,11 @@ public class OrderDetailActivity extends AppCompatActivity {
             return;
         }
 
-        // LOGIC CHO NGƯỜI DÙNG
         if (btnMainAction != null) {
             btnMainAction.setVisibility(View.VISIBLE);
             btnMainAction.setEnabled(true);
             btnMainAction.setAlpha(1.0f);
             
-            // Mặc định cho nút Liên hệ của User
             if (btnContact != null) {
                 btnContact.setVisibility(View.VISIBLE);
                 btnContact.setText("LIÊN HỆ");
@@ -224,7 +218,6 @@ public class OrderDetailActivity extends AppCompatActivity {
                 btnMainAction.setEnabled(false);
                 btnMainAction.setAlpha(0.5f);
                 
-                // Cho phép người dùng hủy yêu cầu hủy
                 if (btnContact != null) {
                     btnContact.setText("Rút lại yêu cầu hủy");
                     btnContact.setBackgroundTintList(getColorStateList(android.R.color.holo_blue_dark));
@@ -303,11 +296,11 @@ public class OrderDetailActivity extends AppCompatActivity {
         orderManager.updateOrderStatus(order.getId(), newStatus, new OrderManager.OnActionCompleteListener() {
             @Override
             public void onSuccess() {
-                // Tạo thông báo cho người dùng
                 createStatusNotification(newStatus);
+                if ("admin".equals(userRole)) {
+                    createAdminNotification(newStatus);
+                }
                 Toast.makeText(OrderDetailActivity.this, "Cập nhật trạng thái thành công!", Toast.LENGTH_SHORT).show();
-                
-                // Cập nhật lại dữ liệu local để UI thay đổi kịp thời
                 order.setStatus(newStatus);
                 displayOrderDetails();
             }
@@ -318,17 +311,29 @@ public class OrderDetailActivity extends AppCompatActivity {
         });
     }
 
+    private void createAdminNotification(String status) {
+        String title = "Xác nhận đơn hàng";
+        String message = "Bạn vừa cập nhật đơn hàng của " + order.getUserName() + " sang trạng thái: " + status;
+        
+        String dateStr = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date());
+        Map<String, Object> notification = new HashMap<>();
+        notification.put("userEmail", "admin");
+        notification.put("title", title);
+        notification.put("message", message);
+        notification.put("date", dateStr);
+        notification.put("read", false);
+        notification.put("timestamp", FieldValue.serverTimestamp());
+
+        db.collection("notifications").add(notification);
+    }
+
     private void createStatusNotification(String status) {
         String title = "Cập nhật đơn hàng";
         String message = "";
         
         switch (status) {
-            case "Chờ lấy hàng":
-                message = "Đơn hàng của bạn đã được Shop xác nhận và đang chờ lấy hàng.";
-                break;
-            case "Đang giao":
-                message = "Đơn hàng đang được giao đến bạn. Vui lòng chú ý điện thoại.";
-                break;
+            case "Chờ lấy hàng": message = "Đơn hàng của bạn đã được Shop xác nhận và đang chờ lấy hàng."; break;
+            case "Đang giao": message = "Đơn hàng đang được giao đến bạn. Vui lòng chú ý điện thoại."; break;
             case "Đã giao":
                 title = "Giao hàng thành công";
                 message = "Đơn hàng đã được giao thành công. Hãy để lại đánh giá cho sản phẩm nhé!";
@@ -341,9 +346,7 @@ public class OrderDetailActivity extends AppCompatActivity {
                 title = "Yêu cầu hủy đơn";
                 message = "Bạn đã gửi yêu cầu hủy đơn hàng. Vui lòng chờ Shop phê duyệt.";
                 break;
-            case "Chờ xác nhận":
-                message = "Đơn hàng của bạn đang được tiếp tục xử lý.";
-                break;
+            case "Chờ xác nhận": message = "Đơn hàng của bạn đang được tiếp tục xử lý."; break;
         }
 
         if (message.isEmpty()) return;
@@ -354,7 +357,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         notification.put("title", title);
         notification.put("message", message);
         notification.put("date", dateStr);
-        // Quan trọng: Field timestamp để sắp xếp
+        notification.put("read", false);
         notification.put("timestamp", FieldValue.serverTimestamp());
 
         db.collection("notifications").add(notification);
@@ -370,6 +373,8 @@ public class OrderDetailActivity extends AppCompatActivity {
         ChipGroup chipGroup = dialogView.findViewById(R.id.chipGroupTags);
         EditText etComment = dialogView.findViewById(R.id.etReviewComment);
         CheckBox cbAnonymous = dialogView.findViewById(R.id.cbAnonymous);
+        Button btnSubmit = dialogView.findViewById(R.id.btnSubmitReview);
+        Button btnCancel = dialogView.findViewById(R.id.btnCancelReview);
 
         if (tvProductName != null) tvProductName.setText(item.getProductName());
         String imgData = item.getProductImageUrl();
@@ -384,37 +389,46 @@ public class OrderDetailActivity extends AppCompatActivity {
             }
         }
 
-        new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Light_NoActionBar_Fullscreen)
+        AlertDialog dialog = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Light_NoActionBar_Fullscreen)
                 .setView(dialogView)
-                .setPositiveButton("GỬI ĐÁNH GIÁ", (d, w) -> {
-                    Review review = new Review();
-                    review.setProductId(item.getProductId());
-                    review.setOrderId(order.getId());
-                    review.setUserEmail(order.getUserEmail());
-                    review.setUserName(order.getUserName());
-                    if (rbQuality != null) review.setQualityRating(rbQuality.getRating());
-                    if (rbSeller != null) review.setSellerRating(rbSeller.getRating());
-                    if (rbShipping != null) review.setShippingRating(rbShipping.getRating());
-                    if (etComment != null) review.setComment(etComment.getText().toString());
-                    if (cbAnonymous != null) review.setAnonymous(cbAnonymous.isChecked());
-                    review.setTimestamp(System.currentTimeMillis());
-                    
-                    List<String> selectedTags = new ArrayList<>();
-                    if (chipGroup != null) {
-                        for (int i = 0; i < chipGroup.getChildCount(); i++) {
-                            Chip chip = (Chip) chipGroup.getChildAt(i);
-                            if (chip.isChecked()) selectedTags.add(chip.getText().toString());
-                        }
-                    }
-                    review.setTags(selectedTags);
+                .create();
 
-                    db.collection("reviews").add(review)
-                        .addOnSuccessListener(documentReference -> {
-                            Toast.makeText(OrderDetailActivity.this, "Cảm ơn bạn đã đánh giá!", Toast.LENGTH_SHORT).show();
-                            displayOrderDetails();
-                        });
-                })
-                .setNegativeButton("HỦY", null)
-                .show();
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnSubmit.setOnClickListener(v -> {
+            // RÀNG BUỘC LOGIC: Bắt buộc phải chọn sao cho ít nhất 1 mục
+            if (rbQuality.getRating() == 0 && rbSeller.getRating() == 0 && rbShipping.getRating() == 0) {
+                Toast.makeText(this, "Vui lòng chọn số sao đánh giá", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Review review = new Review();
+            review.setProductId(item.getProductId());
+            review.setOrderId(order.getId());
+            review.setUserEmail(order.getUserEmail());
+            review.setUserName(order.getUserName());
+            review.setQualityRating(rbQuality.getRating());
+            review.setSellerRating(rbSeller.getRating());
+            review.setShippingRating(rbShipping.getRating());
+            review.setComment(etComment.getText().toString());
+            review.setAnonymous(cbAnonymous.isChecked());
+            review.setTimestamp(System.currentTimeMillis());
+            
+            List<String> selectedTags = new ArrayList<>();
+            for (int i = 0; i < chipGroup.getChildCount(); i++) {
+                Chip chip = (Chip) chipGroup.getChildAt(i);
+                if (chip.isChecked()) selectedTags.add(chip.getText().toString());
+            }
+            review.setTags(selectedTags);
+
+            db.collection("reviews").add(review)
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(OrderDetailActivity.this, "Cảm ơn bạn đã đánh giá!", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    displayOrderDetails();
+                });
+        });
+
+        dialog.show();
     }
 }

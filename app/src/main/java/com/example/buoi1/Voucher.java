@@ -6,9 +6,10 @@ public class Voucher implements Serializable {
     private String id;
     private String code;
     private String title;
-    private String type; // "percent" or "amount"
+    private String type; // "PERCENT" or "CASH"
     private double value;
     private double minOrder;
+    private double maxDiscount;
     private long expiryDate;
     private boolean active;
 
@@ -26,6 +27,8 @@ public class Voucher implements Serializable {
     public void setValue(double value) { this.value = value; }
     public double getMinOrder() { return minOrder; }
     public void setMinOrder(double minOrder) { this.minOrder = minOrder; }
+    public double getMaxDiscount() { return maxDiscount; }
+    public void setMaxDiscount(double maxDiscount) { this.maxDiscount = maxDiscount; }
     public long getExpiryDate() { return expiryDate; }
     public void setExpiryDate(long expiryDate) { this.expiryDate = expiryDate; }
     public boolean isActive() { return active; }

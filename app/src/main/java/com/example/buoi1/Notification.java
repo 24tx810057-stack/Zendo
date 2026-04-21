@@ -8,12 +8,14 @@ public class Notification {
     private String id;
     private String title;
     private String message;
-    private String date; // String format dd/MM/yyyy HH:mm để hiển thị
+    private String date; 
     private String userEmail;
-    private boolean read = false; // Trạng thái đã đọc hay chưa
+    private boolean read = false;
+    private String type; // Loại thông báo: order_status, promo, ...
+    private String orderId; // ID đơn hàng liên quan
     
     @ServerTimestamp
-    private Date timestamp; // Dùng để sắp xếp chính xác
+    private Date timestamp; 
 
     public Notification() {}
 
@@ -43,6 +45,12 @@ public class Notification {
 
     public boolean isRead() { return read; }
     public void setRead(boolean read) { this.read = read; }
+
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+
+    public String getOrderId() { return orderId; }
+    public void setOrderId(String orderId) { this.orderId = orderId; }
 
     public Date getTimestamp() { return timestamp; }
     public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
