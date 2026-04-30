@@ -3,6 +3,8 @@ package com.example.buoi1;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,19 +48,31 @@ public class VoucherAdapter extends RecyclerView.Adapter<VoucherAdapter.VoucherV
         holder.tvTitle.setText(voucher.getTitle());
         holder.tvCode.setText("Mã: " + voucher.getCode());
         
-        String valueStr = "percent".equals(voucher.getType()) ? 
+        // FIX LỖI 6đ: Dùng equalsIgnoreCase để không phân biệt PERCENT hay percent
+        String valueStr = (voucher.getType() != null && voucher.getType().equalsIgnoreCase("PERCENT")) ? 
                 (int)voucher.getValue() + "%" : formatter.format(voucher.getValue()) + "đ";
-        holder.tvValue.setText("Giảm: " + valueStr);
+        
+        holder.tvValue.setText(valueStr);
         holder.tvMinOrder.setText("Đơn tối thiểu: " + formatter.format(voucher.getMinOrder()) + "đ");
         
-        if (voucher.getExpiryDate() > 0) {
-            holder.tvExpiry.setText("Hết hạn: " + sdf.format(new Date(voucher.getExpiryDate())));
-        } else {
-            holder.tvExpiry.setText("Không hết hạn");
-        }
+        long now = System.currentTimeMillis();
+        boolean isExpired = voucher.getExpiryDate() > 0 && voucher.getExpiryDate() < now;
+        String expiryText = voucher.getExpiryDate() > 0 ? "Hết hạn: " + sdf.format(new Date(voucher.getExpiryDate())) : "Không hết hạn";
 
-        // UI hiệu ứng bật/tắt
-        updateItemAlpha(holder.itemView, voucher.isActive());
+        // Logic UI cho Voucher hết hạn
+        if (isExpired) {
+            if (holder.layoutLeft != null) holder.layoutLeft.setBackgroundColor(Color.parseColor("#BDBDBD")); // Màu xám
+            holder.itemView.setAlpha(0.6f);
+            holder.tvExpiry.setTextColor(Color.RED);
+            holder.tvExpiry.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9f);
+            holder.tvExpiry.setText(expiryText + " (HẾT HẠN)");
+        } else {
+            if (holder.layoutLeft != null) holder.layoutLeft.setBackgroundColor(Color.parseColor("#2196F3")); // Màu xanh main
+            holder.itemView.setAlpha(voucher.isActive() ? 1.0f : 0.6f);
+            holder.tvExpiry.setTextColor(Color.parseColor("#9E9E9E"));
+            holder.tvExpiry.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f); // Size mặc định
+            holder.tvExpiry.setText(expiryText);
+        }
 
         holder.swActive.setOnCheckedChangeListener(null);
         holder.swActive.setChecked(voucher.isActive());
@@ -67,7 +81,7 @@ public class VoucherAdapter extends RecyclerView.Adapter<VoucherAdapter.VoucherV
                     .update("active", isChecked)
                     .addOnSuccessListener(aVoid -> {
                         voucher.setActive(isChecked);
-                        updateItemAlpha(holder.itemView, isChecked);
+                        if (!isExpired) updateItemAlpha(holder.itemView, isChecked);
                     })
                     .addOnFailureListener(e -> {
                         holder.swActive.setChecked(!isChecked);
@@ -87,7 +101,6 @@ public class VoucherAdapter extends RecyclerView.Adapter<VoucherAdapter.VoucherV
                     .show();
         });
 
-        // Bấm vào item để sửa (Truyền object Voucher sang AddVoucherActivity)
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, AddVoucherActivity.class);
             intent.putExtra("VOUCHER_DATA", voucher);
@@ -108,6 +121,7 @@ public class VoucherAdapter extends RecyclerView.Adapter<VoucherAdapter.VoucherV
         TextView tvTitle, tvCode, tvValue, tvMinOrder, tvExpiry;
         Switch swActive;
         ImageView btnDelete;
+        View layoutLeft;
 
         public VoucherViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -118,6 +132,7 @@ public class VoucherAdapter extends RecyclerView.Adapter<VoucherAdapter.VoucherV
             tvExpiry = itemView.findViewById(R.id.tvVoucherExpiryItem);
             swActive = itemView.findViewById(R.id.swVoucherActive);
             btnDelete = itemView.findViewById(R.id.btnDeleteVoucher);
+            layoutLeft = itemView.findViewById(R.id.layoutLeftVoucher);
         }
     }
 }

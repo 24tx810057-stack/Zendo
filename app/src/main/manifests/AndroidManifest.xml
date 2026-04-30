@@ -13,16 +13,14 @@
         android:theme="@style/Theme.Buoi1">
 
         <activity
-            android:name=".SplashActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Zendo.Splash">
+            android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity" />
         <activity android:name=".ListActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".DetailActivity" />
@@ -36,7 +34,16 @@
         <activity android:name=".OrderListActivity" />
         <activity android:name=".OrderDetailActivity" />
         <activity android:name=".ReviewListActivity" />
+        <activity android:name=".AdminReviewsActivity" />
+        <activity android:name=".VoucherManagementActivity" />
+        <activity android:name=".AddVoucherActivity" />
         <activity android:name=".SettingsActivity" />
+        <activity android:name=".ChatActivity" />
+        <activity android:name=".ForgotPasswordActivity" />
+        <activity android:name=".RevenueActivity" />
+        <activity android:name=".AddressListActivity" />
+        <activity android:name=".AddAddressActivity" />
+        <activity android:name=".AddReviewActivity" />
 
     </application>
 

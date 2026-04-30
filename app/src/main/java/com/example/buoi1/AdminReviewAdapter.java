@@ -106,7 +106,6 @@ public class AdminReviewAdapter extends RecyclerView.Adapter<AdminReviewAdapter.
             etReply.setText(review.getSellerReply());
         }
 
-        // Xử lý khi bấm vào các mẫu trả lời nhanh
         for (int i = 0; i < cgQuickReplies.getChildCount(); i++) {
             View child = cgQuickReplies.getChildAt(i);
             if (child instanceof Chip) {
@@ -136,6 +135,8 @@ public class AdminReviewAdapter extends RecyclerView.Adapter<AdminReviewAdapter.
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(context, "Đã gửi phản hồi", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
+                        review.setSellerReply(reply);
+                        notifyDataSetChanged();
                     })
                     .addOnFailureListener(e -> {
                         Toast.makeText(context, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -144,7 +145,6 @@ public class AdminReviewAdapter extends RecyclerView.Adapter<AdminReviewAdapter.
 
         dialog.show();
         
-        // Ép Dialog rộng ra 90% màn hình
         if (dialog.getWindow() != null) {
             int width = (int) (context.getResources().getDisplayMetrics().widthPixels * 0.90);
             dialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);

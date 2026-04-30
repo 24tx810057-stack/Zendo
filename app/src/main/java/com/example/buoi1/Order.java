@@ -1,6 +1,5 @@
 package com.example.buoi1;
 
-import com.google.firebase.firestore.ServerTimestamp;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -9,17 +8,17 @@ public class Order implements Serializable {
     private String id;
     private String userEmail;
     private List<CartItem> items;
-    private double totalAmount;
-    private double shippingFee;
+    private double totalAmount; // Tổng cuối cùng khách phải trả
+    private double subtotal;    // Tổng tiền hàng (chưa trừ voucher, chưa cộng ship)
+    private double shippingFee; // Phí vận chuyển
+    private double voucherDiscount; // Số tiền được giảm từ voucher
     private String paymentMethod;
     private String status; // Chờ xác nhận, Đang giao, Đã giao, Đã hủy
-    
-    // Sử dụng Date để Firestore tự chuyển đổi từ Timestamp
     private Date timestamp;
-    
     private String address;
     private String phone;
     private String userName;
+    private String note;
 
     public Order() {}
 
@@ -35,8 +34,14 @@ public class Order implements Serializable {
     public double getTotalAmount() { return totalAmount; }
     public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
 
+    public double getSubtotal() { return subtotal; }
+    public void setSubtotal(double subtotal) { this.subtotal = subtotal; }
+
     public double getShippingFee() { return shippingFee; }
     public void setShippingFee(double shippingFee) { this.shippingFee = shippingFee; }
+
+    public double getVoucherDiscount() { return voucherDiscount; }
+    public void setVoucherDiscount(double voucherDiscount) { this.voucherDiscount = voucherDiscount; }
 
     public String getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
@@ -55,4 +60,7 @@ public class Order implements Serializable {
 
     public String getUserName() { return userName; }
     public void setUserName(String userName) { this.userName = userName; }
+
+    public String getNote() { return note; }
+    public void setNote(String note) { this.note = note; }
 }

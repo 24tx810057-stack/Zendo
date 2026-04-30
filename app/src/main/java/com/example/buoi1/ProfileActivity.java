@@ -112,7 +112,6 @@ public class ProfileActivity extends AppCompatActivity {
     private void setupUIByRole() {
         boolean isAdmin = "admin".equals(userRole);
         
-        // LUÔN hiển thị mục yêu thích cho cả 2 role
         if (sectionFavorite != null) {
             sectionFavorite.setVisibility(View.VISIBLE);
         }
@@ -155,17 +154,16 @@ public class ProfileActivity extends AppCompatActivity {
             btnChangePassword.setOnClickListener(v -> showChangePasswordDialog());
         }
 
-        // Click để mở trang yêu thích
         if (sectionFavorite != null) {
             sectionFavorite.setOnClickListener(v -> startActivity(new Intent(this, FavoriteActivity.class)));
         }
 
         if (btnAdminOrders != null) btnAdminOrders.setOnClickListener(v -> startActivity(new Intent(this, OrderListActivity.class)));
+
         if (btnAdminProducts != null) btnAdminProducts.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ListActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+            startActivity(new Intent(this, AddProductActivity.class));
         });
+
         if (btnAdminVouchers != null) btnAdminVouchers.setOnClickListener(v -> startActivity(new Intent(this, VoucherManagementActivity.class)));
         if (btnAdminReviews != null) btnAdminReviews.setOnClickListener(v -> startActivity(new Intent(this, AdminReviewsActivity.class)));
 
@@ -346,7 +344,6 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void updateRevenueStats() {
-        // Lấy thời điểm bắt đầu của tháng hiện tại
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_MONTH, 1);
         cal.set(Calendar.HOUR_OF_DAY, 0);

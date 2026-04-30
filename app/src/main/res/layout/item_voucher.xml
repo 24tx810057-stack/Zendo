@@ -18,6 +18,7 @@
 
         <!-- Left side: Icon & Value -->
         <LinearLayout
+            android:id="@+id/layoutLeftVoucher"
             android:layout_width="114dp"
             android:layout_height="match_parent"
             android:background="@color/blue_main"
@@ -49,12 +50,6 @@
                 android:textSize="10sp"
                 android:textStyle="bold" />
         </LinearLayout>
-
-        <!-- Divider line (dashed look) -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:background="#EEEEEE" />
 
         <!-- Right side: Details -->
         <RelativeLayout
@@ -138,7 +133,6 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Actions -->
             <Switch
                 android:id="@+id/swVoucherActive"
                 android:layout_width="wrap_content"

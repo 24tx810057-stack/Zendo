@@ -108,7 +108,9 @@ public class ReviewListActivity extends AppCompatActivity {
             TextView tvReplyContent = view.findViewById(R.id.tvReviewReplyContent);
             TextView btnReply = view.findViewById(R.id.btnReplyReviewList);
 
-            ivAvatar.setImageResource(R.drawable.ic_launcher_background);
+            // Reset UI state for recycled view
+            ivAvatar.setImageResource(R.drawable.ic_person);
+            ivAvatar.setTag(null);
             tvName.setText(review.getUserName() != null ? review.getUserName() : "Người dùng Zendo");
 
             if (review.isAnonymous()) {
@@ -117,18 +119,23 @@ public class ReviewListActivity extends AppCompatActivity {
                     anonName = anonName.charAt(0) + "***" + anonName.charAt(anonName.length() - 1);
                 } else anonName = "Người dùng ẩn danh";
                 tvName.setText(anonName);
+                ivAvatar.setImageResource(R.drawable.ic_person);
             } else {
                 String email = review.getUserEmail();
                 if (email != null && !email.isEmpty()) {
                     if (userCache.containsKey(email)) {
                         updateUserUI(userCache.get(email), ivAvatar, tvName);
                     } else {
+                        ivAvatar.setTag(email);
                         db.collection("users").whereEqualTo("email", email).get()
                                 .addOnSuccessListener(snapshots -> {
                                     if (!snapshots.isEmpty()) {
                                         User user = snapshots.getDocuments().get(0).toObject(User.class);
                                         userCache.put(email, user);
-                                        updateUserUI(user, ivAvatar, tvName);
+                                        // Ensure we're updating the correct view after async fetch
+                                        if (email.equals(ivAvatar.getTag())) {
+                                            updateUserUI(user, ivAvatar, tvName);
+                                        }
                                     }
                                 });
                     }
@@ -138,7 +145,14 @@ public class ReviewListActivity extends AppCompatActivity {
             rbStars.setRating(review.getQualityRating());
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             tvDate.setText(sdf.format(new Date(review.getTimestamp())));
-            tvComment.setText(review.getComment());
+            
+            // Fix đánh giá trống: Nếu không có comment thì ẩn TextView đi
+            if (review.getComment() != null && !review.getComment().trim().isEmpty()) {
+                tvComment.setText(review.getComment());
+                tvComment.setVisibility(View.VISIBLE);
+            } else {
+                tvComment.setVisibility(View.GONE);
+            }
 
             if (review.getSellerReply() != null && !review.getSellerReply().isEmpty()) {
                 layoutReply.setVisibility(View.VISIBLE);
@@ -155,8 +169,10 @@ public class ReviewListActivity extends AppCompatActivity {
                 btnReply.setVisibility(View.GONE);
             }
 
+            // Fix tags trống
             cgTags.removeAllViews();
-            if (review.getTags() != null) {
+            if (review.getTags() != null && !review.getTags().isEmpty()) {
+                cgTags.setVisibility(View.VISIBLE);
                 for (String tag : review.getTags()) {
                     Chip chip = new Chip(ReviewListActivity.this);
                     chip.setText(tag);
@@ -164,6 +180,8 @@ public class ReviewListActivity extends AppCompatActivity {
                     chip.setTextSize(10f);
                     cgTags.addView(chip);
                 }
+            } else {
+                cgTags.setVisibility(View.GONE);
             }
 
             return view;
@@ -174,14 +192,19 @@ public class ReviewListActivity extends AppCompatActivity {
             if (user.getFullName() != null) tvName.setText(user.getFullName());
             String avatarData = user.getAvatar();
             if (avatarData != null && !avatarData.isEmpty()) {
-                if (avatarData.startsWith("http")) Glide.with(ReviewListActivity.this).load(avatarData).into(ivAvatar);
-                else {
+                if (avatarData.startsWith("http")) {
+                    Glide.with(ReviewListActivity.this).load(avatarData).placeholder(R.drawable.ic_person).into(ivAvatar);
+                } else {
                     try {
                         byte[] decodedString = Base64.decode(avatarData, Base64.DEFAULT);
                         Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                         ivAvatar.setImageBitmap(bitmap);
-                    } catch (Exception e) {}
+                    } catch (Exception e) {
+                        ivAvatar.setImageResource(R.drawable.ic_person);
+                    }
                 }
+            } else {
+                ivAvatar.setImageResource(R.drawable.ic_person);
             }
         }
 

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.tabs.TabLayout;
@@ -20,6 +21,7 @@ public class OrderListActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ListView lvOrders;
+    private TextView tvTitle;
     private List<Order> allOrders = new ArrayList<>();
     private List<Order> filteredOrders = new ArrayList<>();
     private OrderAdapter adapter;
@@ -38,11 +40,19 @@ public class OrderListActivity extends AppCompatActivity {
 
         initViews();
         setupTabs();
+        
+        // Đổi tiêu đề dựa trên Role
+        if ("admin".equals(userRole)) {
+            tvTitle.setText("Quản lý đơn hàng");
+        } else {
+            tvTitle.setText("Đơn mua của tôi");
+        }
     }
 
     private void initViews() {
         tabLayout = findViewById(R.id.tabLayoutOrders);
         lvOrders = findViewById(R.id.lvOrderList);
+        tvTitle = findViewById(R.id.tvOrderListTitle);
         findViewById(R.id.btnBackOrderList).setOnClickListener(v -> finish());
 
         adapter = new OrderAdapter(this, filteredOrders);
@@ -94,11 +104,11 @@ public class OrderListActivity extends AppCompatActivity {
         }
 
         Query query = db.collection("orders");
+        // USER thì lọc theo Email, ADMIN thì lấy tuốt tuồn tuột
         if (!"admin".equals(userRole)) {
             query = query.whereEqualTo("userEmail", userEmail);
         }
         
-        // Lưu ý: Nếu App crash hoặc báo lỗi ở đây, hãy kiểm tra Logcat để tạo Index Firestore
         query.orderBy("timestamp", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -118,8 +128,7 @@ public class OrderListActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     Log.e("OrderList", "Firebase error: " + e.getMessage());
-                    // Nếu lỗi do thiếu Index, Logcat sẽ hiện link dẫn đến console Firebase
-                    Toast.makeText(this, "Lỗi tải đơn hàng. Kiểm tra Logcat!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Lỗi tải đơn hàng: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }
 

@@ -17,7 +17,7 @@
             android:id="@+id/ivReviewUserAvatar"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@drawable/ic_launcher_background"
+            android:src="@drawable/ic_person"
             android:scaleType="centerCrop"
             android:padding="1dp"
             android:background="#EEEEEE"
@@ -26,8 +26,8 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
             android:layout_weight="1"
+            android:layout_marginStart="12dp"
             android:orientation="vertical">
 
             <TextView
@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:numStars="5"
-                android:progressTint="#EE4D2D"
+                android:progressTint="#FFC107"
                 android:rating="5" />
         </LinearLayout>
 
@@ -65,31 +65,32 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:lineSpacingExtra="3dp"
-        android:text="Sản phẩm rất tốt, giao hàng nhanh chóng. Sẽ ủng hộ shop lần sau!"
+        android:text="Sản phẩm rất tốt..."
         android:textColor="#424242"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:visibility="visible" />
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/cgReviewTags"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:visibility="gone" />
 
-    <!-- Phần hiển thị phản hồi của Shop cho User thấy -->
     <LinearLayout
         android:id="@+id/layoutReviewReply"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:background="#F9F9F9"
+        android:background="#F0F7FF"
         android:orientation="vertical"
-        android:padding="10dp"
+        android:padding="12dp"
         android:visibility="gone">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Phản hồi của Shop:"
-            android:textColor="#EE4D2D"
+            android:textColor="#1976D2"
             android:textSize="12sp"
             android:textStyle="bold" />
         <TextView
@@ -98,7 +99,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Nội dung shop trả lời..."
-            android:textColor="#616161"
+            android:textColor="#455A64"
             android:textSize="13sp" />
     </LinearLayout>
 
@@ -111,7 +112,7 @@
         android:background="?attr/selectableItemBackground"
         android:padding="8dp"
         android:text="TRẢ LỜI"
-        android:textColor="#EE4D2D"
+        android:textColor="#2196F3"
         android:textSize="12sp"
         android:textStyle="bold"
         android:visibility="gone" />

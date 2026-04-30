@@ -117,6 +117,18 @@
                             android:text="Địa chỉ của bạn"
                             android:textColor="#757575"
                             android:textSize="13sp" />
+
+                        <!-- Nút Thêm địa chỉ mới nếu chưa có -->
+                        <Button
+                            android:id="@+id/btnAddFirstAddress"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/tvLabelAdd"
+                            android:layout_marginTop="12dp"
+                            android:text="THÊM ĐỊA CHỈ GIAO HÀNG"
+                            android:visibility="gone"
+                            android:backgroundTint="@color/blue_main"
+                            android:textColor="#FFFFFF" />
                     </RelativeLayout>
 
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="16dp" android:background="#F0F0F0" />
@@ -186,7 +198,6 @@
                             app:layout_constraintBottom_toBottomOf="parent"/>
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <!-- Đổi RadioGroup thành LinearLayout để quản lý thủ công -->
                     <LinearLayout
                         android:id="@+id/layoutShippingGroup"
                         android:layout_width="match_parent"
@@ -198,9 +209,11 @@
                             android:id="@+id/layoutItemFast"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="?attr/selectableItemBackground"
+                            android:background="@drawable/bg_shipping_selector"
                             android:clickable="true"
-                            android:focusable="true">
+                            android:focusable="true"
+                            android:padding="12dp"
+                            android:layout_marginBottom="8dp">
                             <RadioButton
                                 android:id="@+id/rbFast"
                                 android:layout_width="wrap_content"
@@ -209,15 +222,16 @@
                                 android:text="Hỏa tốc"
                                 android:textSize="14sp"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"/>
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="@id/rbFast"
-                                app:layout_constraintBottom_toBottomOf="@id/rbFast">
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent">
                                 <TextView
                                     android:id="@+id/tvFastOldPrice"
                                     android:layout_width="wrap_content"
@@ -242,9 +256,10 @@
                             android:id="@+id/layoutItemStandard"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="?attr/selectableItemBackground"
+                            android:background="@drawable/bg_shipping_selector"
                             android:clickable="true"
-                            android:focusable="true">
+                            android:focusable="true"
+                            android:padding="12dp">
                             <RadioButton
                                 android:id="@+id/rbStandard"
                                 android:layout_width="wrap_content"
@@ -253,15 +268,16 @@
                                 android:text="Tiêu chuẩn"
                                 android:textSize="14sp"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"/>
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="@id/rbStandard"
-                                app:layout_constraintBottom_toBottomOf="@id/rbStandard">
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent">
                                 <TextView
                                     android:id="@+id/tvStandardOldPrice"
                                     android:layout_width="wrap_content"
@@ -361,7 +377,39 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Khối 3: Chi tiết thanh toán -->
+            <!-- Khối 3: Ghi chú đơn hàng -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Ghi chú đơn hàng"
+                        android:textColor="#212121"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                    <EditText
+                        android:id="@+id/etOrderNote"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/rounded_edittext"
+                        android:hint="Lưu ý cho người bán (ví dụ: Giao giờ hành chính...)"
+                        android:padding="12dp"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Khối 4: Chi tiết thanh toán -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -428,28 +476,42 @@
         android:layout_alignParentBottom="true"
         android:background="#FFFFFF"
         android:elevation="12dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bằng cách đặt hàng, bạn đồng ý với Điều khoản của Zendo"
+            android:textColor="#9E9E9E"
+            android:textSize="10sp"
+            android:layout_marginBottom="8dp"/>
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tổng thanh toán" android:textColor="#757575" android:textSize="12sp" />
-            <TextView android:id="@+id/tvSummaryTotalSticky" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0đ" android:textColor="@color/blue_main" android:textSize="18sp" android:textStyle="bold" />
-        </LinearLayout>
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tổng thanh toán" android:textColor="#757575" android:textSize="12sp" />
+                <TextView android:id="@+id/tvSummaryTotalSticky" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0đ" android:textColor="@color/blue_main" android:textSize="18sp" android:textStyle="bold" />
+            </LinearLayout>
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnPlaceOrder"
-            android:layout_width="160dp"
-            android:layout_height="56dp"
-            android:background="@drawable/bg_sky_blue_gradient"
-            android:text="ĐẶT HÀNG"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnPlaceOrder"
+                android:layout_width="160dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_sky_blue_gradient"
+                android:text="ĐẶT HÀNG"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>

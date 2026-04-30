@@ -11,8 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class VoucherManagementActivity extends AppCompatActivity {
@@ -51,7 +53,9 @@ public class VoucherManagementActivity extends AppCompatActivity {
     private void loadVouchers() {
         if (voucherListener != null) voucherListener.remove();
         
+        // Sắp xếp voucher: Cái nào mới tạo hoặc còn hạn hiện lên trên
         voucherListener = db.collection("vouchers")
+                .orderBy("expiryDate", Query.Direction.DESCENDING)
                 .addSnapshotListener((value, error) -> {
                     if (error != null) return;
                     if (value != null) {
@@ -61,9 +65,19 @@ public class VoucherManagementActivity extends AppCompatActivity {
                             voucher.setId(doc.getId());
                             voucherList.add(voucher);
                         }
+                        
+                        // Sắp xếp thêm logic: Voucher nào hết hạn thì cho xuống cuối cùng
+                        long now = System.currentTimeMillis();
+                        Collections.sort(voucherList, (v1, v2) -> {
+                            boolean isExpired1 = v1.getExpiryDate() < now;
+                            boolean isExpired2 = v2.getExpiryDate() < now;
+                            if (isExpired1 && !isExpired2) return 1;
+                            if (!isExpired1 && isExpired2) return -1;
+                            return Long.compare(v2.getExpiryDate(), v1.getExpiryDate());
+                        });
+
                         adapter.notifyDataSetChanged();
                         
-                        // Hiển thị trạng thái trống nếu danh sách rỗng
                         if (voucherList.isEmpty()) {
                             llEmpty.setVisibility(View.VISIBLE);
                             rvVouchers.setVisibility(View.GONE);

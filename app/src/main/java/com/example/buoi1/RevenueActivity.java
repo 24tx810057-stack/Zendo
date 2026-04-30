@@ -29,6 +29,7 @@ public class RevenueActivity extends AppCompatActivity {
     private DecimalFormat formatter = new DecimalFormat("###,###,###");
     private TabLayout tabLayout;
     private double totalItemsValueForPercent = 0; 
+    private OrderManager orderManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +37,12 @@ public class RevenueActivity extends AppCompatActivity {
         setContentView(R.layout.activity_revenue);
 
         db = FirebaseFirestore.getInstance();
+        orderManager = new OrderManager();
         initViews();
         setupTabs();
         
         if (tabLayout != null) {
-            TabLayout.Tab monthTab = tabLayout.getTabAt(0); // Mặc định về Tất cả để test dữ liệu
+            TabLayout.Tab monthTab = tabLayout.getTabAt(0);
             if (monthTab != null) {
                 monthTab.select();
                 loadRevenueData(null);
@@ -55,8 +57,28 @@ public class RevenueActivity extends AppCompatActivity {
         gvTopProducts = findViewById(R.id.gvTopProducts);
         tabLayout = findViewById(R.id.tabLayoutTime);
         ImageView btnBack = findViewById(R.id.btnBackRevenue);
+        ImageView btnSync = findViewById(R.id.btnSyncSoldCount);
 
         if (btnBack != null) btnBack.setOnClickListener(v -> finish());
+        
+        // Xử lý nút đồng bộ lượt bán
+        if (btnSync != null) {
+            btnSync.setOnClickListener(v -> {
+                Toast.makeText(this, "Đang đồng bộ lại lượt bán...", Toast.LENGTH_SHORT).show();
+                orderManager.recalculateAllProductSoldCounts(new OrderManager.OnActionCompleteListener() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(RevenueActivity.this, "Đồng bộ thành công! Vui lòng tải lại trang.", Toast.LENGTH_LONG).show();
+                        loadRevenueData(null); // Load lại dữ liệu để cập nhật hiển thị
+                    }
+
+                    @Override
+                    public void onFailure(String error) {
+                        Toast.makeText(RevenueActivity.this, "Lỗi đồng bộ: " + error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
+        }
 
         adapter = new TopProductAdapter(this, topProducts, 0);
         if (gvTopProducts != null) gvTopProducts.setAdapter(adapter);
@@ -93,11 +115,10 @@ public class RevenueActivity extends AppCompatActivity {
             .whereEqualTo("status", "Đã giao")
             .get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
-                double totalRevenueNet = 0; // Tiền thực nhận
-                double totalGrossValue = 0; // Tổng giá trị hàng (để chia %)
+                double totalRevenueNet = 0;
+                double totalGrossValue = 0;
                 int totalOrders = 0;
                 
-                // Map lưu Doanh thu và Số lượng của từng sản phẩm
                 Map<String, Double> productRevenueMap = new HashMap<>();
                 Map<String, Integer> productCountMap = new HashMap<>();
                 Map<String, Product> productDataMap = new HashMap<>();
@@ -139,17 +160,14 @@ public class RevenueActivity extends AppCompatActivity {
                 tvTotalOrders.setText(String.valueOf(totalOrders));
                 tvAvgValue.setText(totalOrders > 0 ? formatter.format(totalRevenueNet / totalOrders) + "đ" : "0đ");
 
-                // Chuyển dữ liệu vào List để hiển thị
                 topProducts.clear();
                 for (String pid : productRevenueMap.keySet()) {
                     Product p = productDataMap.get(pid);
                     p.setSoldCount(productCountMap.get(pid));
-                    // Lưu doanh thu vào price để adapter lấy hiển thị (hoặc dùng field chuyên dụng)
                     p.setPrice(productRevenueMap.get(pid) / p.getSoldCount()); 
                     topProducts.add(p);
                 }
 
-                // Sắp xếp theo doanh thu giảm dần
                 Collections.sort(topProducts, (p1, p2) -> {
                     double r1 = p1.getPrice() * p1.getSoldCount();
                     double r2 = p2.getPrice() * p2.getSoldCount();

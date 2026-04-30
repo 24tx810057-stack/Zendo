@@ -2,7 +2,6 @@ package com.example.buoi1;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -12,34 +11,26 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class OrderDetailActivity extends AppCompatActivity {
 
-    private TextView tvStatus, tvOrderDate, tvNamePhone, tvAddress;
-    private TextView tvSubtotal, tvShipping, tvTotal, tvPaymentMethod;
+    private TextView tvStatus, tvOrderDate, tvNamePhone, tvAddress, tvNote;
+    private TextView tvSubtotal, tvShipping, tvVoucher, tvTotal, tvPaymentMethod;
+    private View layoutVoucherContainer;
     private LinearLayout layoutProducts;
-    private Button btnMainAction, btnContact, btnDeleteOrder;
+    private Button btnMainAction, btnCancelAction;
     
     private Order order;
     private OrderManager orderManager;
@@ -64,11 +55,9 @@ public class OrderDetailActivity extends AppCompatActivity {
         initViews();
         displayOrderDetails();
 
-        boolean triggerReview = getIntent().getBooleanExtra("trigger_review", false);
-        if (triggerReview && order != null && "Đã giao".equals(order.getStatus())) {
-            if (order.getItems() != null && !order.getItems().isEmpty()) {
-                showReviewDialog(order.getItems().get(0));
-            }
+        // Nếu đi từ nút Đánh giá ở danh sách đơn hàng
+        if (getIntent().getBooleanExtra("trigger_review", false)) {
+            startAddReviewActivity();
         }
     }
 
@@ -77,15 +66,27 @@ public class OrderDetailActivity extends AppCompatActivity {
         tvOrderDate = findViewById(R.id.tvOrderDate);
         tvNamePhone = findViewById(R.id.tvReceiverNamePhone);
         tvAddress = findViewById(R.id.tvReceiverAddress);
+        tvNote = findViewById(R.id.tvOrderNote);
         tvSubtotal = findViewById(R.id.tvOrderSubtotal);
         tvShipping = findViewById(R.id.tvOrderShipping);
+        tvVoucher = findViewById(R.id.tvOrderVoucher);
+        layoutVoucherContainer = findViewById(R.id.layoutOrderVoucher);
         tvTotal = findViewById(R.id.tvOrderTotal);
         tvPaymentMethod = findViewById(R.id.tvOrderPaymentMethod);
         layoutProducts = findViewById(R.id.layoutOrderProducts);
         btnMainAction = findViewById(R.id.btnMainAction);
-        btnContact = findViewById(R.id.btnContactSeller);
+        btnCancelAction = findViewById(R.id.btnCancelOrder);
         
         findViewById(R.id.btnBackOrder).setOnClickListener(v -> finish());
+    }
+
+    private void startAddReviewActivity() {
+        if (order == null || order.getItems() == null || order.getItems().isEmpty()) return;
+        Intent intent = new Intent(this, AddReviewActivity.class);
+        intent.putExtra("product_id", order.getItems().get(0).getProductId());
+        intent.putExtra("order_id", order.getId());
+        intent.putExtra("cart_item", order.getItems().get(0));
+        startActivity(intent);
     }
 
     private void displayOrderDetails() {
@@ -95,16 +96,30 @@ public class OrderDetailActivity extends AppCompatActivity {
         tvNamePhone.setText(order.getUserName() + " | " + order.getPhone());
         tvAddress.setText(order.getAddress());
         
-        if (order.getTimestamp() != null) {
-            tvOrderDate.setText("Ngày đặt hàng: " + dateFormat.format(order.getTimestamp()));
+        if (order.getNote() != null && !order.getNote().trim().isEmpty()) {
+            tvNote.setText(order.getNote());
+            tvNote.setTextColor(0xFF212121);
         } else {
-            tvOrderDate.setText("Ngày đặt hàng: N/A");
+            tvNote.setText("Không có ghi chú từ khách hàng");
+            tvNote.setTextColor(0xFF9E9E9E);
         }
         
-        tvSubtotal.setText(formatter.format(order.getTotalAmount() - order.getShippingFee()) + "đ");
+        if (order.getTimestamp() != null) {
+            tvOrderDate.setText("Ngày đặt hàng: " + dateFormat.format(order.getTimestamp()));
+        }
+
+        tvSubtotal.setText(formatter.format(order.getSubtotal()) + "đ");
         tvShipping.setText(formatter.format(order.getShippingFee()) + "đ");
+        
+        if (order.getVoucherDiscount() > 0) {
+            layoutVoucherContainer.setVisibility(View.VISIBLE);
+            tvVoucher.setText("-" + formatter.format(order.getVoucherDiscount()) + "đ");
+        } else {
+            layoutVoucherContainer.setVisibility(View.GONE);
+        }
+
         tvTotal.setText(formatter.format(order.getTotalAmount()) + "đ");
-        tvPaymentMethod.setText(order.getPaymentMethod());
+        tvPaymentMethod.setText("Phương thức thanh toán: " + order.getPaymentMethod());
 
         displayProducts(order.getItems());
         setupFooterActions();
@@ -114,15 +129,11 @@ public class OrderDetailActivity extends AppCompatActivity {
         if (items == null) return;
         layoutProducts.removeAllViews();
         for (CartItem item : items) {
-            View view = LayoutInflater.from(this).inflate(R.layout.item_cart, layoutProducts, false);
-            if(view.findViewById(R.id.cbSelectItem) != null) view.findViewById(R.id.cbSelectItem).setVisibility(View.GONE);
-            if(view.findViewById(R.id.btnMinus) != null) view.findViewById(R.id.btnMinus).setVisibility(View.GONE);
-            if(view.findViewById(R.id.btnPlus) != null) view.findViewById(R.id.btnPlus).setVisibility(View.GONE);
-            
-            TextView tvName = view.findViewById(R.id.tvCartProductName);
-            TextView tvPrice = view.findViewById(R.id.tvCartProductPrice);
+            View view = LayoutInflater.from(this).inflate(R.layout.item_checkout_product, layoutProducts, false);
+            TextView tvName = view.findViewById(R.id.tvName);
+            TextView tvPrice = view.findViewById(R.id.tvPrice);
             TextView tvQuantity = view.findViewById(R.id.tvQuantity);
-            ImageView ivProduct = view.findViewById(R.id.ivCartProduct);
+            ImageView ivProduct = view.findViewById(R.id.ivProduct);
 
             tvName.setText(item.getProductName());
             tvPrice.setText(formatter.format(item.getProductPrice()) + "đ");
@@ -139,19 +150,6 @@ public class OrderDetailActivity extends AppCompatActivity {
                     } catch (Exception e) {}
                 }
             }
-
-            view.setOnClickListener(v -> {
-                db.collection("products").document(item.getProductId()).get()
-                        .addOnSuccessListener(documentSnapshot -> {
-                            Product p = documentSnapshot.toObject(Product.class);
-                            if (p != null) {
-                                Intent intent = new Intent(this, DetailActivity.class);
-                                intent.putExtra("product_data", p);
-                                startActivity(intent);
-                            }
-                        });
-            });
-
             layoutProducts.addView(view);
         }
     }
@@ -159,122 +157,80 @@ public class OrderDetailActivity extends AppCompatActivity {
     private void setupFooterActions() {
         String status = order.getStatus();
         if (status == null) status = "";
-        
+        btnCancelAction.setVisibility(View.GONE);
+
         if ("admin".equals(userRole)) {
-            if (status.equals("Đã giao")) {
-                btnContact.setVisibility(View.GONE);
-            } else {
-                btnContact.setVisibility(View.VISIBLE);
-                btnContact.setText("XÓA ĐƠN");
-                btnContact.setBackgroundTintList(getColorStateList(android.R.color.holo_red_dark));
-                btnContact.setTextColor(getColor(android.R.color.white));
-                btnContact.setOnClickListener(v -> confirmDeleteOrder());
-            }
-
-            if (btnMainAction != null) {
-                btnMainAction.setVisibility(View.VISIBLE);
-                
-                if (status.equals("Yêu cầu hủy")) {
-                    btnMainAction.setText("Đồng ý hủy đơn");
-                    btnMainAction.setOnClickListener(v -> updateStatusByAdmin("Đã hủy"));
-                    
-                    btnContact.setVisibility(View.VISIBLE);
-                    btnContact.setText("Từ chối hủy");
-                    btnContact.setBackgroundTintList(getColorStateList(android.R.color.holo_orange_dark));
-                    btnContact.setOnClickListener(v -> updateStatusByAdmin("Chờ xác nhận"));
-                } else if (status.equals("Chờ xác nhận")) {
-                    btnMainAction.setText("Xác nhận đơn hàng");
-                    btnMainAction.setOnClickListener(v -> updateStatusByAdmin("Chờ lấy hàng"));
-                } else if (status.equals("Chờ lấy hàng")) {
-                    btnMainAction.setText("Giao cho ĐVVC");
-                    btnMainAction.setOnClickListener(v -> updateStatusByAdmin("Đang giao"));
-                } else if (status.equals("Đang giao")) {
-                    btnMainAction.setText("Xác nhận đã giao");
-                    btnMainAction.setOnClickListener(v -> updateStatusByAdmin("Đã giao"));
-                } else {
-                    btnMainAction.setVisibility(View.GONE);
-                }
-            }
-            return;
-        }
-
-        if (btnMainAction != null) {
             btnMainAction.setVisibility(View.VISIBLE);
-            btnMainAction.setEnabled(true);
-            btnMainAction.setAlpha(1.0f);
-            
-            if (btnContact != null) {
-                btnContact.setVisibility(View.VISIBLE);
-                btnContact.setText("LIÊN HỆ");
-                btnContact.setBackgroundTintList(getColorStateList(android.R.color.darker_gray));
-                btnContact.setOnClickListener(v -> Toast.makeText(this, "Tính năng chat đang phát triển", Toast.LENGTH_SHORT).show());
+            if (status.equals("Yêu cầu hủy")) {
+                btnMainAction.setText("Đồng ý hủy đơn");
+                btnMainAction.setOnClickListener(v -> updateStatus("Đã hủy"));
+                btnCancelAction.setVisibility(View.VISIBLE);
+                btnCancelAction.setText("Từ chối hủy");
+                btnCancelAction.setOnClickListener(v -> updateStatus("Chờ xác nhận"));
+            } else if (status.equals("Chờ xác nhận")) {
+                btnMainAction.setText("Xác nhận đơn hàng");
+                btnMainAction.setOnClickListener(v -> updateStatus("Chờ lấy hàng"));
+                btnCancelAction.setVisibility(View.VISIBLE);
+                btnCancelAction.setText("XÓA ĐƠN");
+                btnCancelAction.setOnClickListener(v -> confirmDelete());
+            } else if (status.equals("Chờ lấy hàng")) {
+                btnMainAction.setText("Giao cho ĐVVC");
+                btnMainAction.setOnClickListener(v -> updateStatus("Đang giao"));
+            } else if (status.equals("Đang giao")) {
+                btnMainAction.setText("Xác nhận đã giao");
+                btnMainAction.setOnClickListener(v -> updateStatus("Đã giao"));
+            } else {
+                btnMainAction.setVisibility(View.GONE);
+                btnCancelAction.setVisibility(View.VISIBLE);
+                btnCancelAction.setText("XÓA ĐƠN");
+                btnCancelAction.setOnClickListener(v -> confirmDelete());
             }
-
+        } else {
+            btnMainAction.setVisibility(View.VISIBLE);
             if (status.equals("Chờ xác nhận") || status.equals("Chờ lấy hàng")) {
-                btnMainAction.setText("Yêu cầu hủy đơn");
-                btnMainAction.setOnClickListener(v -> requestCancelOrder());
+                btnMainAction.setText("Gửi yêu cầu hủy");
+                btnMainAction.setOnClickListener(v -> updateStatus("Yêu cầu hủy"));
             } else if (status.equals("Yêu cầu hủy")) {
                 btnMainAction.setText("Đang chờ duyệt hủy...");
                 btnMainAction.setEnabled(false);
-                btnMainAction.setAlpha(0.5f);
-                
-                if (btnContact != null) {
-                    btnContact.setText("Rút lại yêu cầu hủy");
-                    btnContact.setBackgroundTintList(getColorStateList(android.R.color.holo_blue_dark));
-                    btnContact.setOnClickListener(v -> undoCancelRequest());
-                }
+                btnMainAction.setAlpha(0.6f);
             } else if (status.equals("Đã giao")) {
-                checkIfAlreadyReviewed();
+                db.collection("reviews").whereEqualTo("orderId", order.getId()).get()
+                        .addOnSuccessListener(queryDocumentSnapshots -> {
+                            if (queryDocumentSnapshots.isEmpty()) {
+                                btnMainAction.setText("Đánh giá sản phẩm");
+                                btnMainAction.setOnClickListener(v -> startAddReviewActivity());
+                            } else {
+                                btnMainAction.setText("Tiếp tục mua sắm");
+                                btnMainAction.setOnClickListener(v -> finish());
+                            }
+                        });
             } else {
-                btnMainAction.setText("Mua lại");
-                btnMainAction.setOnClickListener(v -> Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show());
+                btnMainAction.setText("Tiếp tục mua sắm");
+                btnMainAction.setOnClickListener(v -> finish());
             }
         }
     }
 
-    private void checkIfAlreadyReviewed() {
-        db.collection("reviews")
-                .whereEqualTo("userEmail", order.getUserEmail())
-                .whereEqualTo("orderId", order.getId())
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        btnMainAction.setText("Đã đánh giá");
-                        btnMainAction.setEnabled(false);
-                        btnMainAction.setAlpha(0.5f);
-                    } else {
-                        btnMainAction.setText("Đánh giá sản phẩm");
-                        btnMainAction.setOnClickListener(v -> {
-                            if (order.getItems() != null && !order.getItems().isEmpty()) {
-                                showReviewDialog(order.getItems().get(0));
-                            }
-                        });
-                    }
-                });
+    private void updateStatus(String newStatus) {
+        orderManager.updateOrderStatus(order.getId(), newStatus, new OrderManager.OnActionCompleteListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(OrderDetailActivity.this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+                order.setStatus(newStatus);
+                displayOrderDetails();
+            }
+            @Override
+            public void onFailure(String error) {
+                Toast.makeText(OrderDetailActivity.this, "Lỗi: " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private void requestCancelOrder() {
-        new AlertDialog.Builder(this)
-                .setTitle("Gửi yêu cầu hủy")
-                .setMessage("Yêu cầu hủy của bạn sẽ được gửi tới Shop để duyệt. Bạn có chắc chắn không?")
-                .setPositiveButton("Gửi yêu cầu", (d, w) -> updateStatusByAdmin("Yêu cầu hủy"))
-                .setNegativeButton("Quay lại", null)
-                .show();
-    }
-
-    private void undoCancelRequest() {
-        new AlertDialog.Builder(this)
-                .setTitle("Rút lại yêu cầu")
-                .setMessage("Bạn muốn hủy yêu cầu hủy đơn và tiếp tục mua hàng chứ?")
-                .setPositiveButton("Đồng ý", (d, w) -> updateStatusByAdmin("Chờ xác nhận"))
-                .setNegativeButton("Bỏ qua", null)
-                .show();
-    }
-
-    private void confirmDeleteOrder() {
+    private void confirmDelete() {
         new AlertDialog.Builder(this)
                 .setTitle("Xác nhận xóa")
-                .setMessage("Bạn có chắc chắn muốn xóa vĩnh viễn đơn hàng này không?")
+                .setMessage("Hành động này không thể hoàn tác. Xóa đơn hàng?")
                 .setPositiveButton("Xóa", (d, w) -> {
                     orderManager.deleteOrder(order.getId(), new OrderManager.OnActionCompleteListener() {
                         @Override
@@ -290,145 +246,5 @@ public class OrderDetailActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Hủy", null)
                 .show();
-    }
-
-    private void updateStatusByAdmin(String newStatus) {
-        orderManager.updateOrderStatus(order.getId(), newStatus, new OrderManager.OnActionCompleteListener() {
-            @Override
-            public void onSuccess() {
-                createStatusNotification(newStatus);
-                if ("admin".equals(userRole)) {
-                    createAdminNotification(newStatus);
-                }
-                Toast.makeText(OrderDetailActivity.this, "Cập nhật trạng thái thành công!", Toast.LENGTH_SHORT).show();
-                order.setStatus(newStatus);
-                displayOrderDetails();
-            }
-            @Override
-            public void onFailure(String error) {
-                Toast.makeText(OrderDetailActivity.this, "Lỗi: " + error, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void createAdminNotification(String status) {
-        String title = "Xác nhận đơn hàng";
-        String message = "Bạn vừa cập nhật đơn hàng của " + order.getUserName() + " sang trạng thái: " + status;
-        
-        String dateStr = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date());
-        Map<String, Object> notification = new HashMap<>();
-        notification.put("userEmail", "admin");
-        notification.put("title", title);
-        notification.put("message", message);
-        notification.put("date", dateStr);
-        notification.put("read", false);
-        notification.put("timestamp", FieldValue.serverTimestamp());
-
-        db.collection("notifications").add(notification);
-    }
-
-    private void createStatusNotification(String status) {
-        String title = "Cập nhật đơn hàng";
-        String message = "";
-        
-        switch (status) {
-            case "Chờ lấy hàng": message = "Đơn hàng của bạn đã được Shop xác nhận và đang chờ lấy hàng."; break;
-            case "Đang giao": message = "Đơn hàng đang được giao đến bạn. Vui lòng chú ý điện thoại."; break;
-            case "Đã giao":
-                title = "Giao hàng thành công";
-                message = "Đơn hàng đã được giao thành công. Hãy để lại đánh giá cho sản phẩm nhé!";
-                break;
-            case "Đã hủy":
-                title = "Đanh hàng đã hủy";
-                message = "Đơn hàng của bạn đã bị hủy. Hẹn gặp lại bạn lần sau.";
-                break;
-            case "Yêu cầu hủy":
-                title = "Yêu cầu hủy đơn";
-                message = "Bạn đã gửi yêu cầu hủy đơn hàng. Vui lòng chờ Shop phê duyệt.";
-                break;
-            case "Chờ xác nhận": message = "Đơn hàng của bạn đang được tiếp tục xử lý."; break;
-        }
-
-        if (message.isEmpty()) return;
-
-        String dateStr = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date());
-        Map<String, Object> notification = new HashMap<>();
-        notification.put("userEmail", order.getUserEmail());
-        notification.put("title", title);
-        notification.put("message", message);
-        notification.put("date", dateStr);
-        notification.put("read", false);
-        notification.put("timestamp", FieldValue.serverTimestamp());
-
-        db.collection("notifications").add(notification);
-    }
-
-    private void showReviewDialog(CartItem item) {
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_review, null);
-        ImageView ivProduct = dialogView.findViewById(R.id.ivReviewProduct);
-        TextView tvProductName = dialogView.findViewById(R.id.tvReviewProductName);
-        RatingBar rbQuality = dialogView.findViewById(R.id.rbQuality);
-        RatingBar rbSeller = dialogView.findViewById(R.id.rbSeller);
-        RatingBar rbShipping = dialogView.findViewById(R.id.rbShipping);
-        ChipGroup chipGroup = dialogView.findViewById(R.id.chipGroupTags);
-        EditText etComment = dialogView.findViewById(R.id.etReviewComment);
-        CheckBox cbAnonymous = dialogView.findViewById(R.id.cbAnonymous);
-        Button btnSubmit = dialogView.findViewById(R.id.btnSubmitReview);
-        Button btnCancel = dialogView.findViewById(R.id.btnCancelReview);
-
-        if (tvProductName != null) tvProductName.setText(item.getProductName());
-        String imgData = item.getProductImageUrl();
-        if (imgData != null && !imgData.isEmpty() && ivProduct != null) {
-            if (imgData.startsWith("http")) Glide.with(this).load(imgData).into(ivProduct);
-            else {
-                try {
-                    byte[] decodedString = Base64.decode(imgData, Base64.DEFAULT);
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                    ivProduct.setImageBitmap(bitmap);
-                } catch (Exception e) {}
-            }
-        }
-
-        AlertDialog dialog = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Light_NoActionBar_Fullscreen)
-                .setView(dialogView)
-                .create();
-
-        btnCancel.setOnClickListener(v -> dialog.dismiss());
-
-        btnSubmit.setOnClickListener(v -> {
-            // RÀNG BUỘC LOGIC: Bắt buộc phải chọn sao cho ít nhất 1 mục
-            if (rbQuality.getRating() == 0 && rbSeller.getRating() == 0 && rbShipping.getRating() == 0) {
-                Toast.makeText(this, "Vui lòng chọn số sao đánh giá", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            Review review = new Review();
-            review.setProductId(item.getProductId());
-            review.setOrderId(order.getId());
-            review.setUserEmail(order.getUserEmail());
-            review.setUserName(order.getUserName());
-            review.setQualityRating(rbQuality.getRating());
-            review.setSellerRating(rbSeller.getRating());
-            review.setShippingRating(rbShipping.getRating());
-            review.setComment(etComment.getText().toString());
-            review.setAnonymous(cbAnonymous.isChecked());
-            review.setTimestamp(System.currentTimeMillis());
-            
-            List<String> selectedTags = new ArrayList<>();
-            for (int i = 0; i < chipGroup.getChildCount(); i++) {
-                Chip chip = (Chip) chipGroup.getChildAt(i);
-                if (chip.isChecked()) selectedTags.add(chip.getText().toString());
-            }
-            review.setTags(selectedTags);
-
-            db.collection("reviews").add(review)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(OrderDetailActivity.this, "Cảm ơn bạn đã đánh giá!", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-                    displayOrderDetails();
-                });
-        });
-
-        dialog.show();
     }
 }

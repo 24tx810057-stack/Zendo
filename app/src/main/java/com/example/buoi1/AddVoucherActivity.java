@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,7 +26,6 @@ public class AddVoucherActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private String selectedType = "PERCENT"; // "PERCENT" or "CASH"
-    private Calendar calendar = Calendar.getInstance();
     private long selectedExpiryTimestamp = 0;
 
     private EditText etVoucherTitle, etVoucherCode, etVoucherValue, etMaxDiscount, etMinOrder, etExpiryDate;
@@ -59,21 +57,27 @@ public class AddVoucherActivity extends AppCompatActivity {
         etVoucherTitle.setText(voucher.getTitle());
         etVoucherCode.setText(voucher.getCode());
         etVoucherCode.setEnabled(false);
+
+        // 1. Xác định loại và cập nhật UI trước
+        selectedType = voucher.getType();
+        if (selectedType != null && selectedType.equalsIgnoreCase("PERCENT")) {
+            selectedType = "PERCENT";
+            toggleGroupVoucherType.check(R.id.btnTypePercent);
+            updateUIForType("PERCENT");
+        } else {
+            selectedType = "CASH";
+            toggleGroupVoucherType.check(R.id.btnTypeCash);
+            updateUIForType("CASH");
+        }
+        
+        // 2. Sau khi UI đã đúng đơn vị, mới nạp giá trị vào
         etVoucherValue.setText(String.valueOf((long)voucher.getValue()));
         etMinOrder.setText(String.valueOf((long)voucher.getMinOrder()));
         etMaxDiscount.setText(String.valueOf((long)voucher.getMaxDiscount()));
-        
-        selectedType = voucher.getType();
-        if ("PERCENT".equals(selectedType)) {
-            toggleGroupVoucherType.check(R.id.btnTypePercent);
-        } else {
-            toggleGroupVoucherType.check(R.id.btnTypeCash);
-        }
 
         if (voucher.getExpiryDate() > 0) {
             selectedExpiryTimestamp = voucher.getExpiryDate();
             etExpiryDate.setText(sdf.format(new java.util.Date(selectedExpiryTimestamp)));
-            calendar.setTimeInMillis(selectedExpiryTimestamp);
         }
     }
 
@@ -95,47 +99,63 @@ public class AddVoucherActivity extends AppCompatActivity {
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
 
-        // Toggle Loại giảm giá
+        // Xử lý chuyển đổi loại Voucher
         toggleGroupVoucherType.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (isChecked) {
-                if (checkedId == R.id.btnTypePercent) {
-                    selectedType = "PERCENT";
-                    tilVoucherValue.setSuffixText("%");
-                    tilMaxDiscount.setVisibility(View.VISIBLE);
-                } else {
-                    selectedType = "CASH";
-                    tilVoucherValue.setSuffixText("₫");
-                    tilMaxDiscount.setVisibility(View.GONE);
+                String newType = (checkedId == R.id.btnTypePercent) ? "PERCENT" : "CASH";
+                
+                // Chỉ xử lý nếu thực sự đổi tab khác với loại hiện tại
+                if (!newType.equalsIgnoreCase(selectedType)) {
+                    // XÓA TRẮNG Ô NHẬP KHI ĐỔI LOẠI ĐỂ TRÁNH NHẦM LẪN
+                    etVoucherValue.setText(""); 
+                    selectedType = newType;
+                    updateUIForType(selectedType);
                 }
             }
         });
 
         // Chọn ngày hết hạn
         etExpiryDate.setOnClickListener(v -> {
-            new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-                calendar.set(Calendar.YEAR, year);
-                calendar.set(Calendar.MONTH, month);
-                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                calendar.set(Calendar.HOUR_OF_DAY, 23);
-                calendar.set(Calendar.MINUTE, 59);
-                calendar.set(Calendar.SECOND, 59);
+            Calendar cal = Calendar.getInstance();
+            if (selectedExpiryTimestamp > 0) cal.setTimeInMillis(selectedExpiryTimestamp);
+
+            DatePickerDialog dialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+                cal.set(Calendar.YEAR, year);
+                cal.set(Calendar.MONTH, month);
+                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                cal.set(Calendar.HOUR_OF_DAY, 23);
+                cal.set(Calendar.MINUTE, 59);
+                cal.set(Calendar.SECOND, 59);
                 
-                selectedExpiryTimestamp = calendar.getTimeInMillis();
-                etExpiryDate.setText(sdf.format(calendar.getTime()));
-            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+                selectedExpiryTimestamp = cal.getTimeInMillis();
+                etExpiryDate.setText(sdf.format(cal.getTime()));
+            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+            
+            dialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+            dialog.show();
         });
 
         btnSaveVoucher.setOnClickListener(v -> saveVoucher());
     }
 
+    private void updateUIForType(String type) {
+        if ("PERCENT".equalsIgnoreCase(type)) {
+            tilVoucherValue.setHint("Nhập % giảm giá (1-100)");
+            tilVoucherValue.setSuffixText("%");
+            tilMaxDiscount.setVisibility(View.VISIBLE);
+        } else {
+            tilVoucherValue.setHint("Nhập số tiền giảm (₫)");
+            tilVoucherValue.setSuffixText("₫");
+            tilMaxDiscount.setVisibility(View.GONE);
+        }
+    }
+
     private void setupTextFormatters() {
-        // Định dạng dấu phẩy cho giá trị giảm (nếu là tiền)
-        etVoucherValue.addTextChangedListener(new MoneyTextWatcher(etVoucherValue, () -> "CASH".equals(selectedType)));
+        // Định dạng dấu phẩy cho giá trị giảm (chỉ khi là CASH)
+        etVoucherValue.addTextChangedListener(new MoneyTextWatcher(etVoucherValue, () -> "CASH".equalsIgnoreCase(selectedType)));
         
-        // Định dạng dấu phẩy cho mức giảm tối đa
+        // Định dạng dấu phẩy cho các ô luôn là tiền mặt
         etMaxDiscount.addTextChangedListener(new MoneyTextWatcher(etMaxDiscount, () -> true));
-        
-        // Định dạng dấu phẩy cho đơn hàng tối thiểu
         etMinOrder.addTextChangedListener(new MoneyTextWatcher(etMinOrder, () -> true));
     }
 
@@ -151,29 +171,37 @@ public class AddVoucherActivity extends AppCompatActivity {
             return;
         }
 
-        double value = Double.parseDouble(valueStr);
-        double minOrder = Double.parseDouble(minOrderStr);
-        double maxDiscount = maxDiscountStr.isEmpty() ? value : Double.parseDouble(maxDiscountStr);
+        try {
+            double value = Double.parseDouble(valueStr);
+            if (selectedType.equals("PERCENT") && (value <= 0 || value > 100)) {
+                etVoucherValue.setError("Phần trăm phải từ 1 đến 100");
+                return;
+            }
 
-        Voucher voucher = new Voucher();
-        voucher.setTitle(title);
-        voucher.setCode(code);
-        voucher.setType(selectedType);
-        voucher.setValue(value);
-        voucher.setMinOrder(minOrder);
-        voucher.setMaxDiscount(maxDiscount);
-        voucher.setExpiryDate(selectedExpiryTimestamp);
-        voucher.setActive(true);
+            double minOrder = Double.parseDouble(minOrderStr);
+            double maxDiscount = selectedType.equals("CASH") ? value : (maxDiscountStr.isEmpty() ? value : Double.parseDouble(maxDiscountStr));
 
-        db.collection("vouchers").document(code).set(voucher)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Lưu Voucher thành công", Toast.LENGTH_SHORT).show();
-                    finish();
-                })
-                .addOnFailureListener(e -> Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            Voucher voucher = new Voucher();
+            voucher.setTitle(title);
+            voucher.setCode(code);
+            voucher.setType(selectedType);
+            voucher.setValue(value);
+            voucher.setMinOrder(minOrder);
+            voucher.setMaxDiscount(maxDiscount);
+            voucher.setExpiryDate(selectedExpiryTimestamp);
+            voucher.setActive(true);
+
+            db.collection("vouchers").document(code).set(voucher)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Lưu Voucher thành công", Toast.LENGTH_SHORT).show();
+                        finish();
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Giá trị nhập không hợp lệ", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    // Helper class để định dạng tiền tệ khi gõ
     private static class MoneyTextWatcher implements TextWatcher {
         private final EditText editText;
         private final java.util.function.BooleanSupplier shouldFormat;
@@ -196,7 +224,7 @@ public class AddVoucherActivity extends AppCompatActivity {
             try {
                 String originalString = s.toString();
                 if (originalString.isEmpty()) return;
-                if (originalString.contains(",")) originalString = originalString.replaceAll(",", "");
+                originalString = originalString.replaceAll(",", "");
                 
                 Long longval = Long.parseLong(originalString);
                 DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
