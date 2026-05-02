@@ -307,6 +307,7 @@
                                         android:layout_weight="1"
                                         android:orientation="vertical">
                                         <TextView
+                                            android:id="@+id/tvCompletedOrdersLabel"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:text="Đơn hoàn thành"

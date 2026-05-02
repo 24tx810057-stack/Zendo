@@ -30,6 +30,19 @@
             android:textColor="#212121"
             android:textSize="18sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnEditPolicy"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:paddingHorizontal="16dp"
+            android:text="Sửa"
+            android:textColor="#2196F3"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
     </RelativeLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -42,80 +55,38 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Mục 1 -->
+            <!-- Chế độ hiển thị -->
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1. Chính sách đổi trả 15 ngày"
-                android:textColor="#2196F3"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
+                android:id="@+id/tvPolicyContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="4dp"
-                android:text="Khách hàng có quyền trả hàng và hoàn tiền trong vòng 15 ngày kể từ khi nhận hàng nếu sản phẩm không đúng mô tả, lỗi nhà sản xuất hoặc không còn nhu cầu (với điều kiện sản phẩm còn nguyên tem mác, chưa qua sử dụng)."
-                android:textColor="#616161"
+                android:lineSpacingExtra="6dp"
+                android:text="Đang tải dữ liệu..."
+                android:textColor="#424242"
                 android:textSize="14sp" />
 
-            <!-- Mục 2 -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="2. Cam kết chính hãng 100%"
-                android:textColor="#2196F3"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
+            <!-- Chế độ chỉnh sửa -->
+            <EditText
+                android:id="@+id/etPolicyEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="4dp"
-                android:text="Zendo Store cam kết tất cả sản phẩm được bán ra là hàng chính hãng 100%. Nếu phát hiện hàng giả, hàng nhái, chúng tôi cam kết hoàn tiền 200% giá trị sản phẩm."
-                android:textColor="#616161"
-                android:textSize="14sp" />
+                android:background="@drawable/bg_border_gray_light"
+                android:gravity="top"
+                android:minLines="15"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:visibility="gone" />
 
-            <!-- Mục 3 -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="3. Thời gian bảo hành"
-                android:textColor="#2196F3"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnSavePolicy"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="4dp"
-                android:text="Thời gian bảo hành được áp dụng riêng cho từng sản phẩm (thông tin cụ thể nằm trong bảng thông số kỹ thuật). Sản phẩm sẽ được bảo hành tại các trung tâm bảo hành ủy quyền hoặc trực tiếp tại cửa hàng Zendo."
-                android:textColor="#616161"
-                android:textSize="14sp" />
-
-            <!-- Mục 4 -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="4. Điều kiện bảo hành"
-                android:textColor="#2196F3"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="4dp"
-                android:text="• Sản phẩm còn trong thời hạn bảo hành.\n• Lỗi do nhà sản xuất (nguồn, màn hình, phần cứng nội bộ).\n• Không bảo hành lỗi do người dùng (rơi vỡ, vào nước, cháy nổ do dùng sai sạc)."
-                android:textColor="#616161"
-                android:textSize="14sp" />
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_sky_blue_gradient"
+                android:text="LƯU CHÍNH SÁCH"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
             <View
                 android:layout_width="match_parent"

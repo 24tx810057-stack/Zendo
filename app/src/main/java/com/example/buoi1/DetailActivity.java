@@ -62,7 +62,7 @@ public class DetailActivity extends AppCompatActivity {
     private TextView tvPrice, tvOldPrice, tvDiscountTag, tvName, tvDesc, tvRating, tvSold, tvStock, tvShippingTime, tvPriceBottom;
     private LinearLayout layoutContentSpecs, layoutContentDesc;
     
-    private TextView tvBigRating, tvReviewCountSubtitle, tvTotalReviewsCount, tvViewAllReviews, tvImageIndicator, tvCartBadge;
+    private TextView tvBigRating, tvReviewCountSubtitle, tvTotalReviewsCount, tvViewAllReviews, tvImageIndicator, tvCartBadge, tvProductDetailWarrantyMain;
     private RatingBar rbSmallSummary;
     private ViewPager2 vpImages;
     private LinearLayout llTopReviewsContainer, llImagePreviews;
@@ -137,6 +137,7 @@ public class DetailActivity extends AppCompatActivity {
         pb2 = findViewById(R.id.pb2Star);
         pb1 = findViewById(R.id.pb1Star);
         
+        tvProductDetailWarrantyMain = findViewById(R.id.tvProductDetailWarrantyMain);
         tvSpecChip = findViewById(R.id.tvSpecChip);
         tvSpecScreen = findViewById(R.id.tvSpecScreen);
         tvSpecRam = findViewById(R.id.tvSpecRam);
@@ -335,10 +336,15 @@ public class DetailActivity extends AppCompatActivity {
         if (cartListener != null) cartListener.remove();
     }
 
+    private com.google.firebase.firestore.ListenerRegistration detailProductListener;
+
     private void loadProductDetails() {
         if (productId == null) return;
-        db.collection("products").document(productId).get()
-                .addOnSuccessListener(documentSnapshot -> {
+        if (detailProductListener != null) detailProductListener.remove();
+
+        detailProductListener = db.collection("products").document(productId)
+                .addSnapshotListener((documentSnapshot, error) -> {
+                    if (error != null || documentSnapshot == null || !documentSnapshot.exists()) return;
                     product = documentSnapshot.toObject(Product.class);
                     if (product != null) {
                         displayData();
@@ -602,8 +608,14 @@ public class DetailActivity extends AppCompatActivity {
             if (!warranty.isEmpty()) {
                 if (warranty.matches("\\d+")) warranty += " tháng";
                 tvSpecWarranty.setText(warranty);
+                if (tvProductDetailWarrantyMain != null) {
+                    tvProductDetailWarrantyMain.setText("Bảo hành: " + warranty);
+                }
             } else {
                 tvSpecWarranty.setText("Đang cập nhật");
+                if (tvProductDetailWarrantyMain != null) {
+                    tvProductDetailWarrantyMain.setText("Bảo hành: Đang cập nhật");
+                }
             }
         }
 

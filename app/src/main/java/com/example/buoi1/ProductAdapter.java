@@ -27,7 +27,7 @@ public class ProductAdapter extends BaseAdapter {
     private List<Product> productList;
     private DecimalFormat formatter = new DecimalFormat("###,###,###");
     private DecimalFormat ratingFormatter = new DecimalFormat("0.0");
-    private String userEmail;
+    private String userEmail, userRole;
     private FirebaseFirestore db;
 
     public ProductAdapter(Context context, List<Product> productList) {
@@ -36,6 +36,7 @@ public class ProductAdapter extends BaseAdapter {
         this.db = FirebaseFirestore.getInstance();
         SharedPreferences sharedPref = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
         this.userEmail = sharedPref.getString("user_email", "");
+        this.userRole = sharedPref.getString("user_role", "user");
     }
 
     @Override
@@ -118,6 +119,16 @@ public class ProductAdapter extends BaseAdapter {
         }
 
         tvSold.setText("Đã bán " + (product.getSoldCount() >= 0 ? product.getSoldCount() : "0"));
+
+        // LOGIC LÀM MỜ SẢN PHẨM HẾT HÀNG CHO ADMIN
+        if ("admin".equals(userRole) && product.getStock() <= 0) {
+            convertView.setAlpha(0.4f);
+            tvProductName.setText("[HẾT HÀNG] " + product.getName());
+            tvProductName.setTextColor(0xFFD32F2F); // Màu đỏ cảnh báo
+        } else {
+            convertView.setAlpha(1.0f);
+            tvProductName.setTextColor(0xFF212121); // Màu đen bình thường
+        }
 
         boolean isLiked = product.isLiked(userEmail);
         btnLike.setImageResource(isLiked ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline);

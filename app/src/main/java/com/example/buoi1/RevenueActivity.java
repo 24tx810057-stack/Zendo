@@ -112,7 +112,7 @@ public class RevenueActivity extends AppCompatActivity {
         }
 
         db.collection("orders")
-            .whereEqualTo("status", "Đã giao")
+            .whereEqualTo("status", "Hoàn thành")
             .get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 double totalRevenueNet = 0;

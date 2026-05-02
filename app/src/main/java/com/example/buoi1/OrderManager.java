@@ -16,7 +16,7 @@ public class OrderManager {
 
     public void recalculateAllProductSoldCounts(OnActionCompleteListener listener) {
         db.collection("orders")
-                .whereEqualTo("status", "Đã giao")
+                .whereEqualTo("status", "Hoàn thành")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     Map<String, Integer> trueSoldCountMap = new HashMap<>();
@@ -59,14 +59,37 @@ public class OrderManager {
 
             Map<String, Object> updates = new HashMap<>();
             updates.put("status", newStatus);
-            if ("Hoàn thành".equals(newStatus)) {
-                updates.put("deliveryDate", new java.util.Date());
+
+            if ("Đã giao".equals(newStatus)) {
+                // Chỉ ghi nhận ngày giao nếu đơn này chưa từng được giao (tránh ghi đè)
+                if (order.getDeliveryDate() == null) {
+                    updates.put("deliveryDate", new java.util.Date());
+                }
+            } else if ("Hoàn thành".equals(newStatus)) {
+                // LOGIC THÔNG MINH:
+                // 1. Kiểm tra xem đây có phải là đơn hàng cũ (> 3 ngày) cần "hợp thức hóa" ngày không
+                long threeDaysInMillis = 3L * 24 * 60 * 60 * 1000;
+                long currentTime = System.currentTimeMillis();
+                long orderTime = order.getTimestamp() != null ? order.getTimestamp().getTime() : currentTime;
+
+                if (currentTime - orderTime > threeDaysInMillis) {
+                    // Đơn hàng cũ: Ép ngày nhận = Ngày đặt + 3 ngày (Kể cả khi đã có deliveryDate do Admin bấm nhầm lúc nãy)
+                    java.util.Calendar cal = java.util.Calendar.getInstance();
+                    cal.setTime(new java.util.Date(orderTime));
+                    cal.add(java.util.Calendar.DAY_OF_YEAR, 3);
+                    updates.put("deliveryDate", cal.getTime());
+                } else {
+                    // Đơn hàng mới (trong vòng 3 ngày): Giữ nguyên ngày Admin bấm, hoặc set = hôm nay nếu chưa có
+                    if (order.getDeliveryDate() == null) {
+                        updates.put("deliveryDate", new java.util.Date());
+                    }
+                }
             }
 
             db.collection("orders").document(orderId)
                     .update(updates)
                     .addOnSuccessListener(aVoid -> {
-                        // Tăng lượt bán nếu đơn chuyển sang Hoàn thành
+                        // CHỈ TĂNG LƯỢT BÁN KHI ĐƠN HÀNG HOÀN THÀNH
                         if ("Hoàn thành".equals(newStatus)) {
                             for (CartItem item : order.getItems()) {
                                 if (item.getProductId() != null) {

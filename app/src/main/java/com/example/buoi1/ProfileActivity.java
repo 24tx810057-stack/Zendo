@@ -365,29 +365,31 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void updateRevenueStats() {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        Date startOfMonth = cal.getTime();
-
         db.collection("orders")
-                .whereEqualTo("status", "Đã giao")
+                .whereEqualTo("status", "Hoàn thành")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     double totalRevenue = 0;
-                    int completedCount = 0;
+                    int totalProductsSold = 0;
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Order order = doc.toObject(Order.class);
-                        if (order.getTimestamp() != null && !order.getTimestamp().before(startOfMonth)) {
-                            totalRevenue += order.getTotalAmount();
-                            completedCount++;
+                        totalRevenue += order.getTotalAmount();
+                        
+                        // Đếm tổng số lượng sản phẩm trong từng đơn
+                        if (order.getItems() != null) {
+                            for (CartItem item : order.getItems()) {
+                                totalProductsSold += item.getQuantity();
+                            }
                         }
                     }
                     if (tvTotalRevenue != null) tvTotalRevenue.setText(formatter.format(totalRevenue) + "đ");
-                    if (tvCompletedOrders != null) tvCompletedOrders.setText(completedCount + " đơn");
+                    if (tvCompletedOrders != null) {
+                        tvCompletedOrders.setText(totalProductsSold + " sản phẩm");
+                        TextView tvLabel = ((View) tvCompletedOrders.getParent()).findViewById(R.id.tvCompletedOrdersLabel);
+                        if (tvLabel != null) {
+                            tvLabel.setText("Tổng SP đã bán");
+                        }
+                    }
                 })
                 .addOnFailureListener(e -> Log.e("ProfileActivity", "Error updating stats: ", e));
     }

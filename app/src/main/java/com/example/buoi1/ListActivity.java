@@ -69,6 +69,7 @@ public class ListActivity extends AppCompatActivity {
         setupSearch();
         listenToProductChanges();
         observeBadges();
+        autoCompleteOrders();
 
         gridViewProducts.setOnItemClickListener((parent, view, position, id) -> {
             Product selectedProduct = productList.get(position);
@@ -328,10 +329,57 @@ public class ListActivity extends AppCompatActivity {
             for (QueryDocumentSnapshot document : value) {
                 Product prod = document.toObject(Product.class);
                 prod.setId(document.getId());
-                fullProductList.add(prod);
+                
+                // ẨN HÀNG HẾT TRONG KHO CHO USER
+                if (!"admin".equals(userRole)) {
+                    if (prod.getStock() > 0) {
+                        fullProductList.add(prod);
+                    }
+                } else {
+                    // Admin thấy tất cả
+                    fullProductList.add(prod);
+                }
             }
             filterProducts(etSearch.getText().toString());
         });
+    }
+
+    private void autoCompleteOrders() {
+        // Tìm các đơn "Đã giao" quá 3 ngày
+        long threeDaysInMillis = 3L * 24 * 60 * 60 * 1000;
+        long currentTime = System.currentTimeMillis();
+
+        firestore.collection("orders")
+                .whereEqualTo("status", "Đã giao")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    OrderManager orderManager = new OrderManager();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        Order order = doc.toObject(Order.class);
+                        long deliveryTime = 0;
+                        
+                        if (order.getDeliveryDate() != null) {
+                            deliveryTime = order.getDeliveryDate().getTime();
+                        } else if (order.getTimestamp() != null) {
+                            // Dự phòng cho dữ liệu cũ chưa có deliveryDate
+                            deliveryTime = order.getTimestamp().getTime();
+                        }
+
+                        if (deliveryTime > 0 && (currentTime - deliveryTime > threeDaysInMillis)) {
+                            // Tự động chuyển sang Hoàn thành
+                            orderManager.updateOrderStatus(doc.getId(), "Hoàn thành", new OrderManager.OnActionCompleteListener() {
+                                @Override
+                                public void onSuccess() {
+                                    Log.d("ListActivity", "Auto-completed order: " + doc.getId());
+                                }
+                                @Override
+                                public void onFailure(String error) {
+                                    Log.e("ListActivity", "Auto-complete failed: " + error);
+                                }
+                            });
+                        }
+                    }
+                });
     }
 
     @Override

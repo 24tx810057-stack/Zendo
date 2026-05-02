@@ -313,19 +313,28 @@ public class OrderDetailActivity extends AppCompatActivity {
                 btnMainAction.setEnabled(false);
                 btnMainAction.setAlpha(0.6f);
             } else if (status.equals("Hoàn thành")) {
-                // Kiểm tra xem đã đánh giá chưa. Nếu rồi thì không cho trả hàng.
+                // Kiểm tra xem đã đánh giá chưa.
                 if (order.isReviewed()) {
                     btnCancelAction.setVisibility(View.GONE);
                 } else {
-                    // Hiển thị nút nhưng kiểm tra thời hạn 15 ngày từ NGÀY NHẬN HÀNG
                     btnCancelAction.setVisibility(View.VISIBLE);
-                    btnCancelAction.setText("TRẢ HÀNG/HOÀN TIỀN");
 
                     long currentTime = System.currentTimeMillis();
                     long deliveryTime = order.getDeliveryDate() != null ? order.getDeliveryDate().getTime() : 0;
                     long fifteenDaysInMillis = 15L * 24 * 60 * 60 * 1000;
 
+                    // Lấy hạn bảo hành lớn nhất trong các sản phẩm của đơn hàng để quyết định nút
+                    long maxExpiryTime = 0;
+                    if (order.getItems() != null) {
+                        for (CartItem item : order.getItems()) {
+                            Date exp = calculateExpiryDate(order.getDeliveryDate(), item.getWarranty());
+                            if (exp != null && exp.getTime() > maxExpiryTime) maxExpiryTime = exp.getTime();
+                        }
+                    }
+
                     if (currentTime - deliveryTime <= fifteenDaysInMillis) {
+                        // TRƯỜNG HỢP 1: CÒN HẠN TRẢ HÀNG (15 NGÀY ĐẦU)
+                        btnCancelAction.setText("TRẢ HÀNG/HOÀN TIỀN");
                         btnCancelAction.setEnabled(true);
                         btnCancelAction.setAlpha(1.0f);
                         btnCancelAction.setOnClickListener(v -> {
@@ -333,9 +342,20 @@ public class OrderDetailActivity extends AppCompatActivity {
                             intent.putExtra("order_data", order);
                             startActivity(intent);
                         });
+                    } else if (maxExpiryTime > currentTime) {
+                        // TRƯỜNG HỢP 2: QUÁ 15 NGÀY NHƯNG CÒN BẢO HÀNH
+                        btnCancelAction.setText("YÊU CẦU BẢO HÀNH");
+                        btnCancelAction.setEnabled(true);
+                        btnCancelAction.setAlpha(1.0f);
+                        btnCancelAction.setOnClickListener(v -> {
+                            Toast.makeText(this, "Đang mở form yêu cầu sửa chữa/bảo hành...", Toast.LENGTH_SHORT).show();
+                            // Sau này bạn có thể tạo RequestWarrantyActivity tương tự RequestReturnActivity
+                        });
                     } else {
+                        // TRƯỜNG HỢP 3: HẾT SẠCH HẠN
+                        btnCancelAction.setText("HẾT HẠN BẢO HÀNH");
                         btnCancelAction.setEnabled(false);
-                        btnCancelAction.setAlpha(0.5f); // Làm mờ đi khi hết hạn
+                        btnCancelAction.setAlpha(0.5f);
                     }
                 }
 
@@ -431,9 +451,7 @@ public class OrderDetailActivity extends AppCompatActivity {
             public void onSuccess() {
                 Toast.makeText(OrderDetailActivity.this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
                 order.setStatus(newStatus);
-                if ("Hoàn thành".equals(newStatus)) {
-                    order.setDeliveryDate(new java.util.Date());
-                }
+                // Không set Date ở đây nữa, để OrderManager tự tính toán và SnapshotListener tự cập nhật UI
                 displayOrderDetails();
             }
             @Override

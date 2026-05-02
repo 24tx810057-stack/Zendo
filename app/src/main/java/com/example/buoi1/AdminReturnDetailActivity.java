@@ -112,11 +112,31 @@ public class AdminReturnDetailActivity extends AppCompatActivity {
         db.collection("return_requests").document(returnRequest.getId())
                 .update("status", "approved")
                 .addOnSuccessListener(aVoid -> {
-                    db.collection("orders").document(returnRequest.getOrderId())
-                            .update("status", "Đã hoàn tiền")
-                            .addOnSuccessListener(aVoid2 -> {
-                                Toast.makeText(this, "Đã duyệt hoàn tiền thành công!", Toast.LENGTH_SHORT).show();
-                                finish();
+                    // Lấy thông tin đơn hàng để hoàn lại kho và giảm lượt bán
+                    db.collection("orders").document(returnRequest.getOrderId()).get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                Order order = documentSnapshot.toObject(Order.class);
+                                if (order != null && order.getItems() != null) {
+                                    for (CartItem item : order.getItems()) {
+                                        if (item.getProductId() != null) {
+                                            // Hoàn lại kho
+                                            db.collection("products").document(item.getProductId())
+                                                    .update("stock", com.google.firebase.firestore.FieldValue.increment(item.getQuantity()));
+                                            
+                                            // Giảm lượt bán (vì đã trả hàng)
+                                            db.collection("products").document(item.getProductId())
+                                                    .update("soldCount", com.google.firebase.firestore.FieldValue.increment(-item.getQuantity()));
+                                        }
+                                    }
+                                }
+
+                                // Cập nhật trạng thái đơn hàng
+                                db.collection("orders").document(returnRequest.getOrderId())
+                                        .update("status", "Đã hoàn tiền")
+                                        .addOnSuccessListener(aVoid2 -> {
+                                            Toast.makeText(this, "Đã duyệt hoàn tiền và hoàn lại kho thành công!", Toast.LENGTH_SHORT).show();
+                                            finish();
+                                        });
                             });
                 });
     }

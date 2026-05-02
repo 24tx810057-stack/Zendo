@@ -257,31 +257,60 @@
                     android:id="@+id/btnViewWarrantyPolicy"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:paddingVertical="12dp"
-                    android:gravity="center_vertical"
                     android:clickable="true"
                     android:focusable="true"
                     android:background="?attr/selectableItemBackground">
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_shield_check" />
-                    <TextView
-                        android:layout_width="0dp"
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        android:text="Trả hàng miễn phí 15 ngày  •  Chính hãng 100%  •  Miễn phí vận chuyển"
-                        android:textColor="#212121"
-                        android:textSize="12sp"
-                        android:ellipsize="end"
-                        android:maxLines="1" />
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:src="@drawable/ic_arrow_right"
-                        app:tint="#9E9E9E" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_shield_check" />
+                        <TextView
+                            android:id="@+id/tvProductDetailWarrantyMain"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:text="Bảo hành: Đang cập nhật"
+                            android:textColor="#2196F3"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="8dp">
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_shield_check"
+                            android:alpha="0.5" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:text="Trả hàng miễn phí 15 ngày  •  Chính hãng 100%  •  Miễn phí vận chuyển"
+                            android:textColor="#757575"
+                            android:textSize="11sp"
+                            android:ellipsize="end"
+                            android:maxLines="1" />
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/ic_arrow_right"
+                            app:tint="#9E9E9E" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
