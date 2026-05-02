@@ -21,7 +21,7 @@
                 android:layout_height="32dp"
                 android:layout_centerVertical="true"
                 android:padding="6dp"
-                android:src="@drawable/ic_back_shopee"
+                android:src="@drawable/ic_back"
                 app:tint="@color/blue_main" />
             <TextView
                 android:id="@+id/textViewTitle"
@@ -153,6 +153,19 @@
                             <Spinner android:id="@+id/spAddProductBrand" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="4dp" />
                         </LinearLayout>
                     </LinearLayout>
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:hint="Thời gian bảo hành (đơn vị: Tháng) *">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etAddProductWarranty"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"
+                            android:textSize="15sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -218,6 +231,19 @@
                         android:hint="Số lượng trong kho *">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etAddProductStock"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"
+                            android:textSize="15sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:hint="Thời gian bảo hành (đơn vị: Tháng) *">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etAddProductWarranty"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="number"

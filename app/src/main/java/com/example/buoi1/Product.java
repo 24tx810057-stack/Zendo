@@ -20,6 +20,7 @@ public class Product implements Serializable {
     private double rating;
     private int soldCount;
     private long createdAt;
+    private String warranty;
     private List<String> likedBy = new ArrayList<>();
 
     public Product() {
@@ -87,6 +88,9 @@ public class Product implements Serializable {
 
     public long getCreatedAt() { return createdAt; }
     public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
+
+    public String getWarranty() { return warranty; }
+    public void setWarranty(String warranty) { this.warranty = warranty; }
 
     public List<String> getLikedBy() { return likedBy; }
     public void setLikedBy(List<String> likedBy) { this.likedBy = likedBy; }

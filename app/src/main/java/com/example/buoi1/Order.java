@@ -14,11 +14,13 @@ public class Order implements Serializable {
     private double voucherDiscount; // Số tiền được giảm từ voucher
     private String paymentMethod;
     private String status; // Chờ xác nhận, Đang giao, Đã giao, Đã hủy
-    private Date timestamp;
+    private Date timestamp; // Ngày đặt hàng 
+    private Date deliveryDate; // Ngày khách nhận được hàng
     private String address;
     private String phone;
     private String userName;
     private String note;
+    private boolean reviewed; // Trạng thái đã đánh giá hay chưa
 
     public Order() {}
 
@@ -52,6 +54,9 @@ public class Order implements Serializable {
     public Date getTimestamp() { return timestamp; }
     public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
 
+    public Date getDeliveryDate() { return deliveryDate; }
+    public void setDeliveryDate(Date deliveryDate) { this.deliveryDate = deliveryDate; }
+
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
 
@@ -63,4 +68,7 @@ public class Order implements Serializable {
 
     public String getNote() { return note; }
     public void setNote(String note) { this.note = note; }
+
+    public boolean isReviewed() { return reviewed; }
+    public void setReviewed(boolean reviewed) { this.reviewed = reviewed; }
 }

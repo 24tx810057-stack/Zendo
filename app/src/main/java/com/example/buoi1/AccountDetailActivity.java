@@ -128,7 +128,11 @@ public class AccountDetailActivity extends AppCompatActivity {
                     if (documentSnapshot.exists()) {
                         User user = documentSnapshot.toObject(User.class);
                         if (user != null) {
-                            etNickname.setText(user.getNickname());
+                            String displayName = user.getNickname();
+                            if (displayName == null || displayName.isEmpty()) {
+                                displayName = user.getFullName();
+                            }
+                            etNickname.setText(displayName);
                             etBio.setText(user.getBio());
                             etGender.setText(user.getGender());
                             etBirthdate.setText(user.getBirthdate());
@@ -163,8 +167,10 @@ public class AccountDetailActivity extends AppCompatActivity {
     }
 
     private void saveUserData() {
+        String newName = etNickname.getText().toString().trim();
         Map<String, Object> updateData = new HashMap<>();
-        updateData.put("nickname", etNickname.getText().toString().trim());
+        updateData.put("nickname", newName);
+        // Không cập nhật fullName ở đây để giữ tên thật trong CCCD
         updateData.put("bio", etBio.getText().toString().trim());
         updateData.put("gender", etGender.getText().toString().trim());
         updateData.put("birthdate", etBirthdate.getText().toString().trim());
@@ -173,6 +179,10 @@ public class AccountDetailActivity extends AppCompatActivity {
 
         db.collection("users").document(userEmail).update(updateData)
                 .addOnSuccessListener(aVoid -> {
+                    // Cập nhật SharedPreferences để đồng bộ tên ra bên ngoài
+                    SharedPreferences sharedPref = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+                    sharedPref.edit().putString("user_name", newName).apply();
+
                     Toast.makeText(this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
                     toggleEditMode();
                 })

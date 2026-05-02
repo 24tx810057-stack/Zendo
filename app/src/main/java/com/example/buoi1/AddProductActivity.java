@@ -33,7 +33,7 @@ import java.util.Random;
 public class AddProductActivity extends AppCompatActivity {
 
     private TextView tvAutoId, tvTitle, btnSave, btnAddMoreSpec;
-    private EditText etName, etPrice, etOldPrice, etStock, etDesc;
+    private EditText etName, etPrice, etOldPrice, etStock, etDesc, etWarranty;
     private EditText etSpecChip, etSpecScreen, etSpecRam, etSpecRom, etSpecPin, etSpecOs, etSpecCameraRear, etSpecCameraFront;
     private LinearLayout layoutDynamicSpecs;
     private RecyclerView rvImages;
@@ -84,6 +84,7 @@ public class AddProductActivity extends AppCompatActivity {
         etOldPrice = findViewById(R.id.etAddProductOldPrice);
         etStock = findViewById(R.id.etAddProductStock);
         etDesc = findViewById(R.id.etAddProductDesc);
+        etWarranty = findViewById(R.id.etAddProductWarranty);
         
         etSpecChip = findViewById(R.id.etSpecChip);
         etSpecScreen = findViewById(R.id.etSpecScreen);
@@ -199,6 +200,7 @@ public class AddProductActivity extends AppCompatActivity {
         etPrice.setText(String.valueOf((long)product.getPrice()));
         if (product.getOldPrice() > 0) etOldPrice.setText(String.valueOf((long)product.getOldPrice()));
         etStock.setText(String.valueOf(product.getStock()));
+        if (product.getWarranty() != null) etWarranty.setText(product.getWarranty());
         
         String desc = product.getDescription();
         if (desc != null) {
@@ -270,6 +272,7 @@ public class AddProductActivity extends AppCompatActivity {
         Product product = new Product(id, name, fullDesc.toString().trim(), price, base64Images.get(0), category, stock, "N/A", brand, 4.8, 0, System.currentTimeMillis());
         product.setOldPrice(oldPrice);
         product.setImages(base64Images);
+        product.setWarranty(etWarranty.getText().toString().trim());
 
         db.collection("products").document(id).set(product)
                 .addOnSuccessListener(aVoid -> finish())

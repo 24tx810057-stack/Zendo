@@ -122,6 +122,9 @@ public class AddReviewActivity extends AppCompatActivity {
 
         db.collection("reviews").add(review)
                 .addOnSuccessListener(documentReference -> {
+                    // CẬP NHẬT ĐƠN HÀNG LÀ ĐÃ ĐÁNH GIÁ
+                    db.collection("orders").document(orderId).update("reviewed", true);
+
                     Toast.makeText(this, "Cảm ơn bạn đã đánh giá!", Toast.LENGTH_SHORT).show();
                     setResult(RESULT_OK);
                     finish();

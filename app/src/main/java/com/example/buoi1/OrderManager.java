@@ -57,11 +57,17 @@ public class OrderManager {
                 return;
             }
 
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("status", newStatus);
+            if ("Hoàn thành".equals(newStatus)) {
+                updates.put("deliveryDate", new java.util.Date());
+            }
+
             db.collection("orders").document(orderId)
-                    .update("status", newStatus)
+                    .update(updates)
                     .addOnSuccessListener(aVoid -> {
-                        // Tăng lượt bán nếu đơn chuyển sang Đã giao
-                        if ("Đã giao".equals(newStatus)) {
+                        // Tăng lượt bán nếu đơn chuyển sang Hoàn thành
+                        if ("Hoàn thành".equals(newStatus)) {
                             for (CartItem item : order.getItems()) {
                                 if (item.getProductId() != null) {
                                     db.collection("products").document(item.getProductId())

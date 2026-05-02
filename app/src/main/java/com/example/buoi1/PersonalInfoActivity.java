@@ -87,6 +87,11 @@ public class PersonalInfoActivity extends AppCompatActivity {
         String idCard = etIdCard.getText().toString().trim();
         String address = etAddress.getText().toString().trim();
 
+        if (fullName.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập họ tên", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Map<String, Object> updateData = new HashMap<>();
         updateData.put("fullName", fullName);
         updateData.put("idCard", idCard);
@@ -94,7 +99,14 @@ public class PersonalInfoActivity extends AppCompatActivity {
 
         db.collection("users").document(userEmail).update(updateData)
                 .addOnSuccessListener(aVoid -> {
+                    // CẬP NHẬT TÊN MỚI VÀO SHAREDPREFERENCES ĐỂ ĐỒNG BỘ RA BÊN NGOÀI
+                    SharedPreferences sharedPref = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString("user_name", fullName);
+                    editor.apply();
+
                     Toast.makeText(this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK); // Báo cho màn hình trước biết để load lại data
                     finish();
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());

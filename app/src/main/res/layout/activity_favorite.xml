@@ -18,11 +18,12 @@
 
             <ImageButton
                 android:id="@+id/btnBackFav"
-                android:layout_width="wrap_content"
+                android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_revert"
-                app:tint="#EE4D2D" />
+                android:src="@drawable/ic_back"
+                android:padding="8dp"
+                app:tint="#2196F3" />
 
             <TextView
                 android:layout_width="wrap_content"

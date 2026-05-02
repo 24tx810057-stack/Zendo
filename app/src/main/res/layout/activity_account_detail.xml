@@ -10,7 +10,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="@drawable/bg">
+        android:background="#FFFFFF">
 
         <ImageView
             android:id="@+id/btnBackDetail"
@@ -19,15 +19,15 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="8dp"
             android:padding="8dp"
-            android:src="@android:drawable/ic_menu_revert"
-            app:tint="#FFFFFF" />
+            android:src="@drawable/ic_back"
+            app:tint="#2196F3" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Thiết lập hồ sơ"
-            android:textColor="#FFFFFF"
+            android:textColor="#212121"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -39,7 +39,7 @@
             android:gravity="center"
             android:paddingHorizontal="16dp"
             android:text="Sửa"
-            android:textColor="#FFFFFF"
+            android:textColor="#2196F3"
             android:textSize="14sp" />
     </RelativeLayout>
 

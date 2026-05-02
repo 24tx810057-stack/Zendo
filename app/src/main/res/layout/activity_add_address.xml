@@ -18,9 +18,8 @@
             android:layout_height="48dp"
             android:layout_centerVertical="true"
             android:padding="12dp"
-            android:src="@drawable/ic_arrow_right"
-            android:rotation="180"
-            app:tint="@color/blue_main" />
+            android:src="@drawable/ic_back"
+            app:tint="#2196F3" />
 
         <TextView
             android:id="@+id/tvTitleAddAddress"

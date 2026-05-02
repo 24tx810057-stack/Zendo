@@ -57,7 +57,7 @@ public class DetailActivity extends AppCompatActivity {
     private Product product;
     private String userEmail, userRole;
 
-    private TextView tvSpecChip, tvSpecScreen, tvSpecRam, tvSpecRom, tvSpecPin, tvSpecCamera, tvSpecOs;
+    private TextView tvSpecChip, tvSpecScreen, tvSpecRam, tvSpecRom, tvSpecPin, tvSpecCamera, tvSpecOs, tvSpecWarranty;
     private ImageView ivArrowSpecs, ivArrowDesc;
     private TextView tvPrice, tvOldPrice, tvDiscountTag, tvName, tvDesc, tvRating, tvSold, tvStock, tvShippingTime, tvPriceBottom;
     private LinearLayout layoutContentSpecs, layoutContentDesc;
@@ -144,6 +144,7 @@ public class DetailActivity extends AppCompatActivity {
         tvSpecPin = findViewById(R.id.tvSpecPin);
         tvSpecCamera = findViewById(R.id.tvSpecCamera);
         tvSpecOs = findViewById(R.id.tvSpecOs);
+        tvSpecWarranty = findViewById(R.id.tvSpecWarranty);
 
         layoutContentSpecs = findViewById(R.id.layoutContentSpecs);
         layoutContentDesc = findViewById(R.id.layoutContentDesc);
@@ -198,6 +199,13 @@ public class DetailActivity extends AppCompatActivity {
 
         if (ivFavorite != null) {
             ivFavorite.setOnClickListener(v -> toggleFavorite());
+        }
+
+        View btnViewWarrantyPolicy = findViewById(R.id.btnViewWarrantyPolicy);
+        if (btnViewWarrantyPolicy != null) {
+            btnViewWarrantyPolicy.setOnClickListener(v -> {
+                startActivity(new Intent(this, WarrantyPolicyActivity.class));
+            });
         }
     }
 
@@ -589,6 +597,15 @@ public class DetailActivity extends AppCompatActivity {
         if (tvSpecPin != null) tvSpecPin.setText("Đang cập nhật");
         if (tvSpecCamera != null) tvSpecCamera.setText("Đang cập nhật");
         if (tvSpecOs != null) tvSpecOs.setText("Đang cập nhật");
+        if (tvSpecWarranty != null) {
+            String warranty = (product != null && product.getWarranty() != null) ? product.getWarranty() : "";
+            if (!warranty.isEmpty()) {
+                if (warranty.matches("\\d+")) warranty += " tháng";
+                tvSpecWarranty.setText(warranty);
+            } else {
+                tvSpecWarranty.setText("Đang cập nhật");
+            }
+        }
 
         String[] lines = desc.split("\\r?\\n");
         StringBuilder generalDesc = new StringBuilder();
@@ -623,6 +640,7 @@ public class DetailActivity extends AppCompatActivity {
         ArrayList<CartItem> checkoutList = new ArrayList<>();
         CartItem tempItem = new CartItem(null, productId, product.getName(), 
                 product.getPrice(), product.getImageUrl(), 1, userEmail);
+        tempItem.setWarranty(product.getWarranty());
         checkoutList.add(tempItem);
         Intent intent = new Intent(this, CheckoutActivity.class);
         intent.putExtra("checkout_items", checkoutList);
@@ -642,6 +660,7 @@ public class DetailActivity extends AppCompatActivity {
                     } else {
                         CartItem newItem = new CartItem(null, productId, product.getName(), 
                                 product.getPrice(), product.getImageUrl(), 1, userEmail);
+                        newItem.setWarranty(product.getWarranty());
                         db.collection("cart").add(newItem);
                     }
                     Toast.makeText(this, "Đã thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();

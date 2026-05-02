@@ -44,6 +44,10 @@
         <activity android:name=".RevenueActivity" />
         <activity android:name=".AddressListActivity" />
         <activity android:name=".AddAddressActivity" />
+        <activity android:name=".WarrantyPolicyActivity" />
+        <activity android:name=".RequestReturnActivity" />
+        <activity android:name=".AdminReturnListActivity" />
+        <activity android:name=".AdminReturnDetailActivity" />
 
     </application>
 

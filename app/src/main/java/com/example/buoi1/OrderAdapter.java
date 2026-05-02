@@ -78,27 +78,21 @@ public class OrderAdapter extends BaseAdapter {
         } else {
             // User: Hiển thị logic Đánh giá / Mua lại
             btnAction.setVisibility(View.VISIBLE);
-            if ("Đã giao".equals(order.getStatus())) {
-                btnAction.setText("..."); // Loading state
-                db.collection("reviews")
-                        .whereEqualTo("orderId", order.getId())
-                        .get()
-                        .addOnSuccessListener(queryDocumentSnapshots -> {
-                            if (!queryDocumentSnapshots.isEmpty()) {
-                                // Đã đánh giá -> Chuyển thành nút Mua lại
-                                btnAction.setText("Mua lại");
-                                btnAction.setOnClickListener(v -> goToProductDetail(order));
-                            } else {
-                                // Chưa đánh giá -> Nút Đánh giá
-                                btnAction.setText("Đánh giá");
-                                btnAction.setOnClickListener(v -> {
-                                    Intent intent = new Intent(context, OrderDetailActivity.class);
-                                    intent.putExtra("order_data", order);
-                                    intent.putExtra("trigger_review", true);
-                                    context.startActivity(intent);
-                                });
-                            }
-                        });
+            String status = order.getStatus();
+            
+            if ("Hoàn thành".equals(status) || "Đã giao".equals(status)) {
+                if (order.isReviewed()) {
+                    btnAction.setText("Mua lại");
+                    btnAction.setOnClickListener(v -> goToProductDetail(order));
+                } else {
+                    btnAction.setText("Đánh giá");
+                    btnAction.setOnClickListener(v -> {
+                        Intent intent = new Intent(context, OrderDetailActivity.class);
+                        intent.putExtra("order_data", order);
+                        intent.putExtra("trigger_review", true);
+                        context.startActivity(intent);
+                    });
+                }
             } else {
                 // Các trạng thái khác vẫn hiện nút Mua lại cho User
                 btnAction.setText("Mua lại");

@@ -16,11 +16,11 @@
 
         <ImageView
             android:id="@+id/btnBackToLoginIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_centerVertical="true"
-            android:src="@android:drawable/ic_menu_revert"
-            app:tint="#29B6F6" />
+            android:src="@drawable/ic_back"
+            app:tint="#2196F3" />
 
         <TextView
             android:layout_width="wrap_content"

@@ -18,12 +18,12 @@
 
             <ImageButton
                 android:id="@+id/btnBackCart"
-                android:layout_width="wrap_content"
+                android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_arrow_right"
-                android:rotation="180"
-                app:tint="@color/blue_main" />
+                android:src="@drawable/ic_back"
+                android:padding="8dp"
+                app:tint="#2196F3" />
 
             <TextView
                 android:layout_width="wrap_content"

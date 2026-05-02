@@ -76,7 +76,8 @@ public class OrderListActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setText("Chờ xác nhận"));
         tabLayout.addTab(tabLayout.newTab().setText("Chờ lấy hàng"));
         tabLayout.addTab(tabLayout.newTab().setText("Đang giao"));
-        tabLayout.addTab(tabLayout.newTab().setText("Đã giao"));
+        tabLayout.addTab(tabLayout.newTab().setText("Hoàn thành"));
+        tabLayout.addTab(tabLayout.newTab().setText("Trả hàng"));
         tabLayout.addTab(tabLayout.newTab().setText("Đã hủy"));
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -104,7 +105,7 @@ public class OrderListActivity extends AppCompatActivity {
         }
 
         Query query = db.collection("orders");
-        // USER thì lọc theo Email, ADMIN thì lấy tuốt tuồn tuột
+        // USER thì lọc theo Email, ADMIN thì lấy
         if (!"admin".equals(userRole)) {
             query = query.whereEqualTo("userEmail", userEmail);
         }
@@ -134,24 +135,28 @@ public class OrderListActivity extends AppCompatActivity {
 
     private void filterOrders(int tabPosition) {
         filteredOrders.clear();
-        String statusFilter = "";
         
-        switch (tabPosition) {
-            case 0: statusFilter = "Tất cả"; break;
-            case 1: statusFilter = "Chờ xác nhận"; break;
-            case 2: statusFilter = "Chờ lấy hàng"; break;
-            case 3: statusFilter = "Đang giao"; break;
-            case 4: statusFilter = "Đã giao"; break;
-            case 5: statusFilter = "Đã hủy"; break;
-        }
-
-        if (statusFilter.equals("Tất cả")) {
+        if (tabPosition == 0) { // Tất cả
             filteredOrders.addAll(allOrders);
         } else {
             for (Order order : allOrders) {
-                if (statusFilter.equals(order.getStatus())) {
-                    filteredOrders.add(order);
+                String status = order.getStatus();
+                if (status == null) continue;
+
+                boolean match = false;
+                switch (tabPosition) {
+                    case 1: match = status.equals("Chờ xác nhận"); break;
+                    case 2: match = status.equals("Chờ lấy hàng"); break;
+                    case 3: // Gom Đang giao và Đã giao vào 1 Tab
+                        match = status.equals("Đang giao") || status.equals("Đã giao"); 
+                        break;
+                    case 4: match = status.equals("Hoàn thành"); break;
+                    case 5: // Tab Trả hàng
+                        match = status.equals("Yêu cầu trả hàng") || status.equals("Đã hoàn tiền");
+                        break;
+                    case 6: match = status.equals("Đã hủy"); break;
                 }
+                if (match) filteredOrders.add(order);
             }
         }
         adapter.notifyDataSetChanged();

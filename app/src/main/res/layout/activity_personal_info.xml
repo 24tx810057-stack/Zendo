@@ -18,7 +18,7 @@
             android:layout_height="48dp"
             android:layout_centerVertical="true"
             android:padding="12dp"
-            android:src="@drawable/ic_back_shopee"
+            android:src="@drawable/ic_back"
             app:tint="#29B6F6" />
 
         <TextView

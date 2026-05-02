@@ -44,7 +44,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView btnSetting;
     private View btnCart, layoutUserMenu, layoutAdminMenu, sectionSuggestion, btnChangePassword, btnNotification, sectionFavorite;
     private ShapeableImageView ivAvatar;
-    private View btnAdminOrders, btnAdminProducts, btnAdminVouchers, btnAdminReviews;
+    private View btnAdminOrders, btnAdminProducts, btnAdminVouchers, btnAdminReviews, btnAdminReturnRequests;
     private Button btnLogout;
     private BottomNavigationView bottomNav;
     private NonScrollGridView gvSuggestions;
@@ -98,6 +98,7 @@ public class ProfileActivity extends AppCompatActivity {
         btnAdminProducts = findViewById(R.id.btnAdminProducts);
         btnAdminVouchers = findViewById(R.id.btnAdminVouchers);
         btnAdminReviews = findViewById(R.id.btnAdminReviews);
+        btnAdminReturnRequests = findViewById(R.id.btnAdminReturnRequests);
         btnChangePassword = findViewById(R.id.btnChangePassword);
         sectionFavorite = findViewById(R.id.sectionFavorite);
         
@@ -105,7 +106,12 @@ public class ProfileActivity extends AppCompatActivity {
         btnLogout = findViewById(R.id.btnLogout);
         bottomNav = findViewById(R.id.bottomNavProfile);
 
-        if (tvName != null) tvName.setText(userEmail); 
+        SharedPreferences sharedPref = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+        String savedName = sharedPref.getString("user_name", "");
+        if (tvName != null) {
+            if (!savedName.isEmpty()) tvName.setText(savedName);
+            else tvName.setText(userEmail);
+        }
         if (tvRole != null) tvRole.setText(userRole.equals("admin") ? "Chủ cửa hàng" : "Thành viên");
     }
 
@@ -166,6 +172,12 @@ public class ProfileActivity extends AppCompatActivity {
 
         if (btnAdminVouchers != null) btnAdminVouchers.setOnClickListener(v -> startActivity(new Intent(this, VoucherManagementActivity.class)));
         if (btnAdminReviews != null) btnAdminReviews.setOnClickListener(v -> startActivity(new Intent(this, AdminReviewsActivity.class)));
+        if (btnAdminReturnRequests != null) {
+            btnAdminReturnRequests.setOnClickListener(v -> {
+                // Sẽ tạo activity này ở bước sau
+                startActivity(new Intent(this, AdminReturnListActivity.class));
+            });
+        }
 
         if (btnRevenueStats != null) {
             btnRevenueStats.setOnClickListener(v -> {
@@ -316,10 +328,19 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        
+        // 1. CẬP NHẬT NGAY TỪ CACHE (SharedPreferences) để thấy thay đổi tức thì
+        SharedPreferences sharedPref = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+        String savedName = sharedPref.getString("user_name", "");
+        if (tvName != null && !savedName.isEmpty()) {
+            tvName.setText(savedName);
+        }
+
         loadUserInfoFromFirestore();
         observeNotificationBadge();
         if ("admin".equals(userRole)) {
             updateAdminOrderBadge();
+            updateAdminReturnBadge();
             updateRevenueStats();
         } else {
             updateCartBadge();
@@ -386,6 +407,22 @@ public class ProfileActivity extends AppCompatActivity {
                 });
     }
 
+    private void updateAdminReturnBadge() {
+        db.collection("return_requests")
+                .whereEqualTo("status", "pending")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int count = queryDocumentSnapshots.size();
+                    TextView tvReturnBadge = findViewById(R.id.tvReturnBadge);
+                    if (tvReturnBadge != null) {
+                        if (count > 0) {
+                            tvReturnBadge.setText(String.valueOf(count));
+                            tvReturnBadge.setVisibility(View.VISIBLE);
+                        } else { tvReturnBadge.setVisibility(View.GONE); }
+                    }
+                });
+    }
+
     private void updateCartBadge() {
         if (userEmail == null || userEmail.isEmpty()) return;
         db.collection("cart").whereEqualTo("userEmail", userEmail).get()
@@ -401,12 +438,23 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void loadUserInfoFromFirestore() {
         if (userEmail == null || userEmail.isEmpty()) return;
-        db.collection("users").whereEqualTo("email", userEmail).get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        User user = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
+        db.collection("users").document(userEmail).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        User user = documentSnapshot.toObject(User.class);
                         if (user != null) {
-                            if (tvName != null && user.getFullName() != null && !user.getFullName().isEmpty()) tvName.setText(user.getFullName());
+                            String displayName = user.getNickname();
+                            if (displayName == null || displayName.isEmpty()) {
+                                displayName = user.getFullName();
+                            }
+                            
+                            if (tvName != null && displayName != null && !displayName.isEmpty()) {
+                                tvName.setText(displayName);
+                                // Cập nhật lại cache để đồng bộ
+                                getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+                                    .edit().putString("user_name", displayName).apply();
+                            }
+
                             String base64Avatar = user.getAvatar();
                             if (ivAvatar != null && base64Avatar != null && !base64Avatar.isEmpty()) {
                                 try {

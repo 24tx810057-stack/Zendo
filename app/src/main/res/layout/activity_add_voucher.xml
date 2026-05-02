@@ -21,7 +21,7 @@
                 android:layout_height="32dp"
                 android:layout_centerVertical="true"
                 android:padding="6dp"
-                android:src="@drawable/ic_back_shopee"
+                android:src="@drawable/ic_back"
                 app:tint="@color/blue_main" />
             <TextView
                 android:id="@+id/tvToolbarTitleAddVoucher"
