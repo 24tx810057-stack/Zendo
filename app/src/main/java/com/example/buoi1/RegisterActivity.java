@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText etFullName, etEmail, etPassword, etConfirmPassword, etAddress, etPhone;
+    private EditText etFullName, etEmail, etPassword, etConfirmPassword, etPhone;
     private Button btnRegister;
     private FirebaseFirestore db;
 
@@ -27,7 +27,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         etFullName = findViewById(R.id.etFullName);
         etEmail = findViewById(R.id.etEmail);
-        etAddress = findViewById(R.id.etAddress);
         etPhone = findViewById(R.id.etPhone); 
         etPassword = findViewById(R.id.etRegPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
@@ -44,12 +43,11 @@ public class RegisterActivity extends AppCompatActivity {
     private void registerUser() {
         String fullName = etFullName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
-        String address = etAddress.getText().toString().trim();
         String phone = etPhone != null ? etPhone.getText().toString().trim() : "";
         String password = etPassword.getText().toString().trim();
         String confirmPass = etConfirmPassword.getText().toString().trim();
 
-        if (TextUtils.isEmpty(fullName) || TextUtils.isEmpty(email) || TextUtils.isEmpty(address) || TextUtils.isEmpty(password)) {
+        if (TextUtils.isEmpty(fullName) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
             Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -66,7 +64,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         String userId = UUID.randomUUID().toString().substring(0, 8);
-        User newUser = new User(userId, fullName, email, password, address, phone, "user");
+        User newUser = new User(userId, fullName, email, password, phone, "user");
 
         db.collection("users")
                 .document(email) 

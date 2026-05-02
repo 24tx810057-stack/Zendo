@@ -205,7 +205,6 @@
                         android:layout_marginTop="12dp"
                         android:orientation="vertical">
 
-                        <!-- Hỏa tốc -->
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/layoutItemFast"
                             android:layout_width="match_parent"
@@ -266,7 +265,6 @@
                             </LinearLayout>
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <!-- Tiêu chuẩn -->
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/layoutItemStandard"
                             android:layout_width="match_parent"
@@ -329,7 +327,7 @@
 
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="16dp" android:background="#F0F0F0" />
 
-                    <!-- Voucher Section -->
+                    <!-- Voucher -->
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/layoutVoucher"
                         android:layout_width="match_parent"
@@ -515,34 +513,25 @@
                                 android:layout_height="wrap_content"
                                 android:text="Số TK: 200100"
                                 android:textColor="#212121"
-                                android:textStyle="bold"
-                                android:layout_alignParentStart="true"
-                                android:layout_toStartOf="@+id/btnCopySTK"
-                                android:layout_marginEnd="8dp"/>
-                            <ImageView
+                                android:textStyle="bold"/>
+                            <TextView
                                 android:id="@+id/btnCopySTK"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:src="@drawable/ic_copy"
-                                android:padding="4dp"
-                                android:background="?attr/selectableItemBackgroundBorderless"/>
+                                android:text="SAO CHÉP"
+                                android:textColor="@color/blue_main"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:padding="4dp"/>
                         </RelativeLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Chủ TK: NGUYEN QUOC BAO"
-                            android:textColor="#212121"
-                            android:layout_marginBottom="4dp"/>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Ngân hàng: VIB"
                             android:textColor="#212121"
-                            android:layout_marginBottom="6dp"/>
+                            android:layout_marginBottom="4dp"/>
 
                         <RelativeLayout
                             android:layout_width="match_parent"
@@ -550,23 +539,21 @@
                             android:layout_marginBottom="12dp">
                             <TextView
                                 android:id="@+id/tvTransferNote"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Nội dung: Đang tải..."
                                 android:textColor="#212121"
-                                android:textStyle="bold"
-                                android:layout_alignParentStart="true"
-                                android:layout_toStartOf="@+id/btnCopyNoiDung"
-                                android:layout_marginEnd="8dp"/>
-                            <ImageView
+                                android:textStyle="bold"/>
+                            <TextView
                                 android:id="@+id/btnCopyNoiDung"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:src="@drawable/ic_copy"
-                                android:padding="4dp"
-                                android:background="?attr/selectableItemBackgroundBorderless"/>
+                                android:text="SAO CHÉP"
+                                android:textColor="@color/blue_main"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:padding="4dp"/>
                         </RelativeLayout>
 
                         <ImageView

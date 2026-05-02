@@ -80,7 +80,6 @@
                 android:layout_height="1dp"
                 android:background="#EEEEEE" />
 
-            <!-- Ô nhập Số điện thoại mới -->
             <EditText
                 android:id="@+id/etPhone"
                 android:layout_width="match_parent"
@@ -90,23 +89,6 @@
                 android:background="@android:color/transparent"
                 android:hint="Số điện thoại"
                 android:inputType="phone"
-                android:paddingVertical="15dp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE" />
-
-            <!-- Ô nhập Địa chỉ -->
-            <EditText
-                android:id="@+id/etAddress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp"
-                android:background="@android:color/transparent"
-                android:hint="Địa chỉ giao hàng"
-                android:inputType="textPostalAddress"
                 android:paddingVertical="15dp" />
 
             <View

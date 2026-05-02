@@ -25,6 +25,7 @@ public class AddressListActivity extends AppCompatActivity {
     private LinearLayout btnAddAddress;
     private FirebaseFirestore db;
     private String userEmail;
+    private boolean isLoading = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,12 +34,11 @@ public class AddressListActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         SharedPreferences sharedPref = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
-        userEmail = sharedPref.getString("user_email", "");
+        userEmail = sharedPref.getString("user_email", "").trim();
 
         initViews();
         setupRecyclerView();
         setupListeners();
-        loadAddresses();
     }
 
     private void initViews() {
@@ -52,7 +52,6 @@ public class AddressListActivity extends AppCompatActivity {
         adapter = new AddressAdapter(addressList, new AddressAdapter.OnAddressClickListener() {
             @Override
             public void onEditClick(UserAddress address) {
-                // KHI BẤM SỬA: Gửi đối tượng address sang trang AddAddress
                 Intent intent = new Intent(AddressListActivity.this, AddAddressActivity.class);
                 intent.putExtra("edit_address", address);
                 startActivity(intent);
@@ -73,62 +72,38 @@ public class AddressListActivity extends AppCompatActivity {
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
         btnAddAddress.setOnClickListener(v -> {
-            // KHI BẤM THÊM MỚI: Không gửi gì cả, AddAddressActivity sẽ tự để trắng các ô
             Intent intent = new Intent(AddressListActivity.this, AddAddressActivity.class);
             startActivity(intent);
         });
     }
 
     private void loadAddresses() {
-        if (userEmail.isEmpty()) return;
+        if (userEmail.isEmpty() || isLoading) return;
+        isLoading = true;
 
-        // 1. Lấy danh sách từ collection "addresses" của user này
         db.collection("addresses")
                 .whereEqualTo("userEmail", userEmail)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    addressList.clear();
+                    List<UserAddress> newList = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         UserAddress addr = doc.toObject(UserAddress.class);
                         addr.setId(doc.getId());
-                        addressList.add(addr);
+                        newList.add(addr);
                     }
-                    
-                    // Nếu danh sách trống, có thể lấy từ thông tin User mặc định
-                    if (addressList.isEmpty()) {
-                        loadDefaultUserAddress();
-                    } else {
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-    }
-
-    private void loadDefaultUserAddress() {
-        db.collection("users").whereEqualTo("email", userEmail).get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        User user = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
-                        if (user != null && user.getAddress() != null && !user.getAddress().isEmpty()) {
-                            UserAddress defaultAddr = new UserAddress();
-                            defaultAddr.setFullName(user.getFullName());
-                            defaultAddr.setPhone(user.getPhone());
-                            defaultAddr.setDetailAddress(user.getAddress());
-                            defaultAddr.setWard("Chưa cập nhật");
-                            defaultAddr.setDistrict("");
-                            defaultAddr.setProvinceCity("");
-                            defaultAddr.setDefault(true);
-                            defaultAddr.setType("Nhà riêng");
-                            
-                            addressList.add(defaultAddr);
-                            adapter.notifyDataSetChanged();
-                        }
-                    }
+                    addressList = newList;
+                    adapter.setAddressList(addressList);
+                    isLoading = false;
+                })
+                .addOnFailureListener(e -> {
+                    isLoading = false;
+                    Toast.makeText(this, "Lỗi tải địa chỉ: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        loadAddresses(); // Làm mới danh sách khi quay lại từ trang thêm/sửa
+        loadAddresses();
     }
 }

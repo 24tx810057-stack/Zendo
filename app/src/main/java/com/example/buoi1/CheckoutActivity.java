@@ -1,5 +1,7 @@
 package com.example.buoi1;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,7 +16,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
@@ -27,34 +28,42 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
 import java.text.DecimalFormat;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class CheckoutActivity extends AppCompatActivity {
 
     private TextView tvNamePhone, tvAddress, tvSummarySubtotal, tvSummaryShipping, tvSummaryTotal, tvSummaryTotalSticky;
-    private TextView tvFastPrice, tvFastOldPrice, tvStandardPrice, tvStandardOldPrice, tvShippingBadge;
+    private TextView tvFastPrice, tvStandardPrice, tvFastOldPrice, tvStandardOldPrice, tvShippingBadge;
     private TextView tvSelectedVoucher, tvSummaryDiscount;
     private View layoutVoucher, layoutSummaryDiscount;
     private TextView btnEditAddress;
     private Button btnAddFirstAddress;
     private LinearLayout layoutProductItems;
-    private RadioGroup rgPayment;
     private View btnPlaceOrder;
     private ImageView btnBack;
     private EditText etOrderNote;
+
+    private View layoutPayCOD, layoutPayBank, layoutPayZendo, layoutBankDetails;
+    private RadioButton rbSelectCOD, rbSelectBank, rbSelectZendo;
+    private View btnCopySTK, btnCopyNoiDung;
+    private TextView tvTransferNote;
+    private ImageView ivBankQR;
 
     private View layoutItemFast, layoutItemStandard;
     private RadioButton rbFast, rbStandard;
 
     private FirebaseFirestore db;
     private String userEmail;
-    private User currentUser;
     private List<CartItem> checkoutItems;
     private double subtotalValue = 0;
     private double shippingFee = 15000;
     private double discountAmount = 0;
+    private double finalTotal = 0;
+    private String dynamicDescription = "THANH TOAN DON HANG";
     private DecimalFormat formatter = new DecimalFormat("###,###,###");
 
     private String editName, editPhone, editAddress;
@@ -72,16 +81,16 @@ public class CheckoutActivity extends AppCompatActivity {
         checkoutItems = (ArrayList<CartItem>) getIntent().getSerializableExtra("checkout_items");
 
         initViews();
-        loadUserInfo();
+        loadDefaultAddress();
         displayProducts();
         setupShippingSelection();
+        setupPaymentSelection();
         calculateTotals();
 
         layoutVoucher.setOnClickListener(v -> showVoucherDialog());
         btnPlaceOrder.setOnClickListener(v -> handlePlaceOrder());
         btnBack.setOnClickListener(v -> finish());
         
-        // SỬA TẠI ĐÂY: Mở AddressListActivity thay vì hiện Dialog cũ
         View.OnClickListener addressClickListener = v -> {
             Intent intent = new Intent(CheckoutActivity.this, AddressListActivity.class);
             startActivityForResult(intent, REQUEST_CODE_SELECT_ADDRESS);
@@ -91,28 +100,13 @@ public class CheckoutActivity extends AppCompatActivity {
         btnAddFirstAddress.setOnClickListener(addressClickListener);
     }
 
-    // NHẬN ĐỊA CHỈ TRẢ VỀ
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_SELECT_ADDRESS && resultCode == RESULT_OK && data != null) {
-            UserAddress selected = (UserAddress) data.getSerializableExtra("selected_address");
-            if (selected != null) {
-                editName = selected.getFullName();
-                editPhone = selected.getPhone();
-                editAddress = selected.getFullAddress();
-                updateAddressUI();
-            }
-        }
-    }
-
     private void initViews() {
         tvNamePhone = findViewById(R.id.tvCheckoutNamePhone);
         tvAddress = findViewById(R.id.tvCheckoutAddress);
         btnEditAddress = findViewById(R.id.btnEditAddress);
         btnAddFirstAddress = findViewById(R.id.btnAddFirstAddress);
         layoutProductItems = findViewById(R.id.layoutProductItems);
-        rgPayment = findViewById(R.id.rgPayment);
+        
         tvSummarySubtotal = findViewById(R.id.tvSummarySubtotal);
         tvSummaryShipping = findViewById(R.id.tvSummaryShipping);
         tvSummaryTotal = findViewById(R.id.tvSummaryTotal);
@@ -138,20 +132,108 @@ public class CheckoutActivity extends AppCompatActivity {
         rbStandard = findViewById(R.id.rbStandard);
         
         etOrderNote = findViewById(R.id.etOrderNote);
+
+        layoutPayCOD = findViewById(R.id.layoutPayCOD);
+        layoutPayBank = findViewById(R.id.layoutPayBank);
+        layoutPayZendo = findViewById(R.id.layoutPayZendo);
+        layoutBankDetails = findViewById(R.id.layoutBankDetails);
+        rbSelectCOD = findViewById(R.id.rbSelectCOD);
+        rbSelectBank = findViewById(R.id.rbSelectBank);
+        rbSelectZendo = findViewById(R.id.rbSelectZendo);
+        btnCopySTK = findViewById(R.id.btnCopySTK);
+        btnCopyNoiDung = findViewById(R.id.btnCopyNoiDung);
+        tvTransferNote = findViewById(R.id.tvTransferNote);
+        ivBankQR = findViewById(R.id.ivBankQR);
+    }
+
+    private void setupPaymentSelection() {
+        selectPaymentMethod("COD");
+
+        layoutPayCOD.setOnClickListener(v -> selectPaymentMethod("COD"));
+        layoutPayBank.setOnClickListener(v -> selectPaymentMethod("BANK"));
+        layoutPayZendo.setOnClickListener(v -> selectPaymentMethod("ZENDOPAY"));
+
+        btnCopySTK.setOnClickListener(v -> copyToClipboard("200100", "Đã sao chép số tài khoản VIB"));
+        btnCopyNoiDung.setOnClickListener(v -> copyToClipboard(dynamicDescription, "Đã sao chép nội dung chuyển khoản"));
+    }
+
+    private void selectPaymentMethod(String method) {
+        rbSelectCOD.setChecked(false);
+        rbSelectBank.setChecked(false);
+        rbSelectZendo.setChecked(false);
+        layoutPayCOD.setSelected(false);
+        layoutPayBank.setSelected(false);
+        layoutPayZendo.setSelected(false);
+        layoutBankDetails.setVisibility(View.GONE);
+
+        switch (method) {
+            case "COD":
+                rbSelectCOD.setChecked(true);
+                layoutPayCOD.setSelected(true);
+                break;
+            case "BANK":
+                rbSelectBank.setChecked(true);
+                layoutPayBank.setSelected(true);
+                layoutBankDetails.setVisibility(View.VISIBLE);
+                updateVietQR(); 
+                break;
+            case "ZENDOPAY":
+                rbSelectZendo.setChecked(true);
+                layoutPayZendo.setSelected(true);
+                break;
+        }
+    }
+
+    private void updateVietQR() {
+        if (checkoutItems == null || checkoutItems.isEmpty()) return;
+
+        String bankId = "VIB";
+        String accountNo = "200100";
+        String template = "compact2";
+        
+        String firstItemName = checkoutItems.get(0).getProductName();
+        String cleanName = removeAccent(firstItemName).replaceAll("[^a-zA-Z0-9]", "");
+        if (cleanName.length() > 10) cleanName = cleanName.substring(0, 10);
+        
+        dynamicDescription = "ZENDO " + cleanName.toUpperCase() + " " + (int)finalTotal;
+        
+        if (tvTransferNote != null) {
+            tvTransferNote.setText("Nội dung: " + dynamicDescription);
+        }
+
+        String url = String.format("https://img.vietqr.io/image/%s-%s-%s.png?amount=%d&addInfo=%s",
+                bankId, accountNo, template, (int)finalTotal, dynamicDescription);
+        
+        Glide.with(this)
+                .load(url)
+                .placeholder(R.drawable.bg_border_gray_light)
+                .into(ivBankQR);
+    }
+
+    private String removeAccent(String s) {
+        String temp = Normalizer.normalize(s, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(temp).replaceAll("").replace('đ', 'd').replace('Đ', 'D');
+    }
+
+    private void copyToClipboard(String text, String message) {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("ZendoInfo", text);
+        if (clipboard != null) {
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void setupShippingSelection() {
         rbStandard.setChecked(true);
         layoutItemStandard.setSelected(true);
-        rbFast.setChecked(false);
-        layoutItemFast.setSelected(false);
 
         View.OnClickListener fastListener = v -> {
             rbFast.setChecked(true);
             rbStandard.setChecked(false);
             layoutItemFast.setSelected(true);
             layoutItemStandard.setSelected(false);
-            updateShippingFee();
             calculateTotals();
         };
 
@@ -160,110 +242,55 @@ public class CheckoutActivity extends AppCompatActivity {
             rbStandard.setChecked(true);
             layoutItemFast.setSelected(false);
             layoutItemStandard.setSelected(true);
-            updateShippingFee();
             calculateTotals();
         };
 
         layoutItemFast.setOnClickListener(fastListener);
-        rbFast.setOnClickListener(fastListener);
-
         layoutItemStandard.setOnClickListener(standardListener);
-        rbStandard.setOnClickListener(standardListener);
     }
 
-    private void updateShippingFee() {
-        if (subtotalValue >= 100000) {
-            shippingFee = 0;
+    private void calculateTotals() {
+        if (subtotalValue >= 100000) shippingFee = 0;
+        else shippingFee = rbFast.isChecked() ? 30000 : 15000;
+
+        if (shippingFee == 0) {
+            tvShippingBadge.setVisibility(View.VISIBLE);
+            tvFastOldPrice.setVisibility(View.VISIBLE);
+            tvFastOldPrice.setPaintFlags(tvFastOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            tvFastPrice.setText("MIỄN PHÍ");
+            tvFastPrice.setTextColor(0xFF2E7D32);
+            tvStandardOldPrice.setVisibility(View.VISIBLE);
+            tvStandardOldPrice.setPaintFlags(tvStandardOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            tvStandardPrice.setText("MIỄN PHÍ");
+            tvStandardPrice.setTextColor(0xFF2E7D32);
+            tvSummaryShipping.setText("Miễn phí");
         } else {
-            shippingFee = rbFast.isChecked() ? 30000 : 15000;
+            tvShippingBadge.setVisibility(View.GONE);
+            tvFastOldPrice.setVisibility(View.GONE);
+            tvFastPrice.setText("30.000đ");
+            tvFastPrice.setTextColor(ContextCompat.getColor(this, R.color.blue_main));
+            tvStandardOldPrice.setVisibility(View.GONE);
+            tvStandardPrice.setText("15.000đ");
+            tvStandardPrice.setTextColor(ContextCompat.getColor(this, R.color.blue_main));
+            tvSummaryShipping.setText(formatter.format(shippingFee) + "đ");
         }
-    }
 
-    private void showVoucherDialog() {
-        db.collection("vouchers")
-                .whereEqualTo("active", true)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Voucher> availableVouchers = new ArrayList<>();
-                    List<String> voucherOptions = new ArrayList<>();
-                    long currentTime = System.currentTimeMillis();
-
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        try {
-                            Voucher voucher = doc.toObject(Voucher.class);
-                            if (voucher == null) continue;
-                            voucher.setId(doc.getId());
-
-                            boolean isNotExpired = (voucher.getExpiryDate() == 0 || voucher.getExpiryDate() > currentTime);
-                            boolean isMinOrderMet = (subtotalValue >= voucher.getMinOrder());
-
-                            if (isNotExpired && isMinOrderMet) {
-                                availableVouchers.add(voucher);
-                                String valueStr = "PERCENT".equalsIgnoreCase(voucher.getType()) ? (int)voucher.getValue() + "%" : formatter.format(voucher.getValue()) + "đ";
-                                voucherOptions.add(voucher.getCode() + " - Giảm " + valueStr);
-                            }
-                        } catch (Exception e) {}
-                    }
-
-                    if (availableVouchers.isEmpty()) {
-                        Toast.makeText(this, "Không có voucher nào khả dụng", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    new AlertDialog.Builder(this)
-                            .setTitle("Chọn Voucher")
-                            .setItems(voucherOptions.toArray(new String[0]), (dialog, which) -> {
-                                applyVoucherObject(availableVouchers.get(which));
-                            })
-                            .show();
-                });
-    }
-
-    private void applyVoucherObject(Voucher voucher) {
-        if ("PERCENT".equalsIgnoreCase(voucher.getType())) {
-            discountAmount = subtotalValue * (voucher.getValue() / 100.0);
-            if (voucher.getMaxDiscount() > 0 && discountAmount > voucher.getMaxDiscount()) {
-                discountAmount = voucher.getMaxDiscount();
-            }
+        tvSummarySubtotal.setText(formatter.format(subtotalValue) + "đ");
+        if (discountAmount > 0) {
+            layoutSummaryDiscount.setVisibility(View.VISIBLE);
+            tvSummaryDiscount.setText("-" + formatter.format(discountAmount) + "đ");
         } else {
-            discountAmount = voucher.getValue();
+            layoutSummaryDiscount.setVisibility(View.GONE);
         }
-        if (discountAmount > subtotalValue) discountAmount = subtotalValue;
 
-        tvSelectedVoucher.setText(voucher.getCode() + " (-" + formatter.format(discountAmount) + "đ)");
-        tvSelectedVoucher.setTextColor(0xFF2E7D32);
-        calculateTotals();
-    }
+        finalTotal = subtotalValue + shippingFee - discountAmount;
+        if (finalTotal < 0) finalTotal = 0;
+        String totalStr = formatter.format(finalTotal) + "đ";
+        tvSummaryTotal.setText(totalStr);
+        tvSummaryTotalSticky.setText(totalStr);
 
-    private void loadUserInfo() {
-        if (userEmail.isEmpty()) return;
-        db.collection("users").whereEqualTo("email", userEmail).get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        currentUser = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
-                        if (currentUser != null) {
-                            editName = currentUser.getFullName();
-                            editPhone = currentUser.getPhone();
-                            editAddress = currentUser.getAddress();
-                            updateAddressUI();
-                        }
-                    }
-                });
-    }
-
-    private void updateAddressUI() {
-        if (editAddress == null || editAddress.isEmpty()) {
-            tvNamePhone.setVisibility(View.GONE);
-            tvAddress.setVisibility(View.GONE);
-            btnEditAddress.setVisibility(View.GONE);
-            btnAddFirstAddress.setVisibility(View.VISIBLE);
-        } else {
-            tvNamePhone.setVisibility(View.VISIBLE);
-            tvAddress.setVisibility(View.VISIBLE);
-            btnEditAddress.setVisibility(View.VISIBLE);
-            btnAddFirstAddress.setVisibility(View.GONE);
-            tvNamePhone.setText(editName + " | " + editPhone);
-            tvAddress.setText(editAddress);
+        if (layoutBankDetails != null && layoutBankDetails.getVisibility() == View.VISIBLE) {
+            updateVietQR();
         }
     }
 
@@ -277,11 +304,9 @@ public class CheckoutActivity extends AppCompatActivity {
             TextView tvName = view.findViewById(R.id.tvName);
             TextView tvPrice = view.findViewById(R.id.tvPrice);
             TextView tvQuantity = view.findViewById(R.id.tvQuantity);
-
             tvName.setText(item.getProductName());
             tvPrice.setText(formatter.format(item.getProductPrice()) + "đ");
             tvQuantity.setText("x" + item.getQuantity());
-
             String imgData = item.getProductImageUrl();
             if (imgData != null && !imgData.isEmpty()) {
                 if (imgData.startsWith("http")) Glide.with(this).load(imgData).into(ivProduct);
@@ -297,66 +322,16 @@ public class CheckoutActivity extends AppCompatActivity {
         }
     }
 
-    private void calculateTotals() {
-        updateShippingFee();
-        
-        if (shippingFee == 0) {
-            tvShippingBadge.setVisibility(View.VISIBLE);
-            
-            tvFastOldPrice.setVisibility(View.VISIBLE);
-            tvFastOldPrice.setPaintFlags(tvFastOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            tvFastPrice.setText("MIỄN PHÍ");
-            tvFastPrice.setTextColor(0xFF2E7D32);
-
-            tvStandardOldPrice.setVisibility(View.VISIBLE);
-            tvStandardOldPrice.setPaintFlags(tvStandardOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            tvStandardPrice.setText("MIỄN PHÍ");
-            tvStandardPrice.setTextColor(0xFF2E7D32);
-            
-            tvSummaryShipping.setText("Miễn phí");
-        } else {
-            tvShippingBadge.setVisibility(View.GONE);
-            tvFastOldPrice.setVisibility(View.GONE);
-            tvFastPrice.setText("30.000đ");
-            tvFastPrice.setTextColor(ContextCompat.getColor(this, R.color.blue_main));
-
-            tvStandardOldPrice.setVisibility(View.GONE);
-            tvStandardPrice.setText("15.000đ");
-            tvStandardPrice.setTextColor(ContextCompat.getColor(this, R.color.blue_main));
-            
-            tvSummaryShipping.setText(formatter.format(shippingFee) + "đ");
-        }
-
-        tvSummarySubtotal.setText(formatter.format(subtotalValue) + "đ");
-        
-        if (discountAmount > 0) {
-            layoutSummaryDiscount.setVisibility(View.VISIBLE);
-            tvSummaryDiscount.setText("-" + formatter.format(discountAmount) + "đ");
-        } else {
-            layoutSummaryDiscount.setVisibility(View.GONE);
-        }
-
-        double total = subtotalValue + shippingFee - discountAmount;
-        if (total < 0) total = 0;
-        String totalStr = formatter.format(total) + "đ";
-        tvSummaryTotal.setText(totalStr);
-        tvSummaryTotalSticky.setText(totalStr);
-    }
-
     private void handlePlaceOrder() {
         if (editAddress == null || editAddress.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập địa chỉ nhận hàng", Toast.LENGTH_SHORT).show();
             return;
         }
-        String paymentMethod = "";
-        int checkedPaymentId = rgPayment.getCheckedRadioButtonId();
-        if (checkedPaymentId == R.id.rbCash) paymentMethod = "Tiền mặt";
-        else if (checkedPaymentId == R.id.rbBank) paymentMethod = "Chuyển khoản";
-        else if (checkedPaymentId == R.id.rbBeepay) paymentMethod = "Ví ZendoPay";
+        String paymentMethod = "Tiền mặt";
+        if (rbSelectBank.isChecked()) paymentMethod = "Chuyển khoản";
+        else if (rbSelectZendo.isChecked()) paymentMethod = "Ví ZendoPay";
 
-        double finalAmount = subtotalValue + shippingFee - discountAmount;
         WriteBatch batch = db.batch();
-        
         for (CartItem item : checkoutItems) {
             if (item.getProductId() != null) {
                 batch.update(db.collection("products").document(item.getProductId()), "stock", FieldValue.increment(-item.getQuantity()));
@@ -365,7 +340,6 @@ public class CheckoutActivity extends AppCompatActivity {
                 batch.delete(db.collection("cart").document(item.getId()));
             }
         }
-
         Order order = new Order();
         order.setUserEmail(userEmail);
         order.setUserName(editName);
@@ -375,7 +349,7 @@ public class CheckoutActivity extends AppCompatActivity {
         order.setSubtotal(subtotalValue);
         order.setShippingFee(shippingFee);
         order.setVoucherDiscount(discountAmount);
-        order.setTotalAmount(finalAmount);
+        order.setTotalAmount(finalTotal);
         order.setPaymentMethod(paymentMethod);
         order.setStatus("Chờ xác nhận");
         order.setTimestamp(new Date());
@@ -390,5 +364,97 @@ public class CheckoutActivity extends AppCompatActivity {
             startActivity(new Intent(this, ListActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             finish();
         });
+    }
+
+    private void loadDefaultAddress() {
+        if (userEmail.isEmpty()) return;
+        db.collection("addresses").whereEqualTo("userEmail", userEmail).whereEqualTo("default", true).limit(1).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        UserAddress addr = queryDocumentSnapshots.getDocuments().get(0).toObject(UserAddress.class);
+                        if (addr != null) {
+                            editName = addr.getFullName();
+                            editPhone = addr.getPhone();
+                            editAddress = addr.getFullAddress();
+                            updateAddressUI();
+                        }
+                    } else {
+                        db.collection("addresses").whereEqualTo("userEmail", userEmail).limit(1).get()
+                                .addOnSuccessListener(snapshots -> {
+                                    if (!snapshots.isEmpty()) {
+                                        UserAddress addr = snapshots.getDocuments().get(0).toObject(UserAddress.class);
+                                        if (addr != null) {
+                                            editName = addr.getFullName();
+                                            editPhone = addr.getPhone();
+                                            editAddress = addr.getFullAddress();
+                                            updateAddressUI();
+                                        }
+                                    } else updateAddressUI();
+                                });
+                    }
+                });
+    }
+
+    private void updateAddressUI() {
+        if (editAddress == null || editAddress.isEmpty()) {
+            tvNamePhone.setVisibility(View.GONE); tvAddress.setVisibility(View.GONE);
+            btnEditAddress.setVisibility(View.GONE); btnAddFirstAddress.setVisibility(View.VISIBLE);
+        } else {
+            tvNamePhone.setVisibility(View.VISIBLE); tvAddress.setVisibility(View.VISIBLE);
+            btnEditAddress.setVisibility(View.VISIBLE); btnAddFirstAddress.setVisibility(View.GONE);
+            tvNamePhone.setText(editName + " | " + editPhone);
+            tvAddress.setText(editAddress);
+        }
+    }
+
+    private void showVoucherDialog() {
+        db.collection("vouchers").whereEqualTo("active", true).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            List<Voucher> availableVouchers = new ArrayList<>();
+            List<String> voucherOptions = new ArrayList<>();
+            long currentTime = System.currentTimeMillis();
+            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                try {
+                    Voucher v = doc.toObject(Voucher.class);
+                    if (v == null) continue;
+                    v.setId(doc.getId());
+                    if ((v.getExpiryDate() == 0 || v.getExpiryDate() > currentTime) && (subtotalValue >= v.getMinOrder())) {
+                        availableVouchers.add(v);
+                        String valueStr = "PERCENT".equalsIgnoreCase(v.getType()) ? (int)v.getValue() + "%" : formatter.format(v.getValue()) + "đ";
+                        voucherOptions.add(v.getCode() + " - Giảm " + valueStr);
+                    }
+                } catch (Exception e) {}
+            }
+            if (availableVouchers.isEmpty()) {
+                Toast.makeText(this, "Không có voucher nào khả dụng", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            new AlertDialog.Builder(this).setTitle("Chọn Voucher")
+                    .setItems(voucherOptions.toArray(new String[0]), (dialog, which) -> applyVoucherObject(availableVouchers.get(which))).show();
+        });
+    }
+
+    private void applyVoucherObject(Voucher voucher) {
+        if ("PERCENT".equalsIgnoreCase(voucher.getType())) {
+            discountAmount = subtotalValue * (voucher.getValue() / 100.0);
+            if (voucher.getMaxDiscount() > 0 && discountAmount > voucher.getMaxDiscount()) discountAmount = voucher.getMaxDiscount();
+        } else discountAmount = voucher.getValue();
+        if (discountAmount > subtotalValue) discountAmount = subtotalValue;
+        tvSelectedVoucher.setText(voucher.getCode() + " (-" + formatter.format(discountAmount) + "đ)");
+        tvSelectedVoucher.setTextColor(0xFF2E7D32);
+        calculateTotals();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_SELECT_ADDRESS && resultCode == RESULT_OK && data != null) {
+            UserAddress selected = (UserAddress) data.getSerializableExtra("selected_address");
+            if (selected != null) {
+                editName = selected.getFullName();
+                editPhone = selected.getPhone();
+                editAddress = selected.getFullAddress();
+                updateAddressUI();
+            }
+        }
     }
 }

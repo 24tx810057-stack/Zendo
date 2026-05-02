@@ -23,6 +23,7 @@
             app:tint="@color/blue_main" />
 
         <TextView
+            android:id="@+id/tvTitleAddAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -42,59 +43,11 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Dán và nhập nhanh section -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#E3F2FD"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="8dp">
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:src="@android:drawable/ic_menu_edit"
-                        app:tint="@color/blue_main" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="Dán và nhập nhanh"
-                        android:textColor="#212121"
-                        android:textStyle="bold"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Dán hoặc nhập thông tin, nhấn chọn Tự động điền để nhập tên, số điện thoại và địa chỉ."
-                    android:textColor="#757575"
-                    android:textSize="12sp"
-                    android:layout_marginBottom="12dp"/>
-
-                <EditText
-                    android:id="@+id/etQuickPaste"
-                    android:layout_width="match_parent"
-                    android:layout_height="80dp"
-                    android:background="@drawable/bg_border_gray_light"
-                    android:hint="Dán hoặc nhập thông tin..."
-                    android:padding="12dp"
-                    android:textSize="13sp"
-                    android:gravity="top"
-                    android:textColorHint="#BDBDBD"/>
-            </LinearLayout>
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:text="Địa chỉ (dùng thông tin trước sáp nhập)"
+                android:text="Thông tin địa chỉ (trước khi sát nhập)"
                 android:textColor="#616161"
                 android:textSize="13sp" />
 

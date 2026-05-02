@@ -6,6 +6,7 @@
     android:background="#F5F5F5"
     android:orientation="vertical">
 
+    <!-- Header Toolbar -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
@@ -25,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Thông tin tài khoản"
+            android:text="Thiết lập hồ sơ"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -42,162 +43,238 @@
             android:textSize="14sp" />
     </RelativeLayout>
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
             <!-- Avatar Section -->
             <RelativeLayout
                 android:id="@+id/layoutChangeAvatar"
-                android:layout_width="110dp"
-                android:layout_height="110dp"
-                android:layout_gravity="center"
-                android:layout_marginBottom="24dp">
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:background="#FFFFFF">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/ivDetailAvatar"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_person"
-                    android:scaleType="centerCrop"
-                    app:shapeAppearanceOverlay="@style/CircleImage"
-                    app:strokeColor="#29B6F6"
-                    app:strokeWidth="2dp" />
+                <RelativeLayout
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
+                    android:layout_centerInParent="true">
 
-                <ImageView
-                    android:id="@+id/ivCameraBadge"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-                    android:background="@drawable/circle_background_translucent"
-                    android:padding="6dp"
-                    android:src="@android:drawable/ic_menu_camera"
-                    android:visibility="gone"
-                    app:tint="#29B6F6" />
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivDetailAvatar"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_person"
+                        android:scaleType="centerCrop"
+                        app:shapeAppearanceOverlay="@style/CircleImage"
+                        app:strokeColor="#29B6F6"
+                        app:strokeWidth="2dp" />
+
+                    <ImageView
+                        android:id="@+id/ivCameraBadge"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentBottom="true"
+                        android:background="@drawable/circle_background_translucent"
+                        android:padding="6dp"
+                        android:src="@android:drawable/ic_menu_camera"
+                        android:visibility="gone"
+                        app:tint="#29B6F6" />
+                </RelativeLayout>
             </RelativeLayout>
 
-            <androidx.cardview.widget.CardView
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="#EEEEEE" />
+
+            <!-- BOX 1: Thông tin cơ bản -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="2dp">
+                android:background="#FFFFFF"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp">
 
+                <!-- Tên -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Họ tên"
-                        android:textColor="#757575"
-                        android:textSize="12sp" />
-
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <TextView android:layout_width="100dp" android:layout_height="wrap_content" android:text="Tên" android:textColor="#212121" />
                     <EditText
-                        android:id="@+id/etDetailFullName"
+                        android:id="@+id/etNicknameDetail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
                         android:background="@null"
                         android:enabled="false"
-                        android:text="Quản trị viên"
+                        android:hint="Thiết lập ngay"
                         android:textColor="#212121"
-                        android:textSize="16sp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="12dp"
-                        android:background="#EEEEEE" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Email"
-                        android:textColor="#757575"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/tvDetailEmail"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="admin@gmail.com"
-                        android:textColor="#BDBDBD"
-                        android:textSize="16sp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="12dp"
-                        android:background="#EEEEEE" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Số điện thoại"
-                        android:textColor="#757575"
-                        android:textSize="12sp" />
-
-                    <EditText
-                        android:id="@+id/etDetailPhone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:background="@null"
-                        android:enabled="false"
-                        android:hint="Chưa cập nhật"
-                        android:inputType="phone"
-                        android:textColor="#212121"
-                        android:textSize="16sp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="12dp"
-                        android:background="#EEEEEE" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Địa chỉ"
-                        android:textColor="#757575"
-                        android:textSize="12sp" />
-
-                    <EditText
-                        android:id="@+id/etDetailAddress"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:background="@null"
-                        android:enabled="false"
-                        android:hint="Chưa cập nhật"
-                        android:textColor="#212121"
-                        android:textSize="16sp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F5F5F5" />
 
-            <Button
-                android:id="@+id/btnSaveAccount"
+                <!-- Bio -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <TextView android:layout_width="100dp" android:layout_height="wrap_content" android:text="Bio" android:textColor="#212121" />
+                    <EditText
+                        android:id="@+id/etBioDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:enabled="false"
+                        android:hint="Thêm tiểu sử"
+                        android:textColor="#212121"
+                        android:textSize="14sp" />
+                </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F5F5F5" />
+
+                <!-- Giới tính -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <TextView android:layout_width="100dp" android:layout_height="wrap_content" android:text="Giới tính" android:textColor="#212121" />
+                    <EditText
+                        android:id="@+id/etGenderDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:enabled="false"
+                        android:hint="Thiết lập ngay"
+                        android:textColor="#212121"
+                        android:textSize="14sp" />
+                </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F5F5F5" />
+
+                <!-- Ngày sinh -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <TextView android:layout_width="100dp" android:layout_height="wrap_content" android:text="Ngày sinh" android:textColor="#212121" />
+                    <EditText
+                        android:id="@+id/etBirthdateDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:enabled="false"
+                        android:hint="Thiết lập ngay"
+                        android:textColor="#212121"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="#EEEEEE" />
+
+            <!-- BOX 2: Thông tin cá nhân -->
+            <LinearLayout
+                android:id="@+id/btnOpenPersonalInfo"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="32dp"
-                android:backgroundTint="#29B6F6"
+                android:background="#FFFFFF"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Thông tin cá nhân"
+                    android:textColor="#212121"
+                    android:textSize="14sp" />
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_arrow_right"
+                    app:tint="#BDBDBD" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="#EEEEEE" />
+
+            <!-- BOX 3: Liên hệ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp">
+
+                <!-- Điện thoại -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <TextView android:layout_width="100dp" android:layout_height="wrap_content" android:text="Số điện thoại" android:textColor="#212121" />
+                    <EditText
+                        android:id="@+id/etPhoneAccountDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:enabled="false"
+                        android:hint="Thiết lập ngay"
+                        android:inputType="phone"
+                        android:textColor="#212121"
+                        android:textSize="14sp" />
+                </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F5F5F5" />
+
+                <!-- Email -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <TextView android:layout_width="100dp" android:layout_height="wrap_content" android:text="Email" android:textColor="#212121" />
+                    <TextView
+                        android:id="@+id/tvEmailAccountDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="#757575"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="#EEEEEE" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnSaveAccountDetail"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_margin="16dp"
+                android:background="@drawable/bg_sky_blue_gradient"
                 android:text="LƯU THAY ĐỔI"
                 android:textColor="#FFFFFF"
-                android:visibility="gone"
-                app:cornerRadius="8dp" />
+                android:textStyle="bold"
+                android:visibility="gone" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Thân ví màu xanh -->
+    <path
+        android:fillColor="#0091EA"
+        android:pathData="M20,7h-1L19,5a2,2 0,0 0,-2 -2L4,3a2,2 0,0 0,-2 2v14a2,2 0,0 0,2 2h16a2,2 0,0 0,2 -2L22,9a2,2 0,0 0,-2 -2zM4,5h13v2L4,7L4,5zM20,19L4,19L4,9h16v10z"/>
+    <!-- Nắp ví nhỏ bên phải -->
+    <path
+        android:fillColor="#0091EA"
+        android:pathData="M16,12h4v3h-4z"/>
+    <!-- Chữ Z màu trắng ở giữa -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M10,11h5v1.5l-3.5,4h3.5v1.5h-5v-1.5l3.5,-4h-3.5z"/>
+</vector>

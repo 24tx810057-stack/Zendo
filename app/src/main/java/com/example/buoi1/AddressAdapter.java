@@ -22,6 +22,39 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
     public AddressAdapter(List<UserAddress> addressList, OnAddressClickListener listener) {
         this.addressList = addressList;
         this.listener = listener;
+        updateSelectedPosition();
+    }
+
+    public void setAddressList(List<UserAddress> newList) {
+        this.addressList = newList;
+        updateSelectedPosition();
+        notifyDataSetChanged();
+    }
+
+    private void updateSelectedPosition() {
+        if (addressList == null || addressList.isEmpty()) {
+            selectedPosition = -1;
+            return;
+        }
+
+        if (addressList.size() == 1) {
+            selectedPosition = 0;
+            return;
+        }
+
+        // Nếu có nhiều hơn 1 địa chỉ, tìm địa chỉ mặc định
+        selectedPosition = -1;
+        for (int i = 0; i < addressList.size(); i++) {
+            if (addressList.get(i).isDefault()) {
+                selectedPosition = i;
+                break;
+            }
+        }
+        
+        // Nếu không có địa chỉ nào là mặc định, mặc định chọn cái đầu tiên
+        if (selectedPosition == -1 && !addressList.isEmpty()) {
+            selectedPosition = 0;
+        }
     }
 
     @NonNull
@@ -39,17 +72,21 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
         holder.tvDetail.setText(address.getDetailAddress());
         holder.tvArea.setText(address.getWard() + ", " + address.getDistrict() + ", " + address.getProvinceCity());
         
-        // Hiển thị các nhãn (Badge) như trong ảnh 1
+        // Chỉ hiển thị nhãn Mặc định
         holder.tvDefaultBadge.setVisibility(address.isDefault() ? View.VISIBLE : View.GONE);
-        holder.tvPickupBadge.setVisibility(address.isPickupAddress() ? View.VISIBLE : View.GONE);
+        if (holder.tvPickupBadge != null) {
+            holder.tvPickupBadge.setVisibility(View.GONE);
+        }
 
         holder.rbSelect.setChecked(position == selectedPosition);
 
         holder.itemView.setOnClickListener(v -> {
             int oldPos = selectedPosition;
             selectedPosition = holder.getAdapterPosition();
-            notifyItemChanged(oldPos);
-            notifyItemChanged(selectedPosition);
+            if (oldPos != selectedPosition) {
+                notifyItemChanged(oldPos);
+                notifyItemChanged(selectedPosition);
+            }
             listener.onAddressSelected(address);
         });
 
