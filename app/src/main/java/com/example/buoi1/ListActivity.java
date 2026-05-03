@@ -345,41 +345,41 @@ public class ListActivity extends AppCompatActivity {
     }
 
     private void autoCompleteOrders() {
-        // Tìm các đơn "Đã giao" quá 3 ngày
+        // Tìm các đơn hàng cần hoàn thành hoặc sửa lại ngày
         long threeDaysInMillis = 3L * 24 * 60 * 60 * 1000;
+        long oneDayInMillis = 24L * 60 * 60 * 1000;
         long currentTime = System.currentTimeMillis();
 
-        firestore.collection("orders")
-                .whereEqualTo("status", "Đã giao")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    OrderManager orderManager = new OrderManager();
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        Order order = doc.toObject(Order.class);
-                        long deliveryTime = 0;
-                        
-                        if (order.getDeliveryDate() != null) {
-                            deliveryTime = order.getDeliveryDate().getTime();
-                        } else if (order.getTimestamp() != null) {
-                            // Dự phòng cho dữ liệu cũ chưa có deliveryDate
-                            deliveryTime = order.getTimestamp().getTime();
-                        }
+        firestore.collection("orders").get().addOnSuccessListener(queryDocumentSnapshots -> {
+            OrderManager orderManager = new OrderManager();
+            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                Order order = doc.toObject(Order.class);
+                if (order.getTimestamp() == null) continue;
+                
+                String status = order.getStatus();
+                long orderTime = order.getTimestamp().getTime();
 
-                        if (deliveryTime > 0 && (currentTime - deliveryTime > threeDaysInMillis)) {
-                            // Tự động chuyển sang Hoàn thành
-                            orderManager.updateOrderStatus(doc.getId(), "Hoàn thành", new OrderManager.OnActionCompleteListener() {
-                                @Override
-                                public void onSuccess() {
-                                    Log.d("ListActivity", "Auto-completed order: " + doc.getId());
-                                }
-                                @Override
-                                public void onFailure(String error) {
-                                    Log.e("ListActivity", "Auto-complete failed: " + error);
-                                }
-                            });
-                        }
+                // 1. TỰ ĐỘNG HOÀN THÀNH: Đơn "Đã giao" quá 3 ngày
+                if ("Đã giao".equals(status) && (currentTime - orderTime > threeDaysInMillis)) {
+                    orderManager.updateOrderStatus(doc.getId(), "Hoàn thành", new OrderManager.OnActionCompleteListener() {
+                        @Override public void onSuccess() {}
+                        @Override public void onFailure(String error) {}
+                    });
+                }
+                
+                // 2. SỬA LẠI NGÀY (REPAIR): Nếu đơn cũ (> 3 ngày) mà ngày nhận lại là "mới đây" (do lỗi logic cũ)
+                if ("Hoàn thành".equals(status) && (currentTime - orderTime > threeDaysInMillis)) {
+                    long deliveryTime = order.getDeliveryDate() != null ? order.getDeliveryDate().getTime() : 0;
+                    // Nếu ngày nhận nằm trong vòng 24h qua -> Chắc chắn là do bị ép sai ngày
+                    if (deliveryTime > (currentTime - oneDayInMillis)) {
+                        java.util.Calendar cal = java.util.Calendar.getInstance();
+                        cal.setTime(order.getTimestamp());
+                        cal.add(java.util.Calendar.DAY_OF_YEAR, 3);
+                        firestore.collection("orders").document(doc.getId()).update("deliveryDate", cal.getTime());
                     }
-                });
+                }
+            }
+        });
     }
 
     @Override

@@ -120,11 +120,10 @@ public class OrderDetailActivity extends AppCompatActivity {
         tvStatus.setText(order.getStatus());
         if (tvOrderIdDisplay != null) {
             String fullId = order.getId();
-            String shortId = fullId;
-            if (fullId != null && fullId.length() > 8) {
-                shortId = fullId.substring(fullId.length() - 8).toUpperCase();
+            if (fullId != null) {
+                String idToDisplay = fullId.length() > 8 ? fullId.substring(fullId.length() - 8).toUpperCase() : fullId.toUpperCase();
+                tvOrderIdDisplay.setText("#" + idToDisplay);
             }
-            tvOrderIdDisplay.setText("#" + shortId);
         }
         tvNamePhone.setText(order.getUserName() + " | " + order.getPhone());
         tvAddress.setText(order.getAddress());
@@ -163,7 +162,57 @@ public class OrderDetailActivity extends AppCompatActivity {
 
         displayProducts(order.getItems());
         setupReturnBanner(); // Hiển thị banner khiếu nại nếu có
-        setupFooterActions();
+
+        // KIỂM TRA XEM ĐÃ CÓ YÊU CẦU BẢO HÀNH CHƯA RỒI MỚI SETUP NÚT
+        db.collection("warranty_requests")
+                .whereEqualTo("orderId", order.getId())
+                .get()
+                .addOnSuccessListener(snapshots -> {
+                    boolean hasWarrantyRequest = !snapshots.isEmpty();
+                    checkAndSetupFooter(hasWarrantyRequest);
+                })
+                .addOnFailureListener(e -> checkAndSetupFooter(false));
+    }
+
+    private void checkAndSetupFooter(boolean hasWarrantyRequest) {
+        if (order.getItems() == null || order.getItems().isEmpty()) {
+            setupFooterActions(hasWarrantyRequest);
+            return;
+        }
+
+        // Kiểm tra xem tất cả các item đã có warranty snapshot chưa
+        boolean itemsChecksPassed = true;
+        for (CartItem item : order.getItems()) {
+            if (item.getWarranty() == null || item.getWarranty().isEmpty()) {
+                itemsChecksPassed = false;
+                break;
+            }
+        }
+
+        if (itemsChecksPassed) {
+            setupFooterActions(hasWarrantyRequest);
+        } else {
+            // Nếu thiếu, đi lấy từ database (cho các đơn test cũ)
+            final int total = order.getItems().size();
+            java.util.concurrent.atomic.AtomicInteger count = new java.util.concurrent.atomic.AtomicInteger(0);
+            
+            for (CartItem item : order.getItems()) {
+                if (item.getWarranty() == null || item.getWarranty().isEmpty()) {
+                    db.collection("products").document(item.getProductId()).get()
+                            .addOnSuccessListener(doc -> {
+                                if (doc.exists()) {
+                                    item.setWarranty(doc.getString("warranty"));
+                                }
+                                if (count.incrementAndGet() == total) setupFooterActions(hasWarrantyRequest);
+                            })
+                            .addOnFailureListener(e -> {
+                                if (count.incrementAndGet() == total) setupFooterActions(hasWarrantyRequest);
+                            });
+                } else {
+                    if (count.incrementAndGet() == total) setupFooterActions(hasWarrantyRequest);
+                }
+            }
+        }
     }
 
     private void setupReturnBanner() {
@@ -199,36 +248,23 @@ public class OrderDetailActivity extends AppCompatActivity {
             tvPrice.setText(formatter.format(item.getProductPrice()) + "đ");
             tvQuantity.setText("x" + item.getQuantity());
 
-            // HIỂN THỊ THÔNG TIN BẢO HÀNH CHO TỪNG SẢN PHẨM
-            if (item.getWarranty() != null && !item.getWarranty().isEmpty()) {
-                String warrantyDisplay = item.getWarranty();
-                if (warrantyDisplay.matches("\\d+")) warrantyDisplay += " tháng";
-
-                TextView tvWarrantyItem = new TextView(this);
-                tvWarrantyItem.setText("Bảo hành: " + warrantyDisplay);
-                tvWarrantyItem.setTextSize(11);
-                tvWarrantyItem.setTextColor(0xFF757575);
-                
-                // Tính ngày hết hạn nếu đơn đã hoàn thành
-                if ("Hoàn thành".equals(order.getStatus()) && order.getDeliveryDate() != null) {
-                    Date expiryDate = calculateExpiryDate(order.getDeliveryDate(), item.getWarranty());
-                    if (expiryDate != null) {
-                        String expiryStr = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(expiryDate);
-                        tvWarrantyItem.append(" (Hết hạn: " + expiryStr + ")");
-                        
-                        // Đổi màu nếu sắp hết hạn hoặc đã hết hạn
-                        if (expiryDate.before(new Date())) {
-                            tvWarrantyItem.setTextColor(0xFFF44336); // Đỏ
-                        } else {
-                            tvWarrantyItem.setTextColor(0xFF2E7D32); // Xanh
-                        }
-
-                        // Cho phép bấm vào để xem thẻ bảo hành
-                        tvWarrantyItem.setPaintFlags(tvWarrantyItem.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
-                        tvWarrantyItem.setOnClickListener(v -> showWarrantyCard(item, order.getDeliveryDate(), expiryDate));
-                    }
-                }
-                ((LinearLayout)view.findViewById(R.id.tvName).getParent()).addView(tvWarrantyItem);
+            // KHỐI HIỂN THỊ BẢO HÀNH (CÓ FALLBACK CHO DỮ LIỆU CŨ)
+            LinearLayout itemContainer = (LinearLayout)view.findViewById(R.id.tvName).getParent();
+            String itemWarranty = item.getWarranty();
+            
+            if (itemWarranty != null && !itemWarranty.isEmpty()) {
+                displayItemWarranty(itemContainer, item, itemWarranty);
+            } else {
+                // Nếu đơn cũ chưa có warranty snapshot, thử lấy từ Product gốc
+                db.collection("products").document(item.getProductId()).get()
+                        .addOnSuccessListener(doc -> {
+                            if (doc.exists()) {
+                                String currentWarranty = doc.getString("warranty");
+                                if (currentWarranty != null && !currentWarranty.isEmpty()) {
+                                    displayItemWarranty(itemContainer, item, currentWarranty);
+                                }
+                            }
+                        });
             }
 
             String imgData = item.getProductImageUrl();
@@ -246,7 +282,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         }
     }
 
-    private void setupFooterActions() {
+    private void setupFooterActions(boolean hasWarrantyRequest) {
         String status = order.getStatus();
         if (status == null) status = "";
         
@@ -313,27 +349,25 @@ public class OrderDetailActivity extends AppCompatActivity {
                 btnMainAction.setEnabled(false);
                 btnMainAction.setAlpha(0.6f);
             } else if (status.equals("Hoàn thành")) {
-                // Kiểm tra xem đã đánh giá chưa.
-                if (order.isReviewed()) {
-                    btnCancelAction.setVisibility(View.GONE);
-                } else {
-                    btnCancelAction.setVisibility(View.VISIBLE);
+                long currentTime = System.currentTimeMillis();
+                long deliveryTime = order.getDeliveryDate() != null ? order.getDeliveryDate().getTime() : 0;
+                long fifteenDaysInMillis = 15L * 24 * 60 * 60 * 1000;
 
-                    long currentTime = System.currentTimeMillis();
-                    long deliveryTime = order.getDeliveryDate() != null ? order.getDeliveryDate().getTime() : 0;
-                    long fifteenDaysInMillis = 15L * 24 * 60 * 60 * 1000;
-
-                    // Lấy hạn bảo hành lớn nhất trong các sản phẩm của đơn hàng để quyết định nút
-                    long maxExpiryTime = 0;
-                    if (order.getItems() != null) {
-                        for (CartItem item : order.getItems()) {
-                            Date exp = calculateExpiryDate(order.getDeliveryDate(), item.getWarranty());
-                            if (exp != null && exp.getTime() > maxExpiryTime) maxExpiryTime = exp.getTime();
-                        }
+                // Lấy hạn bảo hành lớn nhất trong các sản phẩm
+                long maxExpiryTime = 0;
+                if (order.getItems() != null) {
+                    for (CartItem item : order.getItems()) {
+                        Date exp = calculateExpiryDate(order.getDeliveryDate(), item.getWarranty());
+                        if (exp != null && exp.getTime() > maxExpiryTime) maxExpiryTime = exp.getTime();
                     }
+                }
 
-                    if (currentTime - deliveryTime <= fifteenDaysInMillis) {
-                        // TRƯỜNG HỢP 1: CÒN HẠN TRẢ HÀNG (15 NGÀY ĐẦU)
+                if (currentTime - deliveryTime <= fifteenDaysInMillis) {
+                    // TRƯỜNG HỢP 1: TRONG 15 NGÀY ĐẦU
+                    if (order.isReviewed()) {
+                        btnCancelAction.setVisibility(View.GONE); // Đã đánh giá -> Cấm trả hàng
+                    } else {
+                        btnCancelAction.setVisibility(View.VISIBLE);
                         btnCancelAction.setText("TRẢ HÀNG/HOÀN TIỀN");
                         btnCancelAction.setEnabled(true);
                         btnCancelAction.setAlpha(1.0f);
@@ -342,17 +376,35 @@ public class OrderDetailActivity extends AppCompatActivity {
                             intent.putExtra("order_data", order);
                             startActivity(intent);
                         });
-                    } else if (maxExpiryTime > currentTime) {
-                        // TRƯỜNG HỢP 2: QUÁ 15 NGÀY NHƯNG CÒN BẢO HÀNH
-                        btnCancelAction.setText("YÊU CẦU BẢO HÀNH");
-                        btnCancelAction.setEnabled(true);
-                        btnCancelAction.setAlpha(1.0f);
-                        btnCancelAction.setOnClickListener(v -> {
-                            Toast.makeText(this, "Đang mở form yêu cầu sửa chữa/bảo hành...", Toast.LENGTH_SHORT).show();
-                            // Sau này bạn có thể tạo RequestWarrantyActivity tương tự RequestReturnActivity
-                        });
+                    }
+                } else {
+                    // TRƯỜNG HỢP 2: QUÁ 15 NGÀY -> CHUYỂN SANG CHẾ ĐỘ BẢO HÀNH
+                    if (maxExpiryTime > currentTime) {
+                        if (hasWarrantyRequest) {
+                            btnCancelAction.setVisibility(View.VISIBLE);
+                            btnCancelAction.setText("ĐÃ GỬI YÊU CẦU BH");
+                            btnCancelAction.setEnabled(false);
+                            btnCancelAction.setAlpha(0.6f);
+                        } else {
+                            btnCancelAction.setVisibility(View.VISIBLE);
+                            btnCancelAction.setText("YÊU CẦU BẢO HÀNH");
+                            btnCancelAction.setEnabled(true);
+                            btnCancelAction.setAlpha(1.0f);
+                            btnCancelAction.setOnClickListener(v -> {
+                                if (order.getItems() != null && !order.getItems().isEmpty()) {
+                                    CartItem firstItem = order.getItems().get(0);
+                                    Date expiryDate = calculateExpiryDate(order.getDeliveryDate(), firstItem.getWarranty());
+                                    
+                                    Intent intent = new Intent(this, RequestWarrantyActivity.class);
+                                    intent.putExtra("order_data", order);
+                                    intent.putExtra("cart_item", firstItem);
+                                    intent.putExtra("expiry_date", expiryDate);
+                                    startActivity(intent);
+                                }
+                            });
+                        }
                     } else {
-                        // TRƯỜNG HỢP 3: HẾT SẠCH HẠN
+                        btnCancelAction.setVisibility(View.VISIBLE);
                         btnCancelAction.setText("HẾT HẠN BẢO HÀNH");
                         btnCancelAction.setEnabled(false);
                         btnCancelAction.setAlpha(0.5f);
@@ -407,7 +459,72 @@ public class OrderDetailActivity extends AppCompatActivity {
         }
     }
 
-    private void showWarrantyCard(CartItem item, Date deliveryDate, Date expiryDate) {
+    private void displayItemWarranty(LinearLayout container, CartItem item, String warranty) {
+        String warrantyText = warranty;
+        if (warrantyText != null && warrantyText.matches("\\d+")) warrantyText += " tháng";
+        final String finalWarrantyDisplay = (warrantyText == null) ? "" : warrantyText;
+
+        TextView tvWarrantyItem = new TextView(this);
+        tvWarrantyItem.setText("Bảo hành: " + finalWarrantyDisplay);
+        tvWarrantyItem.setTextSize(11);
+        tvWarrantyItem.setTextColor(0xFF757575);
+        
+        // KIỂM TRA TRẠNG THÁI YÊU CẦU BẢO HÀNH TRƯỚC
+        db.collection("warranty_requests")
+                .whereEqualTo("orderId", order.getId())
+                .whereEqualTo("productId", item.getProductId())
+                .get()
+                .addOnSuccessListener(snapshots -> {
+                    String statusBadge = "";
+                    if (!snapshots.isEmpty()) {
+                        String status = snapshots.getDocuments().get(0).getString("status");
+                        if ("pending_repair".equals(status)) {
+                            statusBadge = " [Chờ tiếp nhận]";
+                        } else if ("repairing".equals(status)) {
+                            statusBadge = " [Đang sửa chữa]";
+                        } else if ("repaired".equals(status)) {
+                            statusBadge = " [Đã sửa xong]";
+                        } else if ("rejected".equals(status)) {
+                            statusBadge = " [Từ chối bảo hành]";
+                        }
+                    }
+
+                    // Tính ngày hết hạn nếu đơn đã hoàn thành
+                    if ("Hoàn thành".equals(order.getStatus()) && order.getDeliveryDate() != null) {
+                        Date expiryDate = calculateExpiryDate(order.getDeliveryDate(), warranty);
+                        if (expiryDate != null) {
+                            String expiryStr = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(expiryDate);
+                            tvWarrantyItem.setText("Bảo hành: " + finalWarrantyDisplay + " (Hết hạn: " + expiryStr + ")");
+                            
+                            if (!statusBadge.isEmpty()) {
+                                tvWarrantyItem.append(statusBadge);
+                            }
+
+                            if (expiryDate.before(new Date())) tvWarrantyItem.setTextColor(0xFFF44336);
+                            else tvWarrantyItem.setTextColor(0xFF2E7D32);
+
+                            tvWarrantyItem.setPaintFlags(tvWarrantyItem.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
+                            tvWarrantyItem.setOnClickListener(v -> showWarrantyCard(item, order.getDeliveryDate(), expiryDate, warranty));
+                        }
+                    }
+                });
+
+        container.addView(tvWarrantyItem);
+    }
+
+    private void showWarrantyCard(CartItem item, Date deliveryDate, Date expiryDate, String warranty) {
+        // Kiểm tra xem item này đã gửi yêu cầu bảo hành chưa
+        db.collection("warranty_requests")
+                .whereEqualTo("orderId", order.getId())
+                .whereEqualTo("productId", item.getProductId())
+                .get()
+                .addOnSuccessListener(snapshots -> {
+                    boolean itemHasRequest = !snapshots.isEmpty();
+                    showWarrantyCardUI(item, deliveryDate, expiryDate, itemHasRequest);
+                });
+    }
+
+    private void showWarrantyCardUI(CartItem item, Date deliveryDate, Date expiryDate, boolean hasRequest) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_warranty_card, null);
         builder.setView(view);
@@ -416,7 +533,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         TextView tvId = view.findViewById(R.id.tvCardOrderId);
         TextView tvActive = view.findViewById(R.id.tvCardActivationDate);
         TextView tvExpire = view.findViewById(R.id.tvCardExpiryDate);
-        TextView tvStatus = view.findViewById(R.id.tvCardStatus);
+        TextView tvStatusCard = view.findViewById(R.id.tvCardStatus);
         Button btnClose = view.findViewById(R.id.btnCloseCard);
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -427,20 +544,66 @@ public class OrderDetailActivity extends AppCompatActivity {
         tvActive.setText(sdf.format(deliveryDate));
         tvExpire.setText(sdf.format(expiryDate));
 
+        // KIỂM TRA TRẠNG THÁI CỤ THỂ TRONG DATABASE ĐỂ ĐỔI TEXT NÚT
+        db.collection("warranty_requests")
+                .whereEqualTo("orderId", order.getId())
+                .whereEqualTo("productId", item.getProductId())
+                .get()
+                .addOnSuccessListener(snapshots -> {
+                    View btnContact = view.findViewById(R.id.btnContactWarranty);
+                    if (btnContact != null) {
+                        if (expiryDate.before(new Date())) {
+                            btnContact.setVisibility(View.GONE);
+                            tvStatusCard.setText("Trạng thái: Hết hạn bảo hành");
+                            tvStatusCard.setTextColor(0xFFF44336);
+                        } else if (!snapshots.isEmpty()) {
+                            String status = snapshots.getDocuments().get(0).getString("status");
+                            btnContact.setEnabled(false);
+                            btnContact.setAlpha(0.6f);
+                            
+                            if ("pending_repair".equals(status)) {
+                                ((Button)btnContact).setText("ĐANG CHỜ TIẾP NHẬN");
+                            } else if ("repairing".equals(status)) {
+                                ((Button)btnContact).setText("ĐANG TRONG QUÁ TRÌNH SỬA CHỮA");
+                            } else if ("repaired".equals(status)) {
+                                ((Button)btnContact).setText("ĐÃ SỬA XONG");
+                            }
+                        } else {
+                            btnContact.setVisibility(View.VISIBLE);
+                            btnContact.setOnClickListener(v -> {
+                                // dismiss và intent cũ
+                            });
+                        }
+                    }
+                });
+
         if (expiryDate.before(new Date())) {
-            tvStatus.setText("Trạng thái: Hết hạn bảo hành");
-            tvStatus.setTextColor(0xFFF44336);
-            tvStatus.setBackgroundColor(0xFFFFEBEE);
+            tvStatusCard.setText("Trạng thái: Hết hạn bảo hành");
+            tvStatusCard.setTextColor(0xFFF44336);
+            tvStatusCard.setBackgroundColor(0xFFFFEBEE);
         } else {
-            tvStatus.setText("Trạng thái: Đang bảo hành");
-            tvStatus.setTextColor(0xFF2E7D32);
-            tvStatus.setBackgroundColor(0xFFE8F5E9);
+            tvStatusCard.setText("Trạng thái: Đang bảo hành");
+            tvStatusCard.setTextColor(0xFF2E7D32);
+            tvStatusCard.setBackgroundColor(0xFFE8F5E9);
         }
 
         AlertDialog dialog = builder.create();
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
+
+        View btnContact = view.findViewById(R.id.btnContactWarranty);
+        if (btnContact != null && !hasRequest) {
+             btnContact.setOnClickListener(v -> {
+                dialog.dismiss();
+                Intent intent = new Intent(this, RequestWarrantyActivity.class);
+                intent.putExtra("order_data", order);
+                intent.putExtra("cart_item", item);
+                intent.putExtra("expiry_date", expiryDate);
+                startActivity(intent);
+            });
+        }
+
         btnClose.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
@@ -462,43 +625,26 @@ public class OrderDetailActivity extends AppCompatActivity {
     }
 
     private Date calculateExpiryDate(Date startDate, String warranty) {
-        if (startDate == null || warranty == null || warranty.isEmpty()) return null;
+        if (startDate == null) return null;
+        
+        // NẾU KHÔNG CÓ BẢO HÀNH -> MẶC ĐỊNH 12 THÁNG CHO DỮ LIỆU TEST
+        String safeWarranty = (warranty == null || warranty.trim().isEmpty()) ? "12" : warranty;
+        
         java.util.Calendar cal = java.util.Calendar.getInstance();
         cal.setTime(startDate);
         try {
-            String lower = warranty.toLowerCase();
+            String lower = safeWarranty.toLowerCase();
             // Lấy phần số (ví dụ: "12 tháng" -> "12")
             String numericPart = lower.replaceAll("[^0-9]", "");
-            if (numericPart.isEmpty()) return null;
-            int value = Integer.parseInt(numericPart);
-            
-            if (lower.contains("tháng")) cal.add(java.util.Calendar.MONTH, value);
-            else if (lower.contains("năm")) cal.add(java.util.Calendar.YEAR, value);
-            else if (lower.contains("ngày")) cal.add(java.util.Calendar.DAY_OF_YEAR, value);
-            else cal.add(java.util.Calendar.MONTH, value); // Mặc định là tháng
-            
+            if (numericPart.isEmpty()) {
+                cal.add(java.util.Calendar.MONTH, 12); // Không có số thì mặc định cộng 12 tháng
+            } else {
+                int value = Integer.parseInt(numericPart);
+                if (lower.contains("năm")) cal.add(java.util.Calendar.YEAR, value);
+                else if (lower.contains("ngày")) cal.add(java.util.Calendar.DAY_OF_YEAR, value);
+                else cal.add(java.util.Calendar.MONTH, value); // Mặc định là tháng
+            }
             return cal.getTime();
         } catch (Exception e) { return null; }
-    }
-
-    private void confirmDelete() {
-        new AlertDialog.Builder(this)
-                .setTitle("Xác nhận xóa")
-                .setMessage("Hành động này không thể hoàn tác. Xóa đơn hàng?")
-                .setPositiveButton("Xóa", (d, w) -> {
-                    orderManager.deleteOrder(order.getId(), new OrderManager.OnActionCompleteListener() {
-                        @Override
-                        public void onSuccess() {
-                            Toast.makeText(OrderDetailActivity.this, "Đã xóa đơn hàng", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-                        @Override
-                        public void onFailure(String error) {
-                            Toast.makeText(OrderDetailActivity.this, "Lỗi: " + error, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                })
-                .setNegativeButton("Hủy", null)
-                .show();
     }
 }

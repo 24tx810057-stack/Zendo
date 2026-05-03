@@ -44,7 +44,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView btnSetting;
     private View btnCart, layoutUserMenu, layoutAdminMenu, sectionSuggestion, btnChangePassword, btnNotification, sectionFavorite;
     private ShapeableImageView ivAvatar;
-    private View btnAdminOrders, btnAdminProducts, btnAdminVouchers, btnAdminReviews, btnAdminReturnRequests;
+    private View btnAdminOrders, btnAdminProducts, btnAdminVouchers, btnAdminReviews, btnAdminReturnRequests, btnAdminWarrantyRequests;
     private Button btnLogout;
     private BottomNavigationView bottomNav;
     private NonScrollGridView gvSuggestions;
@@ -99,6 +99,7 @@ public class ProfileActivity extends AppCompatActivity {
         btnAdminVouchers = findViewById(R.id.btnAdminVouchers);
         btnAdminReviews = findViewById(R.id.btnAdminReviews);
         btnAdminReturnRequests = findViewById(R.id.btnAdminReturnRequests);
+        btnAdminWarrantyRequests = findViewById(R.id.btnAdminWarrantyRequests);
         btnChangePassword = findViewById(R.id.btnChangePassword);
         sectionFavorite = findViewById(R.id.sectionFavorite);
         
@@ -176,6 +177,12 @@ public class ProfileActivity extends AppCompatActivity {
             btnAdminReturnRequests.setOnClickListener(v -> {
                 // Sẽ tạo activity này ở bước sau
                 startActivity(new Intent(this, AdminReturnListActivity.class));
+            });
+        }
+        
+        if (btnAdminWarrantyRequests != null) {
+            btnAdminWarrantyRequests.setOnClickListener(v -> {
+                startActivity(new Intent(this, AdminWarrantyListActivity.class));
             });
         }
 
@@ -341,6 +348,7 @@ public class ProfileActivity extends AppCompatActivity {
         if ("admin".equals(userRole)) {
             updateAdminOrderBadge();
             updateAdminReturnBadge();
+            updateAdminWarrantyBadge();
             updateRevenueStats();
         } else {
             updateCartBadge();
@@ -421,6 +429,22 @@ public class ProfileActivity extends AppCompatActivity {
                             tvReturnBadge.setText(String.valueOf(count));
                             tvReturnBadge.setVisibility(View.VISIBLE);
                         } else { tvReturnBadge.setVisibility(View.GONE); }
+                    }
+                });
+    }
+
+    private void updateAdminWarrantyBadge() {
+        db.collection("warranty_requests")
+                .whereEqualTo("status", "pending_repair")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int count = queryDocumentSnapshots.size();
+                    TextView tvWarrantyBadge = findViewById(R.id.tvWarrantyBadge);
+                    if (tvWarrantyBadge != null) {
+                        if (count > 0) {
+                            tvWarrantyBadge.setText(String.valueOf(count));
+                            tvWarrantyBadge.setVisibility(View.VISIBLE);
+                        } else { tvWarrantyBadge.setVisibility(View.GONE); }
                     }
                 });
     }

@@ -14,8 +14,7 @@ public class Notification {
     private String type; // Loại thông báo: order_status, promo, ...
     private String orderId; // ID đơn hàng liên quan
     
-    @ServerTimestamp
-    private Date timestamp; 
+    private long timestamp; 
 
     public Notification() {}
 
@@ -25,6 +24,7 @@ public class Notification {
         this.date = date;
         this.userEmail = userEmail;
         this.read = false;
+        this.timestamp = System.currentTimeMillis();
     }
 
     @Exclude
@@ -52,6 +52,6 @@ public class Notification {
     public String getOrderId() { return orderId; }
     public void setOrderId(String orderId) { this.orderId = orderId; }
 
-    public Date getTimestamp() { return timestamp; }
-    public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
+    public long getTimestamp() { return timestamp; }
+    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 }

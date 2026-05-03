@@ -30,13 +30,13 @@
                 android:clipToPadding="false">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"
                     android:orientation="horizontal"
                     android:clipChildren="false"
                     android:clipToPadding="false"
-                    android:gravity="center_vertical">
+                    android:gravity="end|center_vertical">
 
                     <ImageView
                         android:id="@+id/btnSetting"
@@ -55,6 +55,7 @@
                         android:clipChildren="false"
                         android:clipToPadding="false">
                         <ImageView
+                            android:id="@+id/ivNotificationIcon"
                             android:layout_width="26dp"
                             android:layout_height="26dp"
                             android:src="@drawable/ic_notifications"
@@ -65,8 +66,8 @@
                             android:layout_height="wrap_content"
                             android:minWidth="18dp"
                             android:minHeight="18dp"
-                            android:layout_alignParentTop="true"
-                            android:layout_alignParentEnd="true"
+                            android:layout_alignTop="@id/ivNotificationIcon"
+                            android:layout_alignEnd="@id/ivNotificationIcon"
                             android:layout_marginTop="-8dp"
                             android:layout_marginEnd="-8dp"
                             android:background="@drawable/bg_circle_red_badge"
@@ -431,6 +432,37 @@
                                 </LinearLayout>
                                 <TextView
                                     android:id="@+id/tvReturnBadge"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:minWidth="18dp"
+                                    android:minHeight="18dp"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_margin="8dp"
+                                    android:background="@drawable/bg_circle_red_badge"
+                                    android:gravity="center"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="9sp"
+                                    android:textStyle="bold"
+                                    android:padding="2dp"
+                                    android:visibility="gone"/>
+                            </RelativeLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/btnAdminWarrantyRequests"
+                            android:layout_width="0dp"
+                            android:layout_height="100dp"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="6dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="2dp">
+                            <RelativeLayout android:layout_width="match_parent" android:layout_height="match_parent">
+                                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
+                                    <ImageView android:layout_width="32dp" android:layout_height="32dp" android:src="@android:drawable/ic_menu_edit" app:tint="#3F51B5"/>
+                                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Bảo hành" android:textStyle="bold" android:textSize="13sp"/>
+                                </LinearLayout>
+                                <TextView
+                                    android:id="@+id/tvWarrantyBadge"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:minWidth="18dp"

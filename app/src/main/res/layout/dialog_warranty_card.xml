@@ -151,10 +151,20 @@
                 android:lineSpacingExtra="2dp" />
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnContactWarranty"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_sky_blue_gradient"
+                android:text="GỬI YÊU CẦU BẢO HÀNH"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnCloseCard"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="12dp"
                 android:background="@drawable/bg_border_gray_light"
                 android:text="ĐÓNG"
                 android:textColor="#757575"

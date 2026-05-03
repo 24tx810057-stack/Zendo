@@ -48,6 +48,9 @@
         <activity android:name=".RequestReturnActivity" />
         <activity android:name=".AdminReturnListActivity" />
         <activity android:name=".AdminReturnDetailActivity" />
+        <activity android:name=".RequestWarrantyActivity" />
+        <activity android:name=".AdminWarrantyListActivity" />
+        <activity android:name=".AdminWarrantyDetailActivity" />
 
     </application>
 
