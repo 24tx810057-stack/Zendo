@@ -107,10 +107,67 @@ public class OrderManager {
                                 }
                             }
                         }
+                        
+                        sendOrderNotification(order, newStatus);
                         listener.onSuccess();
                     })
                     .addOnFailureListener(e -> listener.onFailure(e.getMessage()));
         });
+    }
+
+    private void sendOrderNotification(Order order, String status) {
+        String title = "Cập nhật đơn hàng";
+        String content = "";
+        String type = "order_status";
+        String shortId = order.getId();
+        if (shortId != null && shortId.length() > 8) shortId = shortId.substring(shortId.length() - 8).toUpperCase();
+
+        switch (status) {
+            case "Chờ lấy hàng":
+                content = "Đơn hàng #" + shortId + " đã được xác nhận và đang chờ lấy hàng.";
+                break;
+            case "Đang giao":
+                content = "Đơn hàng #" + shortId + " đang trên đường giao đến bạn.";
+                break;
+            case "Đã giao":
+                content = "Đơn hàng #" + shortId + " đã giao thành công. Vui lòng xác nhận đã nhận hàng.";
+                break;
+            case "Hoàn thành":
+                content = "Cảm ơn bạn đã mua sắm! Đơn hàng #" + shortId + " đã hoàn thành.";
+                break;
+            case "Đã hủy":
+                content = "Đơn hàng #" + shortId + " đã bị hủy.";
+                break;
+            case "Yêu cầu hủy":
+                // Gửi thông báo cho Admin (giả định admin email là "admin")
+                Map<String, Object> adminNotif = new HashMap<>();
+                adminNotif.put("userEmail", "admin");
+                adminNotif.put("title", "Yêu cầu hủy đơn hàng");
+                adminNotif.put("message", "Khách hàng yêu cầu hủy đơn #" + shortId);
+                adminNotif.put("timestamp", System.currentTimeMillis());
+                adminNotif.put("read", false);
+                adminNotif.put("type", "admin_order");
+                adminNotif.put("orderId", order.getId());
+                adminNotif.put("date", new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault()).format(new java.util.Date()));
+                db.collection("notifications").add(adminNotif);
+                return; // Đã gửi cho admin rồi
+            default:
+                return;
+        }
+
+        if (!content.isEmpty()) {
+            Map<String, Object> notif = new HashMap<>();
+            notif.put("userEmail", order.getUserEmail());
+            notif.put("title", title);
+            notif.put("message", content);
+            notif.put("timestamp", System.currentTimeMillis());
+            notif.put("read", false);
+            notif.put("type", type);
+            notif.put("orderId", order.getId());
+            notif.put("date", new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault()).format(new java.util.Date()));
+
+            db.collection("notifications").add(notif);
+        }
     }
 
     public void deleteOrder(String orderId, OnActionCompleteListener listener) {

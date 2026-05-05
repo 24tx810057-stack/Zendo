@@ -293,12 +293,17 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="75dp"
         android:layout_alignParentBottom="true"
         android:background="#FFFFFF"
+        app:elevation="8dp"
+        app:itemIconSize="22dp"
+        app:itemPaddingTop="16dp"
+        app:itemPaddingBottom="8dp"
         app:itemIconTint="@color/selector_nav_color"
         app:itemTextColor="@color/selector_nav_color"
         app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nav_menu" />
+        app:menu="@menu/bottom_nav_menu"
+        app:itemActiveIndicatorStyle="@null" />
 
 </RelativeLayout>

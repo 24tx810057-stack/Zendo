@@ -44,7 +44,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView btnSetting;
     private View btnCart, layoutUserMenu, layoutAdminMenu, sectionSuggestion, btnChangePassword, btnNotification, sectionFavorite;
     private ShapeableImageView ivAvatar;
-    private View btnAdminOrders, btnAdminProducts, btnAdminVouchers, btnAdminReviews, btnAdminReturnRequests, btnAdminWarrantyRequests;
+    private View btnAdminOrders, btnAdminProducts, btnAdminVouchers, btnAdminReviews, btnAdminReturnRequests, btnAdminWarrantyRequests, btnAdminPaymentSettings;
     private Button btnLogout;
     private BottomNavigationView bottomNav;
     private NonScrollGridView gvSuggestions;
@@ -100,6 +100,7 @@ public class ProfileActivity extends AppCompatActivity {
         btnAdminReviews = findViewById(R.id.btnAdminReviews);
         btnAdminReturnRequests = findViewById(R.id.btnAdminReturnRequests);
         btnAdminWarrantyRequests = findViewById(R.id.btnAdminWarrantyRequests);
+        btnAdminPaymentSettings = findViewById(R.id.btnAdminPaymentSettings);
         btnChangePassword = findViewById(R.id.btnChangePassword);
         sectionFavorite = findViewById(R.id.sectionFavorite);
         
@@ -202,7 +203,11 @@ public class ProfileActivity extends AppCompatActivity {
         if (findViewById(R.id.btnStatusReview) != null) findViewById(R.id.btnStatusReview).setOnClickListener(statusClick);
 
         if (btnLogout != null) {
-            btnLogout.setOnClickListener(v -> {
+            if (btnAdminPaymentSettings != null) {
+            btnAdminPaymentSettings.setOnClickListener(v -> startActivity(new Intent(this, PaymentSettingsActivity.class)));
+        }
+
+        btnLogout.setOnClickListener(v -> {
                 getSharedPreferences("AppPrefs", Context.MODE_PRIVATE).edit().clear().apply();
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

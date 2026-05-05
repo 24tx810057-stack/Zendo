@@ -478,6 +478,22 @@
                                     android:visibility="gone"/>
                             </RelativeLayout>
                         </com.google.android.material.card.MaterialCardView>
+
+                        <!-- MỤC MỚI: CÀI ĐẶT THANH TOÁN -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/btnAdminPaymentSettings"
+                            android:layout_width="0dp"
+                            android:layout_height="100dp"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="6dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="2dp">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
+                                <ImageView android:layout_width="32dp" android:layout_height="32dp" android:src="@drawable/ic_receipt_admin" app:tint="#0288D1"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Thanh toán" android:textStyle="bold" android:textSize="13sp"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
                     </GridLayout>
                 </LinearLayout>
 
@@ -554,8 +570,16 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavProfile"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="75dp"
         android:layout_alignParentBottom="true"
         android:background="#FFFFFF"
-        app:menu="@menu/bottom_nav_menu" />
+        app:elevation="8dp"
+        app:itemIconSize="22dp"
+        app:itemPaddingTop="16dp"
+        app:itemPaddingBottom="8dp"
+        app:itemIconTint="@color/selector_nav_color"
+        app:itemTextColor="@color/selector_nav_color"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemActiveIndicatorStyle="@null" />
 </RelativeLayout>

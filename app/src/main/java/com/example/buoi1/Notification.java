@@ -14,7 +14,7 @@ public class Notification {
     private String type; // Loại thông báo: order_status, promo, ...
     private String orderId; // ID đơn hàng liên quan
     
-    private long timestamp; 
+    private Object timestamp; 
 
     public Notification() {}
 
@@ -52,6 +52,13 @@ public class Notification {
     public String getOrderId() { return orderId; }
     public void setOrderId(String orderId) { this.orderId = orderId; }
 
-    public long getTimestamp() { return timestamp; }
-    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+    public long getTimestamp() {
+        if (timestamp instanceof com.google.firebase.Timestamp) {
+            return ((com.google.firebase.Timestamp) timestamp).toDate().getTime();
+        } else if (timestamp instanceof Long) {
+            return (Long) timestamp;
+        }
+        return 0;
+    }
+    public void setTimestamp(Object timestamp) { this.timestamp = timestamp; }
 }

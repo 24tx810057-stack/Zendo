@@ -134,6 +134,7 @@ public class AdminReturnDetailActivity extends AppCompatActivity {
                                 db.collection("orders").document(returnRequest.getOrderId())
                                         .update("status", "Đã hoàn tiền")
                                         .addOnSuccessListener(aVoid2 -> {
+                                            sendNotification(true);
                                             Toast.makeText(this, "Đã duyệt hoàn tiền và hoàn lại kho thành công!", Toast.LENGTH_SHORT).show();
                                             finish();
                                         });
@@ -148,9 +149,35 @@ public class AdminReturnDetailActivity extends AppCompatActivity {
                     db.collection("orders").document(returnRequest.getOrderId())
                             .update("status", "Đã giao") // Trả về trạng thái đã giao
                             .addOnSuccessListener(aVoid2 -> {
+                                sendNotification(false);
                                 Toast.makeText(this, "Đã từ chối khiếu nại", Toast.LENGTH_SHORT).show();
                                 finish();
                             });
                 });
+    }
+
+    private void sendNotification(boolean isApproved) {
+        String title = "Kết quả khiếu nại đơn hàng";
+        String content = "";
+        String shortId = returnRequest.getOrderId();
+        if (shortId != null && shortId.length() > 8) shortId = shortId.substring(shortId.length() - 8).toUpperCase();
+
+        if (isApproved) {
+            content = "Yêu cầu trả hàng/hoàn tiền cho đơn hàng #" + shortId + " đã được chấp nhận. Tiền sẽ được hoàn về cho bạn sớm.";
+        } else {
+            content = "Rất tiếc, yêu cầu trả hàng cho đơn hàng #" + shortId + " đã bị từ chối.";
+        }
+
+        java.util.Map<String, Object> notif = new java.util.HashMap<>();
+        notif.put("userEmail", returnRequest.getUserEmail());
+        notif.put("title", title);
+        notif.put("message", content);
+        notif.put("timestamp", System.currentTimeMillis());
+        notif.put("read", false);
+        notif.put("type", "return_status");
+        notif.put("orderId", returnRequest.getOrderId());
+        notif.put("date", new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault()).format(new java.util.Date()));
+
+        db.collection("notifications").add(notif);
     }
 }

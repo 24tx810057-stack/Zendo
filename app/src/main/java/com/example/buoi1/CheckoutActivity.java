@@ -50,7 +50,7 @@ public class CheckoutActivity extends AppCompatActivity {
     private View layoutPayCOD, layoutPayBank, layoutPayZendo, layoutBankDetails;
     private RadioButton rbSelectCOD, rbSelectBank, rbSelectZendo;
     private View btnCopySTK, btnCopyNoiDung;
-    private TextView tvTransferNote;
+    private TextView tvTransferNote, tvBankSTK, tvBankOwner, tvBankName;
     private ImageView ivBankQR;
 
     private View layoutItemFast, layoutItemStandard;
@@ -69,6 +69,10 @@ public class CheckoutActivity extends AppCompatActivity {
     private String editName, editPhone, editAddress;
     private static final int REQUEST_CODE_SELECT_ADDRESS = 1001;
 
+    private String bankId = "";
+    private String accountNo = "";
+    private String accountName = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +84,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
         checkoutItems = (ArrayList<CartItem>) getIntent().getSerializableExtra("checkout_items");
 
+        loadAdminBankInfo();
         initViews();
         loadDefaultAddress();
         displayProducts();
@@ -143,6 +148,9 @@ public class CheckoutActivity extends AppCompatActivity {
         btnCopySTK = findViewById(R.id.btnCopySTK);
         btnCopyNoiDung = findViewById(R.id.btnCopyNoiDung);
         tvTransferNote = findViewById(R.id.tvTransferNote);
+        tvBankSTK = findViewById(R.id.tvBankSTK);
+        tvBankOwner = findViewById(R.id.tvBankOwner);
+        tvBankName = findViewById(R.id.tvBankName);
         ivBankQR = findViewById(R.id.ivBankQR);
     }
 
@@ -153,7 +161,7 @@ public class CheckoutActivity extends AppCompatActivity {
         layoutPayBank.setOnClickListener(v -> selectPaymentMethod("BANK"));
         layoutPayZendo.setOnClickListener(v -> selectPaymentMethod("ZENDOPAY"));
 
-        btnCopySTK.setOnClickListener(v -> copyToClipboard("200100", "Đã sao chép số tài khoản VIB"));
+        btnCopySTK.setOnClickListener(v -> copyToClipboard(accountNo, "Đã sao chép số tài khoản"));
         btnCopyNoiDung.setOnClickListener(v -> copyToClipboard(dynamicDescription, "Đã sao chép nội dung chuyển khoản"));
     }
 
@@ -184,11 +192,28 @@ public class CheckoutActivity extends AppCompatActivity {
         }
     }
 
+    private void loadAdminBankInfo() {
+        db.collection("admin_settings").document("bank_info").get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        bankId = documentSnapshot.getString("bankId");
+                        accountNo = documentSnapshot.getString("accountNo");
+                        accountName = documentSnapshot.getString("accountName");
+
+                        if (tvBankSTK != null) tvBankSTK.setText("Số TK: " + accountNo);
+                        if (tvBankOwner != null) tvBankOwner.setText("Chủ TK: " + accountName);
+                        if (tvBankName != null) tvBankName.setText("Ngân hàng: " + bankId);
+
+                        if (rbSelectBank != null && rbSelectBank.isChecked()) {
+                            updateVietQR();
+                        }
+                    }
+                });
+    }
+
     private void updateVietQR() {
         if (checkoutItems == null || checkoutItems.isEmpty()) return;
 
-        String bankId = "VIB";
-        String accountNo = "200100";
         String template = "compact2";
         
         String firstItemName = checkoutItems.get(0).getProductName();
@@ -224,7 +249,6 @@ public class CheckoutActivity extends AppCompatActivity {
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         }
     }
-
     private void setupShippingSelection() {
         rbStandard.setChecked(true);
         layoutItemStandard.setSelected(true);
