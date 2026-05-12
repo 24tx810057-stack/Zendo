@@ -69,6 +69,7 @@ public class DetailActivity extends AppCompatActivity {
     private ProgressBar pb5, pb4, pb3, pb2, pb1;
     private ImageView ivFavorite;
     private ListenerRegistration cartListener;
+    private androidx.recyclerview.widget.RecyclerView rvSimilarProducts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,6 +137,7 @@ public class DetailActivity extends AppCompatActivity {
         pb3 = findViewById(R.id.pb3Star);
         pb2 = findViewById(R.id.pb2Star);
         pb1 = findViewById(R.id.pb1Star);
+        rvSimilarProducts = findViewById(R.id.rvSimilarProducts);
         
         tvProductDetailWarrantyMain = findViewById(R.id.tvProductDetailWarrantyMain);
         tvSpecChip = findViewById(R.id.tvSpecChip);
@@ -330,6 +332,28 @@ public class DetailActivity extends AppCompatActivity {
         loadProductReviews(); 
     }
 
+    private void loadSimilarProducts() {
+        if (productId == null) return;
+        db.collection("products")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Product> allProducts = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        Product p = doc.toObject(Product.class);
+                        p.setId(doc.getId());
+                        allProducts.add(p);
+                    }
+                    List<Product> similar = RecommendationEngine.recommendSimilarProducts(product, allProducts, 6);
+                    if (rvSimilarProducts != null && !similar.isEmpty()) {
+                        HorizontalProductAdapter adapter = new HorizontalProductAdapter(this, similar);
+                        rvSimilarProducts.setAdapter(adapter);
+                        findViewById(R.id.layoutSimilarProducts).setVisibility(View.VISIBLE);
+                    } else if (findViewById(R.id.layoutSimilarProducts) != null) {
+                        findViewById(R.id.layoutSimilarProducts).setVisibility(View.GONE);
+                    }
+                });
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -349,6 +373,7 @@ public class DetailActivity extends AppCompatActivity {
                     if (product != null) {
                         displayData();
                         checkIfLiked();
+                        loadSimilarProducts(); // Load lại gợi ý khi đã có dữ liệu tags mới nhất
                     }
                 });
     }

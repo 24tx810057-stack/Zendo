@@ -10,7 +10,8 @@
         android:id="@+id/toolbarAddAddress"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="#FFFFFF">
+        android:background="#FFFFFF"
+        android:elevation="4dp">
 
         <ImageView
             android:id="@+id/btnBackAddAddress"
@@ -28,14 +29,16 @@
             android:layout_centerInParent="true"
             android:text="Địa chỉ mới"
             android:textColor="#212121"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
     </RelativeLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/btnSaveAddress"
-        android:layout_below="@id/toolbarAddAddress">
+        android:layout_below="@id/toolbarAddAddress"
+        android:background="#F8F9FA">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -45,74 +48,114 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Thông tin địa chỉ (trước khi sát nhập)"
-                android:textColor="#616161"
-                android:textSize="13sp" />
+                android:paddingHorizontal="16dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="8dp"
+                android:text="Thông tin địa chỉ"
+                android:textColor="#757575"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
-            <!-- Input fields section -->
+            <!-- Contact section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#FFFFFF"
                 android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/etFullName"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="54dp"
-                    android:background="@null"
-                    android:hint="Họ và tên"
-                    android:paddingHorizontal="16dp"
-                    android:textSize="15sp" />
-                <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#EEEEEE" android:layout_marginHorizontal="16dp"/>
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp">
+                    <EditText
+                        android:id="@+id/etFullName"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:hint="Họ và tên"
+                        android:textSize="15sp" />
+                </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#F0F0F0" android:layout_marginHorizontal="16dp"/>
 
-                <EditText
-                    android:id="@+id/etPhone"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="54dp"
-                    android:background="@null"
-                    android:hint="Số điện thoại"
-                    android:inputType="phone"
-                    android:paddingHorizontal="16dp"
-                    android:textSize="15sp" />
-                <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#EEEEEE" android:layout_marginHorizontal="16dp"/>
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp">
+                    <EditText
+                        android:id="@+id/etPhone"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:hint="Số điện thoại"
+                        android:inputType="phone"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <!-- Address section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:orientation="vertical">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="54dp">
+                    android:layout_height="54dp"
+                    android:paddingHorizontal="16dp">
                     <EditText
                         android:id="@+id/etArea"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_toStartOf="@+id/ivArrow"
                         android:background="@null"
-                        android:hint="Tỉnh/Thành phố, Quận/Huyện, Phường/Xã"
-                        android:paddingHorizontal="16dp"
+                        android:hint="Tỉnh/Thành phố, Quận/Huyện..."
                         android:textSize="15sp"
                         android:focusable="false"
                         android:clickable="true" />
                     <ImageView
+                        android:id="@+id/ivArrow"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginEnd="16dp"
                         android:src="@drawable/ic_arrow_right"
                         app:tint="#BDBDBD"/>
                 </RelativeLayout>
-                <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#EEEEEE" android:layout_marginHorizontal="16dp"/>
+                <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#F0F0F0" android:layout_marginHorizontal="16dp"/>
 
-                <EditText
-                    android:id="@+id/etDetailAddress"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="54dp"
-                    android:background="@null"
-                    android:hint="Tên đường, Tòa nhà, Số nhà."
-                    android:paddingHorizontal="16dp"
-                    android:textSize="15sp" />
+                    android:layout_height="wrap_content"
+                    android:minHeight="54dp"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp">
+                    <EditText
+                        android:id="@+id/etDetailAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="54dp"
+                        android:background="@null"
+                        android:hint="Số nhà, tên đường..."
+                        android:textSize="15sp"
+                        android:paddingVertical="8dp" />
+                </LinearLayout>
             </LinearLayout>
 
-            <View android:layout_width="match_parent" android:layout_height="12dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="8dp"
+                android:text="Cài đặt"
+                android:textColor="#757575"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <!-- Settings section -->
             <LinearLayout
@@ -121,31 +164,18 @@
                 android:background="#FFFFFF"
                 android:orientation="vertical">
 
-                <RelativeLayout android:layout_width="match_parent" android:layout_height="54dp" android:paddingHorizontal="16dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:text="Đặt làm địa chỉ mặc định" android:textColor="#212121" android:textSize="14sp" />
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/swDefault"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        app:thumbTint="@color/blue_main"
-                        app:trackTint="@color/blue_voucher_bg" />
-                </RelativeLayout>
-                <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#EEEEEE" android:layout_marginHorizontal="16dp"/>
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="16dp">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Loại địa chỉ:" android:textColor="#212121" android:textSize="14sp" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Loại địa chỉ" android:textColor="#212121" android:textSize="15sp" />
                     <com.google.android.material.button.MaterialButtonToggleGroup
                         android:id="@+id/toggleGroupType"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:singleSelection="true"
-                        app:checkedButton="@+id/btnTypeHome"
                         app:selectionRequired="true">
                         <Button
                             android:id="@+id/btnTypeOffice"
@@ -155,8 +185,8 @@
                             android:text="Văn Phòng"
                             android:textSize="12sp"
                             android:paddingHorizontal="12dp"
-                            app:strokeColor="@color/blue_main"
-                            android:textColor="@color/blue_main" />
+                            app:strokeColor="#E0E0E0"
+                            android:textColor="#757575" />
                         <Button
                             android:id="@+id/btnTypeHome"
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -165,14 +195,28 @@
                             android:text="Nhà Riêng"
                             android:textSize="12sp"
                             android:paddingHorizontal="12dp"
-                            app:strokeColor="@color/blue_main"
-                            android:textColor="@color/blue_main" />
+                            app:strokeColor="#E0E0E0"
+                            android:textColor="#757575" />
                     </com.google.android.material.button.MaterialButtonToggleGroup>
                 </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#F0F0F0" android:layout_marginHorizontal="16dp"/>
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="64dp" android:paddingHorizontal="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:text="Đặt làm địa chỉ mặc định" android:textColor="#212121" android:textSize="15sp" />
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/swDefault"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        app:thumbTint="@color/blue_main"
+                        app:trackTint="#B3E5FC" />
+                </RelativeLayout>
             </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnSaveAddress"

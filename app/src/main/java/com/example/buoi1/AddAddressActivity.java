@@ -89,8 +89,6 @@ public class AddAddressActivity extends AppCompatActivity {
         toggleGroupType = findViewById(R.id.toggleGroupType);
         btnSave = findViewById(R.id.btnSaveAddress);
         btnBack = findViewById(R.id.btnBackAddAddress);
-        etArea.setFocusable(false);
-        etArea.setClickable(true);
     }
 
     private void setupListeners() {
@@ -109,6 +107,20 @@ public class AddAddressActivity extends AppCompatActivity {
         etDetailAddress.addTextChangedListener(watcher);
 
         btnSave.setOnClickListener(v -> saveAddressToFirestore());
+
+        // Xử lý đổi style nút khi click chọn loại địa chỉ
+        toggleGroupType.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            Button btn = findViewById(checkedId);
+            if (btn != null) {
+                if (isChecked) {
+                    btn.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#01579B")));
+                    btn.setTextColor(Color.WHITE);
+                } else {
+                    btn.setBackgroundTintList(ColorStateList.valueOf(Color.TRANSPARENT));
+                    btn.setTextColor(Color.parseColor("#757575"));
+                }
+            }
+        });
     }
 
     private void saveAddressToFirestore() {
@@ -276,8 +288,13 @@ public class AddAddressActivity extends AppCompatActivity {
         etArea.setText(area);
         etDetailAddress.setText(address.getDetailAddress());
         swDefault.setChecked(address.isDefault());
-        if ("Văn phòng".equals(address.getType())) toggleGroupType.check(R.id.btnTypeOffice);
-        else toggleGroupType.check(R.id.btnTypeHome);
+        
+        // Khắc phục lỗi không nhớ loại địa chỉ
+        if ("Văn phòng".equals(address.getType())) {
+            toggleGroupType.check(R.id.btnTypeOffice);
+        } else {
+            toggleGroupType.check(R.id.btnTypeHome);
+        }
     }
 
     private void updateSaveButtonState() {

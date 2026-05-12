@@ -196,11 +196,30 @@ public class ProfileActivity extends AppCompatActivity {
         View btnOrderHistory = findViewById(R.id.btnOrderHistory);
         if (btnOrderHistory != null) btnOrderHistory.setOnClickListener(v -> startActivity(new Intent(this, OrderListActivity.class)));
 
-        View.OnClickListener statusClick = v -> startActivity(new Intent(this, OrderListActivity.class));
-        if (findViewById(R.id.btnStatusPending) != null) findViewById(R.id.btnStatusPending).setOnClickListener(statusClick);
-        if (findViewById(R.id.btnStatusPickup) != null) findViewById(R.id.btnStatusPickup).setOnClickListener(statusClick);
-        if (findViewById(R.id.btnStatusShipping) != null) findViewById(R.id.btnStatusShipping).setOnClickListener(statusClick);
-        if (findViewById(R.id.btnStatusReview) != null) findViewById(R.id.btnStatusReview).setOnClickListener(statusClick);
+        if (findViewById(R.id.btnStatusPending) != null) 
+            findViewById(R.id.btnStatusPending).setOnClickListener(v -> {
+                Intent intent = new Intent(this, OrderListActivity.class);
+                intent.putExtra("tab_index", 1);
+                startActivity(intent);
+            });
+        if (findViewById(R.id.btnStatusPickup) != null) 
+            findViewById(R.id.btnStatusPickup).setOnClickListener(v -> {
+                Intent intent = new Intent(this, OrderListActivity.class);
+                intent.putExtra("tab_index", 2);
+                startActivity(intent);
+            });
+        if (findViewById(R.id.btnStatusShipping) != null) 
+            findViewById(R.id.btnStatusShipping).setOnClickListener(v -> {
+                Intent intent = new Intent(this, OrderListActivity.class);
+                intent.putExtra("tab_index", 3);
+                startActivity(intent);
+            });
+        if (findViewById(R.id.btnStatusReview) != null) 
+            findViewById(R.id.btnStatusReview).setOnClickListener(v -> {
+                Intent intent = new Intent(this, OrderListActivity.class);
+                intent.putExtra("tab_index", 4);
+                startActivity(intent);
+            });
 
         if (btnLogout != null) {
             if (btnAdminPaymentSettings != null) {
@@ -284,57 +303,68 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void loadSuggestions() {
         if (userEmail == null || userEmail.isEmpty()) return;
-        db.collection("orders")
-                .whereEqualTo("userEmail", userEmail)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    Set<String> favoriteBrands = new HashSet<>();
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        Order order = doc.toObject(Order.class);
-                        if (order.getItems() != null) {
-                            for (CartItem item : order.getItems()) {
-                                String[] words = item.getProductName().split(" ");
-                                if (words.length > 0) favoriteBrands.add(words[0].toLowerCase());
-                            }
-                        }
+        
+        final Set<String> purchaseTags = new HashSet<>();
+        final Set<String> cartTags = new HashSet<>();
+        final Set<String> likedTags = new HashSet<>();
+        
+        // 1. Lấy Tags từ Lịch sử mua hàng
+        db.collection("orders").whereEqualTo("userEmail", userEmail).get().addOnSuccessListener(orderSnaps -> {
+            for (QueryDocumentSnapshot doc : orderSnaps) {
+                Order order = doc.toObject(Order.class);
+                if (order.getItems() != null) {
+                    for (CartItem item : order.getItems()) {
+                        String[] words = item.getProductName().split(" ");
+                        for(String w : words) if(w.length() > 3) purchaseTags.add(w.toLowerCase());
                     }
-                    fetchAndSortProducts(favoriteBrands);
+                }
+            }
+            
+            // 2. Lấy Tags từ Giỏ hàng
+            db.collection("cart").whereEqualTo("userEmail", userEmail).get().addOnSuccessListener(cartSnaps -> {
+                for (QueryDocumentSnapshot doc : cartSnaps) {
+                    CartItem item = doc.toObject(CartItem.class);
+                    String[] words = item.getProductName().split(" ");
+                    for(String w : words) if(w.length() > 3) cartTags.add(w.toLowerCase());
+                }
+                
+                // 3. Lấy Tags từ Yêu thích
+                db.collection("products").whereArrayContains("likedBy", userEmail).get().addOnSuccessListener(likedSnaps -> {
+                    for (QueryDocumentSnapshot doc : likedSnaps) {
+                        Product p = doc.toObject(Product.class);
+                        likedTags.addAll(p.getTags());
+                    }
+                    
+                    // 4. Lấy Lịch sử Tìm kiếm từ SharedPreferences
+                    SharedPreferences sharedPref = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+                    String searchHistoryStr = sharedPref.getString("search_history", "");
+                    List<String> searchHistory = new ArrayList<>();
+                    if (!searchHistoryStr.isEmpty()) {
+                        searchHistory.addAll(java.util.Arrays.asList(searchHistoryStr.split(",")));
+                    }
+                    
+                    fetchAndSortProducts(purchaseTags, cartTags, likedTags, searchHistory);
                 });
+            });
+        });
     }
 
-    private void fetchAndSortProducts(Set<String> favoriteBrands) {
-        db.collection("products")
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .limit(20)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Product> allProducts = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        Product product = document.toObject(Product.class);
-                        product.setId(document.getId());
-                        allProducts.add(product);
-                    }
-                    Collections.sort(allProducts, (p1, p2) -> {
-                        int score1 = calculateScore(p1, favoriteBrands);
-                        int score2 = calculateScore(p2, favoriteBrands);
-                        return Integer.compare(score2, score1);
-                    });
-                    suggestionList.clear();
-                    suggestionList.addAll(allProducts);
-                    if (suggestionAdapter != null) suggestionAdapter.notifyDataSetChanged();
-                });
-    }
-
-    private int calculateScore(Product product, Set<String> favoriteBrands) {
-        int score = 0;
-        String name = product.getName().toLowerCase();
-        String brand = product.getBrand() != null ? product.getBrand().toLowerCase() : "";
-        for (String fav : favoriteBrands) {
-            if (name.contains(fav)) score += 10;
-            if (brand.equals(fav)) score += 20;
-        }
-        score += product.getSoldCount();
-        return score;
+    private void fetchAndSortProducts(Set<String> purchaseTags, Set<String> cartTags, Set<String> likedTags, List<String> searchHistory) {
+        db.collection("products").get().addOnSuccessListener(queryDocumentSnapshots -> {
+            List<Product> allProducts = new ArrayList<>();
+            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                Product product = document.toObject(Product.class);
+                product.setId(document.getId());
+                if (product.getStock() > 0) allProducts.add(product);
+            }
+            
+            List<Product> recommended = RecommendationEngine.recommendForUser(
+                    purchaseTags, cartTags, likedTags, searchHistory, allProducts, 20);
+            
+            suggestionList.clear();
+            suggestionList.addAll(recommended);
+            if (suggestionAdapter != null) suggestionAdapter.notifyDataSetChanged();
+        });
     }
 
     @Override

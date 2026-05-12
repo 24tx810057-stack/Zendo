@@ -22,6 +22,7 @@ public class Product implements Serializable {
     private long createdAt;
     private String warranty;
     private List<String> likedBy = new ArrayList<>();
+    private List<String> tags = new ArrayList<>();
 
     public Product() {
     }
@@ -94,6 +95,12 @@ public class Product implements Serializable {
 
     public List<String> getLikedBy() { return likedBy; }
     public void setLikedBy(List<String> likedBy) { this.likedBy = likedBy; }
+
+    public List<String> getTags() {
+        if (tags == null) tags = new ArrayList<>();
+        return tags;
+    }
+    public void setTags(List<String> tags) { this.tags = tags; }
     
     public boolean isLiked(String email) {
         return likedBy != null && likedBy.contains(email);

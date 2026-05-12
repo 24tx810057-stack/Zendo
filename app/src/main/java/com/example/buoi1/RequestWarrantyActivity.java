@@ -41,9 +41,8 @@ public class RequestWarrantyActivity extends AppCompatActivity {
     private View btnPickImages;
     private Button btnSubmit;
 
-    private Order order;
-    private CartItem cartItem;
-    private Date expiryDate;
+    private String orderId, userEmail, productId, productName, productImageUrl;
+    private long expiryDateLong;
     private FirebaseFirestore db;
     private List<String> base64Images = new ArrayList<>();
     private ImagePreviewAdapter adapter;
@@ -78,11 +77,16 @@ public class RequestWarrantyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_request_warranty);
 
         db = FirebaseFirestore.getInstance();
-        order = (Order) getIntent().getSerializableExtra("order_data");
-        cartItem = (CartItem) getIntent().getSerializableExtra("cart_item");
-        expiryDate = (Date) getIntent().getSerializableExtra("expiry_date");
+        
+        orderId = getIntent().getStringExtra("order_id");
+        userEmail = getIntent().getStringExtra("user_email");
+        productId = getIntent().getStringExtra("product_id");
+        productName = getIntent().getStringExtra("product_name");
+        productImageUrl = getIntent().getStringExtra("product_image");
+        expiryDateLong = getIntent().getLongExtra("expiry_date_long", 0);
 
-        if (order == null || cartItem == null) {
+        if (orderId == null || productId == null) {
+            Toast.makeText(this, "Thiếu dữ liệu yêu cầu", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -95,6 +99,7 @@ public class RequestWarrantyActivity extends AppCompatActivity {
         ivProduct = findViewById(R.id.ivWarrantyProduct);
         tvProductName = findViewById(R.id.tvWarrantyProductName);
         tvExpiryInfo = findViewById(R.id.tvWarrantyExpiryInfo);
+        
         spErrorType = findViewById(R.id.spWarrantyErrorType);
         etDesc = findViewById(R.id.etWarrantyDesc);
         rvImages = findViewById(R.id.rvWarrantyImages);
@@ -125,18 +130,17 @@ public class RequestWarrantyActivity extends AppCompatActivity {
     }
 
     private void displayInfo() {
-        tvProductName.setText(cartItem.getProductName());
-        if (expiryDate != null) {
-            String dateStr = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(expiryDate);
+        tvProductName.setText(productName);
+        if (expiryDateLong != 0) {
+            String dateStr = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date(expiryDateLong));
             tvExpiryInfo.setText("Hạn bảo hành: " + dateStr);
         }
 
-        String imgData = cartItem.getProductImageUrl();
-        if (imgData != null) {
-            if (imgData.startsWith("http")) Glide.with(this).load(imgData).into(ivProduct);
+        if (productImageUrl != null) {
+            if (productImageUrl.startsWith("http")) Glide.with(this).load(productImageUrl).into(ivProduct);
             else {
                 try {
-                    byte[] decodedString = Base64.decode(imgData, Base64.DEFAULT);
+                    byte[] decodedString = Base64.decode(productImageUrl, Base64.DEFAULT);
                     Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                     ivProduct.setImageBitmap(bitmap);
                 } catch (Exception e) {}
@@ -166,14 +170,14 @@ public class RequestWarrantyActivity extends AppCompatActivity {
         btnSubmit.setText("ĐANG GỬI...");
 
         Map<String, Object> request = new HashMap<>();
-        request.put("orderId", order.getId());
-        request.put("productId", cartItem.getProductId());
-        request.put("userEmail", order.getUserEmail());
+        request.put("orderId", orderId);
+        request.put("productId", productId);
+        request.put("userEmail", userEmail);
         request.put("errorType", errorTypes[errorPos]);
         request.put("description", desc);
         request.put("evidenceImages", base64Images);
         request.put("status", "pending_repair");
-        request.put("type", "warranty"); // Phân biệt với refund
+        request.put("type", "warranty");
         request.put("timestamp", System.currentTimeMillis());
 
         db.collection("warranty_requests")

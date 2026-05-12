@@ -63,7 +63,24 @@ public class NotificationActivity extends AppCompatActivity {
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
-                        Log.e("NotificationActivity", "Error: " + error.getMessage());
+                        Log.e("NotificationActivity", "Error sorting: " + error.getMessage());
+                        // Fallback if sorting fails due to inconsistent types in Firestore
+                        db.collection("notifications")
+                                .whereEqualTo("userEmail", targetEmail)
+                                .addSnapshotListener((v2, e2) -> {
+                                   if (v2 != null) {
+                                       notificationList.clear();
+                                       for (QueryDocumentSnapshot doc : v2) {
+                                           Notification n = doc.toObject(Notification.class);
+                                           n.setId(doc.getId());
+                                           notificationList.add(n);
+                                       }
+                                       // Manual sort as fallback
+                                       java.util.Collections.sort(notificationList, (n1, n2) -> 
+                                           Long.compare(n2.getTimestamp(), n1.getTimestamp()));
+                                       updateUI();
+                                   }
+                                });
                         return;
                     }
                     if (value != null) {

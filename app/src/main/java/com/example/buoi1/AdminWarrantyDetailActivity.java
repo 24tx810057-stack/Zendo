@@ -166,10 +166,12 @@ public class AdminWarrantyDetailActivity extends AppCompatActivity {
         Map<String, Object> notif = new HashMap<>();
         notif.put("userEmail", request.getUserEmail());
         notif.put("title", title);
-        notif.put("content", content);
+        notif.put("message", content);
         notif.put("timestamp", System.currentTimeMillis());
         notif.put("read", false);
         notif.put("type", "warranty");
+        notif.put("orderId", request.getOrderId());
+        notif.put("date", new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault()).format(new java.util.Date()));
 
         db.collection("notifications").add(notif);
     }

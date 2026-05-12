@@ -21,6 +21,10 @@ public class Order implements Serializable {
     private String userName;
     private String note;
     private boolean reviewed; // Trạng thái đã đánh giá hay chưa
+    private String cancelReason;
+    private String cancelledBy; // "user" hoặc "admin"
+    private Date cancelTimestamp;
+    private boolean cancelRejected; // Đánh dấu nếu Admin đã từng từ chối hủy
 
     public Order() {}
 
@@ -71,4 +75,16 @@ public class Order implements Serializable {
 
     public boolean isReviewed() { return reviewed; }
     public void setReviewed(boolean reviewed) { this.reviewed = reviewed; }
+
+    public String getCancelReason() { return cancelReason; }
+    public void setCancelReason(String cancelReason) { this.cancelReason = cancelReason; }
+
+    public String getCancelledBy() { return cancelledBy; }
+    public void setCancelledBy(String cancelledBy) { this.cancelledBy = cancelledBy; }
+
+    public Date getCancelTimestamp() { return cancelTimestamp; }
+    public void setCancelTimestamp(Date cancelTimestamp) { this.cancelTimestamp = cancelTimestamp; }
+
+    public boolean isCancelRejected() { return cancelRejected; }
+    public void setCancelRejected(boolean cancelRejected) { this.cancelRejected = cancelRejected; }
 }

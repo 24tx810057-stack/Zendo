@@ -27,13 +27,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class AddProductActivity extends AppCompatActivity {
 
     private TextView tvAutoId, tvTitle, btnSave, btnAddMoreSpec;
-    private EditText etName, etPrice, etOldPrice, etStock, etDesc, etWarranty;
+    private EditText etName, etPrice, etOldPrice, etStock, etDesc, etWarranty, etTags;
     private EditText etSpecChip, etSpecScreen, etSpecRam, etSpecRom, etSpecPin, etSpecOs, etSpecCameraRear, etSpecCameraFront;
     private LinearLayout layoutDynamicSpecs;
     private RecyclerView rvImages;
@@ -78,6 +80,7 @@ public class AddProductActivity extends AppCompatActivity {
         tvAutoId = findViewById(R.id.tvAutoProductId);
         
         etName = findViewById(R.id.etAddProductName);
+        etTags = findViewById(R.id.etAddProductTags);
         spCategory = findViewById(R.id.spAddProductCategory);
         spBrand = findViewById(R.id.spAddProductBrand); 
         etPrice = findViewById(R.id.etAddProductPrice);
@@ -200,6 +203,23 @@ public class AddProductActivity extends AppCompatActivity {
         etPrice.setText(String.valueOf((long)product.getPrice()));
         if (product.getOldPrice() > 0) etOldPrice.setText(String.valueOf((long)product.getOldPrice()));
         etStock.setText(String.valueOf(product.getStock()));
+        
+        if (product.getTags() != null) {
+            // LỌC BỎ TAG HỆ THỐNG (Hãng & Danh mục) ĐỂ Ô NHẬP KHÔNG BỊ RÁC
+            List<String> displayTags = new ArrayList<>(product.getTags());
+            String currentB = (product.getBrand() != null) ? product.getBrand().toLowerCase().trim() : "";
+            String currentC = (product.getCategory() != null) ? product.getCategory().toLowerCase().trim() : "";
+            
+            displayTags.remove(currentB);
+            displayTags.remove(currentC);
+            
+            if (!displayTags.isEmpty()) {
+                etTags.setText(android.text.TextUtils.join(", ", displayTags));
+            } else {
+                etTags.setText("");
+            }
+        }
+
         if (product.getWarranty() != null) etWarranty.setText(product.getWarranty());
         
         String desc = product.getDescription();
@@ -269,12 +289,77 @@ public class AddProductActivity extends AppCompatActivity {
         
         fullDesc.append(etDesc.getText().toString().trim());
 
-        Product product = new Product(id, name, fullDesc.toString().trim(), price, base64Images.get(0), category, stock, "N/A", brand, 4.8, 0, System.currentTimeMillis());
+        // HỆ THỐNG TAG TỰ ĐỘNG + THỦ CÔNG
+        Set<String> tagsSet = new HashSet<>();
+        
+        // 1. Tự động thêm Hãng và Danh mục (Viết thường, xóa khoảng trắng)
+        if (brand != null) tagsSet.add(brand.trim().toLowerCase());
+        if (category != null) tagsSet.add(category.trim().toLowerCase());
+        
+        // 2. Thêm Tags thủ công từ Shop
+        String tagsInput = etTags.getText().toString().trim();
+        if (!tagsInput.isEmpty()) {
+            String[] parts = tagsInput.split(",");
+            for (String p : parts) {
+                if (!p.trim().isEmpty()) tagsSet.add(p.trim().toLowerCase());
+            }
+        }
+        List<String> finalTags = new ArrayList<>(tagsSet);
+
+        // GIỮ LẠI LƯỢT BÁN VÀ ĐÁNH GIÁ CŨ KHI EDIT (Lấy trực tiếp từ DB 
+        final String fId = id;
+        final String fName = name;
+        final String fFullDesc = fullDesc.toString().trim();
+        final double fPrice = price;
+        final double fOldPrice = oldPrice;
+        final int fStock = stock;
+        final String fCategory = category;
+        final String fBrand = brand;
+        final String fWarranty = etWarranty.getText().toString().trim();
+
+        if (isEditMode) {
+            db.collection("products").document(id).get().addOnSuccessListener(documentSnapshot -> {
+                Product p = null;
+                if (documentSnapshot.exists()) {
+                    p = documentSnapshot.toObject(Product.class);
+                }
+
+                if (p == null) p = existingProduct;
+
+                if (p != null) {
+                    // CẬP NHẬT TRỰC TIẾP TRÊN ĐỐI TƯỢNG CŨ
+                    p.setName(fName);
+                    p.setPrice(fPrice);
+                    p.setOldPrice(fOldPrice);
+                    p.setStock(fStock);
+                    p.setCategory(fCategory);
+                    p.setBrand(fBrand);
+                    p.setDescription(fFullDesc);
+                    p.setWarranty(fWarranty);
+                    p.setTags(finalTags);
+                    p.setImages(base64Images);
+                    p.setImageUrl(base64Images.get(0));
+
+                    // Lưu lại chính đối tượng đó
+                    db.collection("products").document(fId).set(p)
+                            .addOnSuccessListener(aVoid -> finish())
+                            .addOnFailureListener(e -> Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                }
+            });
+        } else {
+            // Chỉ dùng "new Product" khi tạo máy mới hoàn toàn
+            Product product = new Product(fId, fName, fFullDesc, fPrice, base64Images.get(0), fCategory, fStock, "N/A", fBrand, 5.0, 0, System.currentTimeMillis());
+            saveFinalProduct(product, fOldPrice, base64Images, fWarranty, finalTags);
+        }
+    }
+
+    private void saveFinalProduct(Product product, double oldPrice, List<String> base64Images, String warranty, List<String> finalTags) {
         product.setOldPrice(oldPrice);
         product.setImages(base64Images);
-        product.setWarranty(etWarranty.getText().toString().trim());
+        product.setWarranty(warranty);
+        product.setTags(finalTags);
 
-        db.collection("products").document(id).set(product)
+        db.collection("products").document(product.getId()).set(product)
                 .addOnSuccessListener(aVoid -> finish())
                 .addOnFailureListener(e -> Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }

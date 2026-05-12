@@ -199,8 +199,31 @@ public class ListActivity extends AppCompatActivity {
                 filterProducts(s.toString());
             }
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+                saveSearchQuery(s.toString());
+            }
         });
+    }
+
+    private void saveSearchQuery(String query) {
+        String q = query.trim().toLowerCase();
+        if (q.length() < 2) return;
+
+        SharedPreferences sharedPref = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+        String history = sharedPref.getString("search_history", "");
+        
+        List<String> queries = new ArrayList<>();
+        if (!history.isEmpty()) {
+            queries.addAll(java.util.Arrays.asList(history.split(",")));
+        }
+        
+        if (!queries.contains(q)) {
+            queries.add(0, q);
+            if (queries.size() > 5) {
+                queries = queries.subList(0, 5);
+            }
+            sharedPref.edit().putString("search_history", android.text.TextUtils.join(",", queries)).apply();
+        }
     }
 
     private void filterProducts(String query) {
@@ -345,7 +368,7 @@ public class ListActivity extends AppCompatActivity {
     }
 
     private void autoCompleteOrders() {
-        // Tìm các đơn hàng cần hoàn thành hoặc sửa lại ngày
+        // Tìm các đơn hàng cần hoàn thành
         long threeDaysInMillis = 3L * 24 * 60 * 60 * 1000;
         long oneDayInMillis = 24L * 60 * 60 * 1000;
         long currentTime = System.currentTimeMillis();

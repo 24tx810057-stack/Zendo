@@ -41,6 +41,15 @@ public class OrderListActivity extends AppCompatActivity {
         initViews();
         setupTabs();
         
+        // Mở đúng Tab được yêu cầu từ Intent
+        int tabIndex = getIntent().getIntExtra("tab_index", 0);
+        if (tabLayout != null && tabIndex < tabLayout.getTabCount()) {
+            TabLayout.Tab tab = tabLayout.getTabAt(tabIndex);
+            if (tab != null) {
+                tab.select();
+            }
+        }
+        
         // Đổi tiêu đề dựa trên Role
         if ("admin".equals(userRole)) {
             tvTitle.setText("Quản lý đơn hàng");

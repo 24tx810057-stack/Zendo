@@ -52,6 +52,7 @@
         <activity android:name=".AdminWarrantyListActivity" />
         <activity android:name=".AdminWarrantyDetailActivity" />
         <activity android:name=".PaymentSettingsActivity" />
+        <activity android:name=".CancelOrderDetailActivity" />
 
     </application>
 

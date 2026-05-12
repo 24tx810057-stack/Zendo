@@ -10,7 +10,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="@drawable/bg_sky_blue_gradient"
+        android:background="#FFFFFF"
+        android:elevation="4dp"
         android:paddingHorizontal="16dp">
         <ImageView
             android:id="@+id/btnBack"
@@ -18,13 +19,13 @@
             android:layout_height="32dp"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_back"
-            app:tint="#FFFFFF" />
+            app:tint="#2196F3" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Cài đặt thanh toán QR"
-            android:textColor="#FFFFFF"
+            android:textColor="#212121"
             android:textSize="18sp"
             android:textStyle="bold" />
     </RelativeLayout>
