@@ -276,6 +276,32 @@
             </LinearLayout>
         </LinearLayout>
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmerViewContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <include layout="@layout/shimmer_item_product" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"/>
+                    <include layout="@layout/shimmer_item_product" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <include layout="@layout/shimmer_item_product" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"/>
+                    <include layout="@layout/shimmer_item_product" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"/>
+                </LinearLayout>
+            </LinearLayout>
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
         <GridView
             android:id="@+id/gridViewProducts"
             android:layout_width="match_parent"
@@ -286,22 +312,25 @@
             android:padding="10dp"
             android:scrollbarStyle="outsideOverlay"
             android:stretchMode="columnWidth"
-            android:verticalSpacing="10dp" />
+            android:verticalSpacing="10dp"
+            android:visibility="gone" />
 
     </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
-        android:layout_height="75dp"
+        android:layout_height="72dp"
         android:layout_alignParentBottom="true"
         android:background="#FFFFFF"
         app:elevation="8dp"
-        app:itemIconSize="22dp"
-        app:itemPaddingTop="16dp"
-        app:itemPaddingBottom="8dp"
+        app:itemIconSize="24dp"
+        app:itemPaddingTop="8dp"
+        app:itemPaddingBottom="10dp"
         app:itemIconTint="@color/selector_nav_color"
         app:itemTextColor="@color/selector_nav_color"
+        app:itemTextAppearanceActive="@style/BottomNavText"
+        app:itemTextAppearanceInactive="@style/BottomNavText"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu"
         app:itemActiveIndicatorStyle="@null" />

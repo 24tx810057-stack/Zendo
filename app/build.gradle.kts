@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.buoi1"
+    namespace = "com.zendo.apps"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.buoi1"
+        applicationId = "com.zendo.apps"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -26,6 +26,9 @@ android {
             )
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -37,11 +40,17 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.shimmer)
     
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.messaging)
+
+    // Security
+    implementation("androidx.security:security-crypto:1.1.0")
 
     // Glide
     implementation(libs.glide)
@@ -53,6 +62,12 @@ dependencies {
     // API Address (Retrofit & Gson)
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Room
+    val roomVersion = "2.6.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

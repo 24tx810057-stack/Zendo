@@ -1,0 +1,57 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role == 'admin';
+    }
+    function isOwner(email) {
+      return isSignedIn() && request.auth.token.email == email;
+    }
+
+    // User profiles
+    match /users/{email} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(email) || isAdmin();
+    }
+
+    // Products - Public read, Admin write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Cart - Owner access only
+    match /cart/{cartId} {
+      allow read, write: if isSignedIn() && request.resource.data.userEmail == request.auth.token.email;
+      allow delete: if isSignedIn() && resource.data.userEmail == request.auth.token.email;
+    }
+
+    // Orders - Owner read, Admin read/write
+    match /orders/{orderId} {
+      allow create: if isSignedIn();
+      allow read: if isSignedIn() && (resource.data.userEmail == request.auth.token.email || isAdmin());
+      allow update: if isAdmin() || (isSignedIn() && resource.data.userEmail == request.auth.token.email && request.resource.data.status == 'Yêu cầu hủy');
+    }
+
+    // Notifications - Owner access
+    match /notifications/{notifId} {
+      allow read, update: if isSignedIn() && (resource.data.userEmail == request.auth.token.email || (resource.data.userEmail == 'admin' && isAdmin()));
+      allow create: if true; // Any system event can create
+    }
+
+    // Reviews - Public read, Signed in create
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    // Other collections follow similar patterns...
+  }
+}

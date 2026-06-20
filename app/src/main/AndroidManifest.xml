@@ -54,6 +54,14 @@
         <activity android:name=".PaymentSettingsActivity" />
         <activity android:name=".CancelOrderDetailActivity" />
 
+        <service
+            android:name=".FCMService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

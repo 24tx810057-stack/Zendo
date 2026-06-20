@@ -548,21 +548,30 @@
                     android:textColor="#FFFFFF"
                     android:textStyle="bold" />
 
-                <!-- SECTION: Gợi ý (Đã dời xuống DƯỚI CÙNG hoàn toàn, sau nút Logout) -->
-                <LinearLayout
-                    android:id="@+id/sectionSuggestion"
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sectionSuggestion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="16dp"
+                android:paddingBottom="40dp"
+                android:background="#F5F5F5"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:visibility="gone">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:padding="16dp" android:text="CÓ THỂ BẠN SẼ THÍCH" android:textColor="#01579B" android:textStyle="bold" />
+                <com.zendo.apps.NonScrollGridView
+                    android:id="@+id/gvSuggestions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="24dp"
-                    android:paddingBottom="40dp"
-                    android:clipChildren="false"
-                    android:clipToPadding="false"
-                    android:visibility="gone">
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:padding="16dp" android:text="CÓ THỂ BẠN SẼ THÍCH" android:textColor="#01579B" android:textStyle="bold" />
-                    <com.example.buoi1.NonScrollGridView android:id="@+id/gvSuggestions" android:layout_width="match_parent" android:layout_height="wrap_content" android:numColumns="2" android:padding="8dp" />
-                </LinearLayout>
-
+                    android:numColumns="2"
+                    android:paddingHorizontal="10dp"
+                    android:paddingBottom="10dp"
+                    android:horizontalSpacing="10dp"
+                    android:verticalSpacing="10dp"
+                    android:stretchMode="columnWidth" />
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -570,15 +579,17 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavProfile"
         android:layout_width="match_parent"
-        android:layout_height="75dp"
+        android:layout_height="72dp"
         android:layout_alignParentBottom="true"
         android:background="#FFFFFF"
         app:elevation="8dp"
-        app:itemIconSize="22dp"
-        app:itemPaddingTop="16dp"
-        app:itemPaddingBottom="8dp"
+        app:itemIconSize="24dp"
+        app:itemPaddingTop="8dp"
+        app:itemPaddingBottom="10dp"
         app:itemIconTint="@color/selector_nav_color"
         app:itemTextColor="@color/selector_nav_color"
+        app:itemTextAppearanceActive="@style/BottomNavText"
+        app:itemTextAppearanceInactive="@style/BottomNavText"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu"
         app:itemActiveIndicatorStyle="@null" />

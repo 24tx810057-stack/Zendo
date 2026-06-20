@@ -6,31 +6,42 @@
     android:background="#F8F9FA">
 
     <!-- Toolbar -->
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/toolbarOrder"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="#FFFFFF"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
         android:paddingHorizontal="16dp"
         android:elevation="4dp">
         <ImageView
             android:id="@+id/btnBackOrder"
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:layout_centerVertical="true"
             android:src="@drawable/ic_back"
             android:padding="4dp"
             app:tint="#2196F3" />
         <TextView
+            android:id="@+id/tvOrderDetailTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/btnBackOrder"
+            android:layout_centerVertical="true"
             android:layout_marginStart="12dp"
             android:text="Chi tiết đơn hàng"
             android:textColor="#212121"
             android:textSize="18sp"
             android:textStyle="bold" />
-    </LinearLayout>
+        <ImageView
+            android:id="@+id/btnSearchFromDetail"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:padding="4dp"
+            android:src="@android:drawable/ic_menu_search"
+            app:tint="#2196F3" />
+    </RelativeLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -193,13 +204,13 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@android:drawable/ic_menu_agenda"
+                        android:src="@drawable/ic_receipt_admin"
                         app:tint="@color/blue_main"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="Ghi chú từ khách hàng"
+                        android:text="Ghi chú"
                         android:textColor="#212121"
                         android:textStyle="bold"
                         android:textSize="15sp" />
@@ -211,8 +222,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginStart="28dp"
                     android:text="Không có ghi chú"
-                    android:textColor="#F44336"
-                    android:textStyle="italic"
+                    android:textColor="#9E9E9E"
                     android:textSize="13sp" />
             </LinearLayout>
 
