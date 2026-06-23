@@ -1,10 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.Buoi1" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
+    <style name="Base.Theme.ZendoApps" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/blue_main</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/blue_dark</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
-    <style name="Theme.Buoi1" parent="Base.Theme.Buoi1" />
+    <style name="Theme.ZendoApps" parent="Base.Theme.ZendoApps" />
 
     <style name="Theme.Zendo.Splash" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowBackground">@drawable/bg</item>

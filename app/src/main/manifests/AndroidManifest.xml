@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/logo_zendo"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Buoi1">
+        android:theme="@style/Theme.ZendoApps">
 
         <activity
             android:name=".MainActivity"

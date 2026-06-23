@@ -55,6 +55,22 @@ public class SharedPrefManager {
         return sharedPreferences.getString("user_email", "");
     }
 
+    public void saveUserName(String name) {
+        sharedPreferences.edit().putString("user_name", name).apply();
+    }
+
+    public String getUserName() {
+        return sharedPreferences.getString("user_name", "Người dùng Zendo");
+    }
+
+    public void saveSearchHistory(String history) {
+        sharedPreferences.edit().putString("search_history", history).apply();
+    }
+
+    public String getSearchHistory() {
+        return sharedPreferences.getString("search_history", "");
+    }
+
     public void saveUserId(String id) {
         sharedPreferences.edit().putString("user_id", id).apply();
     }

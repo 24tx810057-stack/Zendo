@@ -20,5 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Buoi1"
+rootProject.name = "ZendoApps"
 include(":app")

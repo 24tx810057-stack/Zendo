@@ -4,9 +4,12 @@
     android:id="@+id/cardOrder"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="4dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="1dp"
-    app:strokeColor="#EEEEEE"
+    app:cardElevation="2dp"
+    app:strokeColor="#F0F0F0"
     app:strokeWidth="1dp"
     android:clickable="true"
     android:focusable="true"
@@ -15,7 +18,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:padding="16dp">
 
         <!-- Header -->
         <ImageView
@@ -97,31 +100,31 @@
         <!-- Nút hành động -->
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnOrderAction"
-            android:layout_width="85dp"
-            android:layout_height="30dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="95dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/bg_filter_chip"
             android:text="Đánh giá"
             android:textAllCaps="false"
             android:textColor="#212121"
-            android:textSize="11sp"
+            android:textSize="12sp"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvOrderTotalQuantity" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnOrderDetail"
-            android:layout_width="85dp"
-            android:layout_height="30dp"
+            android:layout_width="95dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:background="@drawable/bg_filter_chip"
             android:text="Chi tiết"
             android:textAllCaps="false"
             android:textColor="#212121"
-            android:textSize="11sp"
-            app:layout_constraintBottom_toBottomOf="@id/btnOrderAction"
+            android:textSize="12sp"
             app:layout_constraintEnd_toStartOf="@id/btnOrderAction"
-            app:layout_constraintTop_toTopOf="@id/btnOrderAction" />
+            app:layout_constraintTop_toBottomOf="@id/tvOrderTotalQuantity" />
 
         <!-- Footer -->
         <View

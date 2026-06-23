@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_white_top_round"
@@ -16,7 +17,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:padding="20dp"
         android:text="Chọn Zendo Voucher"
         android:textColor="#212121"
         android:textSize="18sp"
@@ -28,55 +29,58 @@
 
         <ProgressBar
             android:id="@+id/pbLoadingVoucher"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_gravity="center"
-            android:layout_margin="50dp"
+            android:layout_margin="60dp"
+            android:indeterminateTint="@color/blue_main"
             android:visibility="visible" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvVoucherList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxHeight="450dp"
+            android:maxHeight="420dp"
             android:overScrollMode="never"
             android:visibility="invisible" />
 
         <LinearLayout
             android:id="@+id/llEmptyVoucher"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="280dp"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="gone">
 
             <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:alpha="0.3"
-                android:contentDescription="Empty"
-                android:src="@drawable/ic_voucher_shopee" />
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:alpha="0.2"
+                android:src="@drawable/ic_voucher_shopee"
+                app:tint="@color/blue_main" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Hiện tại không có voucher nào khả dụng"
+                android:text="Bạn chưa có voucher nào khả dụng"
                 android:textColor="#9E9E9E"
                 android:textSize="14sp" />
         </LinearLayout>
     </FrameLayout>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnConfirmVoucher"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_marginHorizontal="16dp"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="16dp"
-        android:backgroundTint="@color/blue_main"
         android:text="ÁP DỤNG"
         android:textColor="#FFFFFF"
         android:textStyle="bold"
+        app:backgroundTint="@color/blue_main"
+        app:cornerRadius="16dp"
+        app:elevation="4dp"
         android:visibility="gone" />
 
 </LinearLayout>
