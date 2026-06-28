@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="?attr/colorSurface"
     tools:context=".RegisterActivity">
 
     <RelativeLayout
@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:paddingHorizontal="16dp"
+        android:background="?attr/colorSurfaceVariant"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -20,14 +21,14 @@
             android:layout_height="32dp"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_back"
-            app:tint="#2196F3" />
+            app:tint="@color/blue_modern_primary" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Đăng ký"
-            android:textColor="#212121"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="18sp" />
     </RelativeLayout>
 
@@ -57,12 +58,14 @@
                 android:background="@android:color/transparent"
                 android:hint="Họ và tên"
                 android:inputType="textPersonName"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:paddingVertical="15dp" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#EEEEEE" />
+                android:background="?attr/colorOutline" />
 
             <EditText
                 android:id="@+id/etEmail"
@@ -73,12 +76,14 @@
                 android:background="@android:color/transparent"
                 android:hint="Email"
                 android:inputType="textEmailAddress"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:paddingVertical="15dp" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#EEEEEE" />
+                android:background="?attr/colorOutline" />
 
             <EditText
                 android:id="@+id/etPhone"
@@ -89,12 +94,14 @@
                 android:background="@android:color/transparent"
                 android:hint="Số điện thoại"
                 android:inputType="phone"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:paddingVertical="15dp" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#EEEEEE" />
+                android:background="?attr/colorOutline" />
 
             <EditText
                 android:id="@+id/etRegPassword"
@@ -104,20 +111,22 @@
                 android:background="@android:color/transparent"
                 android:hint="Mật khẩu"
                 android:inputType="textPassword"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:paddingVertical="15dp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Mật khẩu phải trên 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
-                android:textColor="#757575"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="11sp"
                 android:layout_marginBottom="16dp" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#EEEEEE" />
+                android:background="?attr/colorOutline" />
 
             <EditText
                 android:id="@+id/etConfirmPassword"
@@ -128,19 +137,21 @@
                 android:background="@android:color/transparent"
                 android:hint="Xác nhận mật khẩu"
                 android:inputType="textPassword"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:paddingVertical="15dp" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#EEEEEE" />
+                android:background="?attr/colorOutline" />
 
             <Button
                 android:id="@+id/btnRegister"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:layout_marginTop="35dp"
-                android:backgroundTint="#29B6F6"
+                android:backgroundTint="@color/blue_modern_primary"
                 android:text="Đăng ký tài khoản"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
@@ -154,7 +165,7 @@
                 android:layout_marginTop="25dp"
                 android:text="Bạn đã có tài khoản? Đăng nhập"
                 android:textAlignment="center"
-                android:textColor="#0055AA"
+                android:textColor="@color/blue_modern_primary"
                 android:textSize="14sp" />
 
         </LinearLayout>

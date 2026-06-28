@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="?attr/colorSurface">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -140,12 +140,11 @@
 
         </RelativeLayout>
 
-        <!-- Thanh chọn hãng -->
         <HorizontalScrollView
             android:id="@+id/hsvBrandFilter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
+            android:background="?attr/colorSurfaceVariant"
             android:paddingVertical="8dp"
             android:scrollbars="none">
 
@@ -220,11 +219,10 @@
             </LinearLayout>
         </HorizontalScrollView>
 
-        <!-- Sắp xếp -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
+            android:background="?attr/colorSurfaceVariant"
             android:elevation="1dp"
             android:orientation="horizontal"
             android:paddingHorizontal="12dp"
@@ -237,7 +235,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Bán chạy"
-                android:textColor="#757575"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="14sp" />
 
             <TextView
@@ -247,7 +245,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Mới nhất"
-                android:textColor="#757575"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="14sp" />
 
             <TextView
@@ -257,7 +255,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Ưu đãi"
-                android:textColor="#757575"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="14sp" />
 
             <LinearLayout
@@ -273,7 +271,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Giá"
-                    android:textColor="#757575"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="14sp" />
 
                 <ImageView
@@ -282,7 +280,7 @@
                     android:layout_height="14dp"
                     android:layout_marginStart="4dp"
                     android:src="@android:drawable/arrow_up_float"
-                    app:tint="#757575" />
+                    app:tint="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
         </LinearLayout>
 
@@ -332,7 +330,7 @@
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_alignParentBottom="true"
-        android:background="#FFFFFF"
+        android:background="?attr/colorSurfaceVariant"
         app:elevation="8dp"
         app:itemIconSize="24dp"
         app:itemPaddingTop="8dp"

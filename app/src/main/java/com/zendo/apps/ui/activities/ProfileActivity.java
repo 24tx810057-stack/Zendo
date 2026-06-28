@@ -88,12 +88,40 @@ public class ProfileActivity extends AppCompatActivity {
             binding.layoutAdminMenu.setVisibility(View.VISIBLE);
             binding.sectionSuggestion.setVisibility(View.GONE);
             binding.layoutCartProfile.setVisibility(View.GONE);
+            binding.sectionWallet.setVisibility(View.GONE);
+            binding.dividerWallet.setVisibility(View.GONE);
+            binding.dividerFavorite.setVisibility(View.GONE);
+            updateRevenueStats();
+            updateAdminOrderBadge();
+            updateAdminReviewBadge();
+            updateAdminReturnBadge();
+            updateAdminWarrantyBadge();
         } else {
             binding.layoutUserMenu.setVisibility(View.VISIBLE);
             binding.layoutAdminMenu.setVisibility(View.GONE);
             binding.sectionSuggestion.setVisibility(View.VISIBLE);
             binding.layoutCartProfile.setVisibility(View.VISIBLE);
+            binding.sectionWallet.setVisibility(View.VISIBLE);
+            binding.dividerWallet.setVisibility(View.VISIBLE);
+            binding.dividerFavorite.setVisibility(View.VISIBLE);
+            updateOrderBadges();
+            loadWalletBalance();
         }
+    }
+
+    private void loadWalletBalance() {
+        if (userEmail == null) return;
+        db.collection("wallets").document(userEmail)
+            .addSnapshotListener((value, error) -> {
+                if (value != null && value.exists()) {
+                    Double balance = value.getDouble("balance");
+                    if (balance != null) {
+                        binding.tvProfileWalletBalance.setText(formatter.format(balance) + "đ");
+                    }
+                } else {
+                    binding.tvProfileWalletBalance.setText("Chưa thiết lập");
+                }
+            });
     }
 
     private void setupListeners() {
@@ -112,6 +140,7 @@ public class ProfileActivity extends AppCompatActivity {
         binding.sectionChat.setOnClickListener(v -> startActivity(new Intent(this, ChatActivity.class)));
         binding.btnChangePassword.setOnClickListener(v -> showChangePasswordDialog());
         binding.sectionFavorite.setOnClickListener(v -> startActivity(new Intent(this, FavoriteActivity.class)));
+        binding.sectionWallet.setOnClickListener(v -> startActivity(new Intent(this, ZendoPayActivity.class)));
 
         binding.btnAdminOrders.setOnClickListener(v -> startActivity(new Intent(this, OrderListActivity.class)));
         binding.btnAdminProducts.setOnClickListener(v -> startActivity(new Intent(this, AddProductActivity.class)));
@@ -172,12 +201,19 @@ public class ProfileActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_change_password, null);
         builder.setView(dialogView);
+        
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
 
         final EditText etOldPass = dialogView.findViewById(R.id.etOldPass);
         final EditText etNewPass = dialogView.findViewById(R.id.etNewPass);
         final EditText etConfirmPass = dialogView.findViewById(R.id.etConfirmPass);
-
-        builder.setPositiveButton("Cập nhật", (dialog, which) -> {
+        
+        dialogView.findViewById(R.id.btnCancelDialog).setOnClickListener(v -> dialog.dismiss());
+        
+        dialogView.findViewById(R.id.btnUpdatePass).setOnClickListener(v -> {
             String oldPass = etOldPass.getText().toString().trim();
             String newPass = etNewPass.getText().toString().trim();
             String confirmPass = etConfirmPass.getText().toString().trim();
@@ -197,12 +233,13 @@ public class ProfileActivity extends AppCompatActivity {
                         .addOnSuccessListener(aVoid -> {
                             db.collection("users").document(userEmail).update("password", newPass);
                             Toast.makeText(this, "Đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
                         })
                         .addOnFailureListener(e -> Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
         });
-        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
-        builder.show();
+
+        dialog.show();
     }
 
     private void setupSuggestions() {
@@ -317,19 +354,33 @@ public class ProfileActivity extends AppCompatActivity {
                 .whereEqualTo("status", "Hoàn thành")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    double totalRevenue = 0;
+                    double monthlyRevenue = 0;
                     int totalProductsSold = 0;
+                    
+                    java.util.Calendar cal = java.util.Calendar.getInstance();
+                    int currentMonth = cal.get(java.util.Calendar.MONTH);
+                    int currentYear = cal.get(java.util.Calendar.YEAR);
+
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Order order = doc.toObject(Order.class);
-                        totalRevenue += order.getTotalAmount();
                         
+                        // Calculate total products sold (all time as per current label)
                         if (order.getItems() != null) {
                             for (CartItem item : order.getItems()) {
                                 totalProductsSold += item.getQuantity();
                             }
                         }
+
+                        // Calculate revenue for current month only
+                        if (order.getTimestamp() != null) {
+                            cal.setTime(order.getTimestamp());
+                            if (cal.get(java.util.Calendar.MONTH) == currentMonth && 
+                                cal.get(java.util.Calendar.YEAR) == currentYear) {
+                                monthlyRevenue += order.getTotalAmount();
+                            }
+                        }
                     }
-                    binding.tvTotalRevenue.setText(formatter.format(totalRevenue) + "đ");
+                    binding.tvTotalRevenue.setText(formatter.format(monthlyRevenue) + "đ");
                     binding.tvCompletedOrders.setText(totalProductsSold + " sản phẩm");
                     if (binding.tvCompletedOrdersLabel != null) {
                         binding.tvCompletedOrdersLabel.setText("Tổng SP đã bán");

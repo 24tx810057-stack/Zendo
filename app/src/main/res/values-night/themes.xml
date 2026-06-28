@@ -1,7 +1,22 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.ZendoApps" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/blue_modern_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/blue_dark</item>
+
+        <!-- Semantic Colors Dark -->
+        <item name="android:windowBackground">@color/slate_950</item>
+        <item name="colorSurface">@color/slate_950</item>
+        <item name="colorOnSurface">@color/slate_text_dark</item>
+        <item name="colorSurfaceVariant">@color/slate_card_dark</item>
+        <item name="colorOnSurfaceVariant">@color/slate_text_sub_dark</item>
+        <item name="colorOutline">@color/slate_800</item>
+        <item name="colorOutlineVariant">@color/slate_700</item>
+        <item name="colorContainer">@color/slate_800</item>
+        <item name="colorOnContainer">@color/slate_text_dark</item>
+
+        <item name="android:statusBarColor">@color/slate_950</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 </resources>

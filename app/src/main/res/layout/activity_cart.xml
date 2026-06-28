@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="?attr/colorSurface">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarCart"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#FFFFFF"
+        android:background="?attr/colorSurfaceVariant"
         android:elevation="4dp">
 
         <RelativeLayout
@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text="Giỏ hàng"
-                android:textColor="#212121"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -61,7 +61,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#FFFFFF"
+        android:background="?attr/colorSurfaceVariant"
         android:elevation="8dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -71,9 +71,9 @@
             android:id="@+id/cbSelectAll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:buttonTint="@color/blue_main"
+            android:buttonTint="@color/blue_modern_primary"
             android:text="Tất cả"
-            android:textColor="#424242"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="14sp" />
 
         <View
@@ -93,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tổng cộng"
-                android:textColor="#757575"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="12sp" />
 
             <TextView

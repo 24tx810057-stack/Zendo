@@ -1,68 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
-    android:orientation="vertical">
+    android:background="?attr/colorSurface">
 
-    <!-- Toolbar -->
+    <!-- Modern Wave Header -->
     <RelativeLayout
+        android:id="@+id/headerSettings"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="#FFFFFF"
-        android:elevation="2dp"
+        android:layout_height="160dp"
+        android:background="@drawable/bg"
+        android:paddingTop="40dp"
         android:paddingHorizontal="16dp">
 
         <ImageView
             android:id="@+id/btnBackSettings"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_centerVertical="true"
             android:padding="4dp"
             android:src="@drawable/ic_back"
-            app:tint="#2196F3" />
+            app:tint="#FFFFFF" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
             android:text="Cài đặt"
-            android:textColor="#212121"
-            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
             android:textStyle="bold" />
     </RelativeLayout>
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="120dp"
+        android:background="@drawable/bg_white_top_round"
+        android:padding="20dp"
+        android:clipToPadding="false">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingBottom="40dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="12dp"
                 android:text="Thông báo"
-                android:textColor="#757575"
-                android:textSize="12sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="13sp"
                 android:textStyle="bold" />
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="0dp">
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="16dp">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -70,21 +76,24 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
                             android:text="Thông báo đơn hàng"
-                            android:textColor="#212121"
-                            android:textSize="14sp" />
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="15sp" />
                         <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/swOrderNotif"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true" />
+                            android:layout_alignParentEnd="true"
+                            app:thumbTint="@color/selector_switch_thumb"
+                            app:trackTint="@color/selector_switch_track" />
                     </RelativeLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:layout_marginVertical="12dp"
-                        android:background="#F5F5F5" />
+                        android:layout_marginVertical="16dp"
+                        android:background="?attr/colorOutline" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -92,39 +101,44 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
                             android:text="Khuyến mãi &amp; Ưu đãi"
-                            android:textColor="#212121"
-                            android:textSize="14sp" />
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="15sp" />
                         <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/swPromoNotif"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true" />
+                            android:layout_alignParentEnd="true"
+                            app:thumbTint="@color/selector_switch_thumb"
+                            app:trackTint="@color/selector_switch_track" />
                     </RelativeLayout>
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="12dp"
                 android:text="Giao diện"
-                android:textColor="#757575"
-                android:textSize="12sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="13sp"
                 android:textStyle="bold" />
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="0dp">
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="16dp">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -132,33 +146,37 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
                             android:text="Chế độ tối"
-                            android:textColor="#212121"
-                            android:textSize="14sp" />
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="15sp" />
                         <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/swDarkMode"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true" />
+                            android:layout_alignParentEnd="true"
+                            app:thumbTint="@color/selector_switch_thumb"
+                            app:trackTint="@color/selector_switch_track" />
                     </RelativeLayout>
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="12dp"
                 android:text="Hỗ trợ"
-                android:textColor="#757575"
-                android:textSize="12sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="13sp"
                 android:textStyle="bold" />
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="0dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -168,40 +186,42 @@
                     <TextView
                         android:id="@+id/btnAbout"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="12dp"
+                        android:layout_height="56dp"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
                         android:text="Về Zendo"
-                        android:textColor="#212121"
-                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="15sp"
                         android:background="?attr/selectableItemBackground" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="#F5F5F5" />
+                        android:background="?attr/colorOutline" />
 
                     <TextView
                         android:id="@+id/btnPolicy"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="12dp"
+                        android:layout_height="56dp"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
                         android:text="Chính sách bảo mật"
-                        android:textColor="#212121"
-                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="15sp"
                         android:background="?attr/selectableItemBackground" />
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:id="@+id/tvVersion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="40dp"
                 android:gravity="center"
                 android:text="Phiên bản 1.0.0"
-                android:textColor="#BDBDBD"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="12sp" />
 
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</RelativeLayout>

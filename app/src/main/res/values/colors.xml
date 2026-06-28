@@ -21,4 +21,12 @@
     <color name="slate_50">#F8FAFC</color>
     <color name="emerald_600">#059669</color>
     <color name="rose_600">#E11D48</color>
+
+    <!-- Dark Mode Specific Palette -->
+    <color name="slate_800">#1E293B</color>
+    <color name="slate_950">#020617</color>
+    <color name="slate_surface_dark">#0F172A</color>
+    <color name="slate_card_dark">#1E293B</color>
+    <color name="slate_text_dark">#F1F5F9</color>
+    <color name="slate_text_sub_dark">#94A3B8</color>
 </resources>

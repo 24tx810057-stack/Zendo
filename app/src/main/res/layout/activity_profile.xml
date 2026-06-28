@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/slate_50">
+    android:background="?attr/colorSurface">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -39,7 +39,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginEnd="16dp"
-                        android:src="@android:drawable/ic_menu_manage"
+                        android:src="@drawable/ic_settings_gear"
                         app:tint="#FFFFFF" />
 
                     <!-- Nút Thông báo -->
@@ -227,7 +227,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Bảng điều khiển của Shop"
-                        android:textColor="@color/slate_900"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:layout_marginBottom="16dp"/>
@@ -318,8 +318,8 @@
                             android:layout_margin="6dp"
                             android:background="@drawable/bg_tile_item">
                             <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_orders" app:tint="@color/blue_modern_primary"/>
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Đơn hàng" android:textStyle="bold" android:textSize="13sp" android:textColor="@color/slate_700"/>
+                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_orders" app:tint="@color/white"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Đơn hàng" android:textStyle="bold" android:textSize="13sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                             </LinearLayout>
                             <TextView
                                 android:id="@+id/tvAdminOrderBadge"
@@ -344,8 +344,8 @@
                             android:layout_margin="6dp"
                             android:background="@drawable/bg_tile_item">
                             <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_products" app:tint="@color/slate_700"/>
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Sản phẩm" android:textStyle="bold" android:textSize="13sp" android:textColor="@color/slate_700"/>
+                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_products" app:tint="?attr/colorOnSurfaceVariant"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Sản phẩm" android:textStyle="bold" android:textSize="13sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                             </LinearLayout>
                         </RelativeLayout>
 
@@ -358,8 +358,8 @@
                             android:layout_margin="6dp"
                             android:background="@drawable/bg_tile_item">
                             <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_vouchers" app:tint="@color/slate_700"/>
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Khuyến mãi" android:textStyle="bold" android:textSize="13sp" android:textColor="@color/slate_700"/>
+                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_vouchers" app:tint="?attr/colorOnSurfaceVariant"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Khuyến mãi" android:textStyle="bold" android:textSize="13sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                             </LinearLayout>
                         </RelativeLayout>
 
@@ -372,8 +372,8 @@
                             android:layout_margin="6dp"
                             android:background="@drawable/bg_tile_item">
                             <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_reviews" app:tint="@color/slate_700"/>
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Đánh giá" android:textStyle="bold" android:textSize="13sp" android:textColor="@color/slate_700"/>
+                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_reviews" app:tint="?attr/colorOnSurfaceVariant"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Đánh giá" android:textStyle="bold" android:textSize="13sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                             </LinearLayout>
                             <TextView
                                 android:id="@+id/tvAdminReviewBadge"
@@ -425,8 +425,8 @@
                             android:layout_margin="6dp"
                             android:background="@drawable/bg_tile_item">
                             <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_warranty" app:tint="@color/slate_700"/>
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Bảo hành" android:textStyle="bold" android:textSize="13sp" android:textColor="@color/slate_700"/>
+                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_warranty" app:tint="?attr/colorOnSurfaceVariant"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Bảo hành" android:textStyle="bold" android:textSize="13sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                             </LinearLayout>
                             <TextView
                                 android:id="@+id/tvWarrantyBadge"
@@ -465,15 +465,30 @@
                             android:layout_margin="6dp"
                             android:background="@drawable/bg_tile_item">
                             <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_categories" app:tint="@color/slate_700"/>
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Ngành hàng" android:textStyle="bold" android:textSize="13sp" android:textColor="@color/slate_700"/>
+                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_categories" app:tint="?attr/colorOnSurfaceVariant"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Ngành hàng" android:textStyle="bold" android:textSize="13sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                             </LinearLayout>
                         </RelativeLayout>
 
                     </GridLayout>
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="20dp" android:background="@color/slate_200" />
+                <View android:id="@+id/dividerWallet" android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="20dp" android:background="?attr/colorOutline" />
+
+                <LinearLayout
+                    android:id="@+id/sectionWallet"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:background="?attr/selectableItemBackground">
+                    <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_zendopay" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="16dp" android:layout_weight="1" android:text="Ví ZendoPay" android:textColor="?attr/colorOnSurface" android:textSize="14sp" />
+                    <TextView android:id="@+id/tvProfileWalletBalance" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="8dp" android:text="0đ" android:textColor="@color/blue_modern_primary" android:textSize="13sp" android:textStyle="bold" />
+                    <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_arrow_right" app:tint="?attr/colorOnSurfaceVariant" />
+                </LinearLayout>
+
+                <View android:id="@+id/dividerFavorite" android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutline" />
 
                 <LinearLayout
                     android:id="@+id/sectionFavorite"
@@ -483,11 +498,11 @@
                     android:orientation="horizontal"
                     android:background="?attr/selectableItemBackground">
                     <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_heart_filled" app:tint="@color/pink_heart" />
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="16dp" android:layout_weight="1" android:text="Sản phẩm yêu thích" android:textColor="@color/slate_700" android:textSize="14sp" />
-                    <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_arrow_right" app:tint="@color/slate_500" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="16dp" android:layout_weight="1" android:text="Sản phẩm yêu thích" android:textColor="?attr/colorOnSurface" android:textSize="14sp" />
+                    <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_arrow_right" app:tint="?attr/colorOnSurfaceVariant" />
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/slate_200" />
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutline" />
 
                 <LinearLayout
                     android:id="@+id/sectionChat"
@@ -497,11 +512,11 @@
                     android:orientation="horizontal"
                     android:background="?attr/selectableItemBackground">
                     <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@android:drawable/stat_notify_chat" app:tint="@color/blue_modern_primary" />
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="16dp" android:layout_weight="1" android:text="Chăm sóc khách hàng" android:textColor="@color/slate_700" android:textSize="14sp" />
-                    <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_arrow_right" app:tint="@color/slate_500" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="16dp" android:layout_weight="1" android:text="Chăm sóc khách hàng" android:textColor="?attr/colorOnSurface" android:textSize="14sp" />
+                    <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_arrow_right" app:tint="?attr/colorOnSurfaceVariant" />
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/slate_200" />
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutline" />
 
                 <LinearLayout
                     android:id="@+id/btnChangePassword"
@@ -510,12 +525,12 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:background="?attr/selectableItemBackground">
-                    <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@android:drawable/ic_lock_idle_lock" app:tint="@color/slate_700" />
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="16dp" android:layout_weight="1" android:text="Đổi mật khẩu" android:textColor="@color/slate_700" android:textSize="14sp" />
-                    <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_arrow_right" app:tint="@color/slate_500" />
+                    <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@android:drawable/ic_lock_idle_lock" app:tint="?attr/colorOnSurface" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="16dp" android:layout_weight="1" android:text="Đổi mật khẩu" android:textColor="?attr/colorOnSurface" android:textSize="14sp" />
+                    <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_arrow_right" app:tint="?attr/colorOnSurfaceVariant" />
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/slate_200" />
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutline" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnLogout"

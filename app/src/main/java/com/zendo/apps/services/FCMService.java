@@ -9,6 +9,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -19,6 +20,15 @@ public class FCMService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
+        SharedPreferences sharedPref = getSharedPreferences("AppSettings", Context.MODE_PRIVATE);
+        
+        // Simple heuristic: if it's from Firebase, we check if any notification is allowed
+        // In a real app, we would check specific flags based on 'type' in remoteMessage.getData()
+        boolean orderNotif = sharedPref.getBoolean("order_notif", true);
+        boolean promoNotif = sharedPref.getBoolean("promo_notif", true);
+        
+        if (!orderNotif && !promoNotif) return;
+
         if (remoteMessage.getNotification() != null) {
             sendNotification(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody());
         }

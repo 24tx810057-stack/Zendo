@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
+        android:name=".ZendoApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -46,6 +47,7 @@
         <activity android:name=".ui.activities.ChatActivity" />
         <activity android:name=".ui.activities.ForgotPasswordActivity" />
         <activity android:name=".ui.activities.RevenueActivity" />
+        <activity android:name=".ui.activities.ZendoPayActivity" />
         <activity android:name=".ui.activities.AddressListActivity" />
         <activity android:name=".ui.activities.AddAddressActivity" />
         <activity android:name=".ui.activities.WarrantyPolicyActivity" />

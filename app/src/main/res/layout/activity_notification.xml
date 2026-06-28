@@ -4,12 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5F5">
+    android:background="?attr/colorSurface">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="#FFFFFF"
+        android:background="?attr/colorSurfaceVariant"
         android:elevation="4dp"
         android:paddingHorizontal="16dp">
 
@@ -19,14 +19,14 @@
             android:layout_height="24dp"
             android:layout_centerVertical="true"
             android:src="@android:drawable/ic_menu_revert"
-            app:tint="#212121" />
+            app:tint="?attr/colorOnSurface" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Thông báo"
-            android:textColor="#212121"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -37,7 +37,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:text="Đọc tất cả"
-            android:textColor="#0288D1"
+            android:textColor="@color/blue_modern_primary"
             android:textSize="14sp"
             android:textStyle="bold"
             android:padding="8dp"

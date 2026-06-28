@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="?attr/colorSurfaceVariant"
     android:fitsSystemWindows="false">
 
     <androidx.core.widget.NestedScrollView
@@ -17,11 +17,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Slider hình ảnh -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="400dp"
-                android:background="#F5F5F5">
+                android:background="?attr/colorSurface">
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/vpProductDetailImages"
                     android:layout_width="match_parent"
@@ -153,7 +152,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Đã bán 0"
-                            android:textColor="#212121"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="12sp" />
                         <ImageView
                             android:layout_width="14dp"
@@ -187,12 +186,12 @@
                         android:ellipsize="end"
                         android:maxLines="2"
                         android:text="Tên sản phẩm Zendo"
-                        android:textColor="#212121"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="16sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="16dp" android:background="#F0F0F0" />
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="16dp" android:background="?attr/colorOutline" />
 
                 <!-- Ô thời gian nhận hàng -->
                 <LinearLayout
@@ -250,7 +249,7 @@
                         app:tint="#9E9E9E" />
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" />
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutline" />
 
                 <!-- Chính sách bảo hành (mẫu Shopee) -->
                 <LinearLayout
@@ -316,12 +315,11 @@
 
             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" />
 
-            <!-- Thông số kỹ thuật -->
             <LinearLayout
                 android:id="@+id/layoutSpecs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
+                android:background="?attr/colorSurfaceVariant"
                 android:orientation="vertical">
                 <LinearLayout
                     android:id="@+id/layoutHeaderSpecs"
@@ -334,7 +332,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Thông số kỹ thuật"
-                        android:textColor="#212121"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="15sp"
                         android:textStyle="bold" />
                     <ImageView
@@ -342,7 +340,7 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:src="@android:drawable/arrow_down_float"
-                        app:tint="#757575" />
+                        app:tint="?attr/colorOnSurfaceVariant" />
                 </LinearLayout>
                 <LinearLayout
                     android:id="@+id/layoutContentSpecs"
@@ -353,62 +351,61 @@
                     android:paddingBottom="16dp"
                     android:visibility="gone">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="4dp">
-                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="Chip:" android:textColor="#757575" android:textSize="13sp"/>
-                        <TextView android:id="@+id/tvSpecChip" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="#212121" android:textSize="13sp"/>
+                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="Chip:" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="13sp"/>
+                        <TextView android:id="@+id/tvSpecChip" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="?attr/colorOnSurface" android:textSize="13sp"/>
                     </LinearLayout>
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="4dp" android:background="#FAFAFA">
-                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="Màn hình:" android:textColor="#757575" android:textSize="13sp"/>
-                        <TextView android:id="@+id/tvSpecScreen" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="#212121" android:textSize="13sp"/>
-                    </LinearLayout>
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="4dp">
-                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="RAM:" android:textColor="#757575" android:textSize="13sp"/>
-                        <TextView android:id="@+id/tvSpecRam" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="#212121" android:textSize="13sp"/>
-                    </LinearLayout>
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="4dp" android:background="#FAFAFA">
-                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="Bộ nhớ trong:" android:textColor="#757575" android:textSize="13sp"/>
-                        <TextView android:id="@+id/tvSpecRom" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="#212121" android:textSize="13sp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="4dp" android:background="?attr/colorSurface">
+                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="Màn hình:" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="13sp"/>
+                        <TextView android:id="@+id/tvSpecScreen" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="?attr/colorOnSurface" android:textSize="13sp"/>
                     </LinearLayout>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="4dp">
-                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="Pin:" android:textColor="#757575" android:textSize="13sp"/>
-                        <TextView android:id="@+id/tvSpecPin" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="#212121" android:textSize="13sp"/>
+                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="RAM:" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="13sp"/>
+                        <TextView android:id="@+id/tvSpecRam" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="?attr/colorOnSurface" android:textSize="13sp"/>
                     </LinearLayout>
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="4dp" android:background="#FAFAFA">
-                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="Camera:" android:textColor="#757575" android:textSize="13sp"/>
-                        <TextView android:id="@+id/tvSpecCamera" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="#212121" android:textSize="13sp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="4dp" android:background="?attr/colorSurface">
+                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="Bộ nhớ trong:" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="13sp"/>
+                        <TextView android:id="@+id/tvSpecRom" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="?attr/colorOnSurface" android:textSize="13sp"/>
                     </LinearLayout>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="4dp">
-                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="Hệ điều hành:" android:textColor="#757575" android:textSize="13sp"/>
-                        <TextView android:id="@+id/tvSpecOs" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="#212121" android:textSize="13sp"/>
+                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="Pin:" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="13sp"/>
+                        <TextView android:id="@+id/tvSpecPin" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="?attr/colorOnSurface" android:textSize="13sp"/>
                     </LinearLayout>
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="4dp" android:background="#FAFAFA">
-                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="Bảo hành:" android:textColor="#757575" android:textSize="13sp"/>
-                        <TextView android:id="@+id/tvSpecWarranty" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="#212121" android:textSize="13sp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="4dp" android:background="?attr/colorSurface">
+                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="Camera:" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="13sp"/>
+                        <TextView android:id="@+id/tvSpecCamera" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="?attr/colorOnSurface" android:textSize="13sp"/>
+                    </LinearLayout>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="4dp">
+                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="Hệ điều hành:" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="13sp"/>
+                        <TextView android:id="@+id/tvSpecOs" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="?attr/colorOnSurface" android:textSize="13sp"/>
+                    </LinearLayout>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingVertical="4dp" android:background="?attr/colorSurface">
+                        <TextView android:layout_width="120dp" android:layout_height="wrap_content" android:text="Bảo hành:" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="13sp"/>
+                        <TextView android:id="@+id/tvSpecWarranty" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Đang cập nhật" android:textColor="?attr/colorOnSurface" android:textSize="13sp"/>
                     </LinearLayout>
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" />
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutline" />
 
-                <!-- Mô tả sản phẩm -->
                 <LinearLayout
                     android:id="@+id/layoutHeaderDesc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
                     android:gravity="center_vertical"
-                    android:background="#FFFFFF">
+                    android:background="?attr/colorSurfaceVariant">
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Mô tả sản phẩm"
-                        android:textColor="#212121"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="15sp" android:textStyle="bold" />
                     <ImageView
                         android:id="@+id/ivArrowDesc"
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:src="@android:drawable/arrow_down_float"
-                        app:tint="#757575" />
+                        app:tint="?attr/colorOnSurfaceVariant" />
                 </LinearLayout>
                 <LinearLayout
                     android:id="@+id/layoutContentDesc"
@@ -418,24 +415,24 @@
                     android:paddingHorizontal="16dp"
                     android:paddingBottom="16dp"
                     android:visibility="gone"
-                    android:background="#FFFFFF">
+                    android:background="?attr/colorSurfaceVariant">
                     <TextView
                         android:id="@+id/tvProductDetailDesc"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Thông tin mô tả chi tiết sản phẩm..."
-                        android:textColor="#616161"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:lineSpacingExtra="4dp"
                         android:textSize="14sp" />
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" />
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutline" />
 
                 <!-- Đánh giá -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
+                    android:background="?attr/colorSurfaceVariant"
                     android:orientation="vertical"
                     android:padding="16dp">
                     <RelativeLayout
@@ -446,7 +443,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Đánh giá sản phẩm"
-                            android:textColor="#212121"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="15sp"
                             android:textStyle="bold" />
                         <TextView
@@ -455,7 +452,7 @@
                             android:layout_height="wrap_content"
                             android:layout_below="@id/tvReviewTitle"
                             android:text="0 đánh giá"
-                            android:textColor="#9E9E9E"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="13sp" />
                         <TextView
                             android:id="@+id/tvViewAllReviews"
@@ -464,7 +461,7 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:text="Xem tất cả >"
-                            android:textColor="#2196F3"
+                            android:textColor="@color/blue_modern_primary"
                             android:textSize="13sp" />
                     </RelativeLayout>
 
@@ -473,7 +470,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:background="#FAFAFA"
+                        android:background="?attr/colorSurface"
                         android:padding="16dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical">
@@ -483,27 +480,27 @@
                             android:layout_weight="1"
                             android:orientation="vertical">
                             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
-                                <TextView android:layout_width="10dp" android:layout_height="wrap_content" android:text="5" android:textSize="10sp" android:textColor="#757575"/>
+                                <TextView android:layout_width="10dp" android:layout_height="wrap_content" android:text="5" android:textSize="10sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                                 <ImageView android:layout_width="8dp" android:layout_height="8dp" android:src="@android:drawable/btn_star_big_on" app:tint="#FFC107" android:layout_marginStart="2dp"/>
                                 <ProgressBar android:id="@+id/pb5Star" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="4dp" android:layout_marginStart="8dp" android:progressTint="#FFC107" android:progress="0"/>
                             </LinearLayout>
                             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginTop="4dp">
-                                <TextView android:layout_width="10dp" android:layout_height="wrap_content" android:text="4" android:textSize="10sp" android:textColor="#757575"/>
+                                <TextView android:layout_width="10dp" android:layout_height="wrap_content" android:text="4" android:textSize="10sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                                 <ImageView android:layout_width="8dp" android:layout_height="8dp" android:src="@android:drawable/btn_star_big_on" app:tint="#FFC107" android:layout_marginStart="2dp"/>
                                 <ProgressBar android:id="@+id/pb4Star" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="4dp" android:layout_marginStart="8dp" android:progressTint="#FFC107" android:progress="0"/>
                             </LinearLayout>
                             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginTop="4dp">
-                                <TextView android:layout_width="10dp" android:layout_height="wrap_content" android:text="3" android:textSize="10sp" android:textColor="#757575"/>
+                                <TextView android:layout_width="10dp" android:layout_height="wrap_content" android:text="3" android:textSize="10sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                                 <ImageView android:layout_width="8dp" android:layout_height="8dp" android:src="@android:drawable/btn_star_big_on" app:tint="#FFC107" android:layout_marginStart="2dp"/>
                                 <ProgressBar android:id="@+id/pb3Star" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="4dp" android:layout_marginStart="8dp" android:progressTint="#FFC107" android:progress="0"/>
                             </LinearLayout>
                             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginTop="4dp">
-                                <TextView android:layout_width="10dp" android:layout_height="wrap_content" android:text="2" android:textSize="10sp" android:textColor="#757575"/>
+                                <TextView android:layout_width="10dp" android:layout_height="wrap_content" android:text="2" android:textSize="10sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                                 <ImageView android:layout_width="8dp" android:layout_height="8dp" android:src="@android:drawable/btn_star_big_on" app:tint="#FFC107" android:layout_marginStart="2dp"/>
                                 <ProgressBar android:id="@+id/pb2Star" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="4dp" android:layout_marginStart="8dp" android:progressTint="#FFC107" android:progress="0"/>
                             </LinearLayout>
                             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:layout_marginTop="4dp">
-                                <TextView android:layout_width="10dp" android:layout_height="wrap_content" android:text="1" android:textSize="10sp" android:textColor="#757575"/>
+                                <TextView android:layout_width="10dp" android:layout_height="wrap_content" android:text="1" android:textSize="10sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                                 <ImageView android:layout_width="8dp" android:layout_height="8dp" android:src="@android:drawable/btn_star_big_on" app:tint="#FFC107" android:layout_marginStart="2dp"/>
                                 <ProgressBar android:id="@+id/pb1Star" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="4dp" android:layout_marginStart="8dp" android:progressTint="#FFC107" android:progress="0"/>
                             </LinearLayout>
@@ -519,7 +516,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0.0"
-                                android:textColor="#212121"
+                                android:textColor="?attr/colorOnSurface"
                                 android:textSize="36sp"
                                 android:textStyle="bold" />
                             <RatingBar
@@ -534,7 +531,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0 đánh giá"
-                                android:textColor="#9E9E9E"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="11sp" />
                         </LinearLayout>
                     </LinearLayout>
@@ -547,21 +544,20 @@
                         android:orientation="vertical" />
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" />
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutline" />
 
-                <!-- Sản phẩm tương tự -->
                 <LinearLayout
                     android:id="@+id/layoutSimilarProducts"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
+                    android:background="?attr/colorSurfaceVariant"
                     android:orientation="vertical"
                     android:padding="16dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Sản phẩm tương tự"
-                        android:textColor="#212121"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="15sp"
                         android:textStyle="bold"
                         android:layout_marginBottom="12dp" />
@@ -674,7 +670,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="#FFFFFF"
+        android:background="?attr/colorSurfaceVariant"
         android:elevation="0dp"
         android:orientation="vertical">
 
@@ -682,7 +678,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#F0F0F0" />
+            android:background="?attr/colorOutline" />
 
         <FrameLayout
             android:layout_width="match_parent"

@@ -13,6 +13,7 @@ import com.zendo.apps.data.models.CartItem;
 import com.zendo.apps.data.models.Voucher;
 
 import com.zendo.apps.data.models.Order;
+import com.zendo.apps.data.models.Wallet;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -138,6 +139,7 @@ public class CheckoutActivity extends AppCompatActivity {
         binding.layoutPayBank.setSelected(false);
         binding.layoutPayZendo.setSelected(false);
         binding.layoutBankDetails.setVisibility(View.GONE);
+        binding.layoutZendoPayDetails.setVisibility(View.GONE);
 
         switch (method) {
             case "COD":
@@ -151,10 +153,48 @@ public class CheckoutActivity extends AppCompatActivity {
                 updateVietQR(); 
                 break;
             case "ZENDOPAY":
-                binding.rbSelectZendo.setChecked(true);
-                binding.layoutPayZendo.setSelected(true);
+                checkWalletAndSelect();
                 break;
         }
+    }
+
+    private void checkWalletAndSelect() {
+        if (userEmail == null) return;
+        
+        db.collection("wallets").document(userEmail).get().addOnSuccessListener(doc -> {
+            if (doc.exists()) {
+                binding.rbSelectZendo.setChecked(true);
+                binding.layoutPayZendo.setSelected(true);
+                binding.tvWalletStatus.setVisibility(View.GONE);
+                
+                // Show wallet details (balance and deposit button)
+                binding.layoutZendoPayDetails.setVisibility(View.VISIBLE);
+                Double balance = doc.getDouble("balance");
+                if (balance != null) {
+                    binding.tvCheckoutWalletBalance.setText("Số dư: " + formatter.format(balance) + "đ");
+                }
+                binding.btnCheckoutDeposit.setOnClickListener(v -> {
+                    startActivity(new Intent(this, ZendoPayActivity.class));
+                });
+            } else {
+                binding.tvWalletStatus.setVisibility(View.VISIBLE);
+                binding.layoutZendoPayDetails.setVisibility(View.GONE);
+                showWalletSetupDialog();
+            }
+        });
+    }
+
+    private void showWalletSetupDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Kích hoạt Ví ZendoPay")
+            .setMessage("Bạn chưa kích hoạt ví ZendoPay. Kích hoạt ngay để thanh toán nhanh chóng và nhận nhiều ưu đãi!")
+            .setPositiveButton("THIẾT LẬP NGAY", (dialog, which) -> {
+                startActivity(new Intent(this, ZendoPayActivity.class));
+            })
+            .setNegativeButton("ĐỂ SAU", (dialog, which) -> {
+                selectPaymentMethod("COD"); // Fallback to COD
+            })
+            .show();
     }
 
     private void loadAdminBankInfo() {
@@ -326,10 +366,43 @@ public class CheckoutActivity extends AppCompatActivity {
         }
 
         if (binding.rbSelectZendo.isChecked()) {
-            showPinBottomSheet();
+            validateWalletBeforeOrder();
         } else {
             proceedToPlaceOrder();
         }
+    }
+
+    private void validateWalletBeforeOrder() {
+        db.collection("wallets").document(userEmail).get().addOnSuccessListener(doc -> {
+            if (!doc.exists()) {
+                showWalletSetupDialog();
+                return;
+            }
+            
+            Wallet wallet = doc.toObject(Wallet.class);
+            if (wallet == null || wallet.getPinCode() == null || wallet.getPinCode().isEmpty()) {
+                showWalletSetupDialog();
+                return;
+            }
+
+            if (wallet.getBalance() < finalTotal) {
+                showInsufficientBalanceDialog();
+                return;
+            }
+
+            showPinBottomSheet();
+        });
+    }
+
+    private void showInsufficientBalanceDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Số dư không đủ")
+            .setMessage("Số dư ví ZendoPay không đủ để thanh toán đơn hàng này. Nạp thêm tiền ngay để tiếp tục mua sắm!")
+            .setPositiveButton("NẠP TIỀN NGAY", (dialog, which) -> {
+                startActivity(new Intent(this, ZendoPayActivity.class));
+            })
+            .setNegativeButton("ĐỂ SAU", null)
+            .show();
     }
 
     private void showPinBottomSheet() {
