@@ -250,6 +250,16 @@
                 android:textColor="#757575"
                 android:textSize="14sp" />
 
+            <TextView
+                android:id="@+id/tvDiscountSort"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Ưu đãi"
+                android:textColor="#757575"
+                android:textSize="14sp" />
+
             <LinearLayout
                 android:id="@+id/llSortPrice"
                 android:layout_width="0dp"

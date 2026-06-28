@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:layout_marginBottom="8dp"
+    android:layout_marginBottom="12dp"
     android:gravity="top">
 
     <com.google.android.material.textfield.TextInputLayout
@@ -12,12 +12,16 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:hint="Tên">
+        android:hint="Tên"
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        app:boxCornerRadiusTopStart="10dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etDynamicSpecName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
+            android:padding="12dp"
             android:textSize="13sp"
             android:inputType="textCapWords" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -26,21 +30,25 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1.8"
+        android:layout_weight="1.5"
         android:layout_marginStart="8dp"
-        android:hint="Giá trị">
+        android:hint="Giá trị"
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        app:boxCornerRadiusTopStart="10dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etDynamicSpecValue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
+            android:padding="12dp"
             android:textSize="13sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <ImageView
         android:id="@+id/btnRemoveSpec"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_marginStart="4dp"
         android:layout_marginTop="12dp"
         android:padding="8dp"

@@ -170,7 +170,7 @@
                     android:textStyle="bold"
                     android:letterSpacing="0.05" />
 
-                <com.zendo.apps.NonScrollGridView
+                <com.zendo.apps.ui.NonScrollGridView
                     android:id="@+id/gvTopProducts"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

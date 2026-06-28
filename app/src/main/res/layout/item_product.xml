@@ -26,6 +26,24 @@
                 android:scaleType="centerInside"
                 android:padding="8dp"
                 android:src="@drawable/ic_launcher_background" />
+
+            <!-- Tem giảm giá chéo -->
+            <TextView
+                android:id="@+id/tvProductDiscountBadge"
+                android:layout_width="70dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="-20dp"
+                android:layout_marginTop="5dp"
+                android:background="#D32F2F"
+                android:gravity="center"
+                android:rotation="-45"
+                android:text="-20%"
+                android:textColor="#FFFFFF"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:elevation="4dp"
+                android:visibility="gone" />
+
             <ImageView
                 android:id="@+id/btnLike"
                 android:layout_width="24dp"

@@ -1,5 +1,9 @@
 package com.zendo.apps.utils;
 
+import com.zendo.apps.data.models.Product;
+
+import com.zendo.apps.data.models.User;
+
 import android.content.Context;
 import android.net.Uri;
 import android.util.Base64;
@@ -120,3 +124,5 @@ public class MigrationTool {
         void onSuccess(Uri uri);
     }
 }
+
+
