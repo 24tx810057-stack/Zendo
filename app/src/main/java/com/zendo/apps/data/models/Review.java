@@ -15,14 +15,14 @@ public class Review implements Serializable {
     private float qualityRating;  
     private float sellerRating;   
     private float shippingRating; 
+    private float rating;
     
     private String comment;
     private List<String> tags = new ArrayList<>();
     private List<String> mediaUrls = new ArrayList<>();
     private boolean isAnonymous;
     private long timestamp;
-    
-    // Thêm trường phản hồi từ người bán
+
     private String sellerReply;
     private long replyTimestamp;
 
@@ -49,8 +49,11 @@ public class Review implements Serializable {
     public void setShippingRating(float shippingRating) { this.shippingRating = shippingRating; }
     
     public float getRating() {
+        if (rating > 0) return rating;
         return (qualityRating + sellerRating + shippingRating) / 3.0f;
     }
+
+    public void setRating(float rating) { this.rating = rating; }
 
     public String getComment() { return comment; }
     public void setComment(String comment) { this.comment = comment; }

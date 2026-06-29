@@ -29,6 +29,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.zendo.apps.data.models.AuthResultState;
+import com.zendo.apps.viewmodels.CartViewModel;
+
+import androidx.lifecycle.ViewModelProvider;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -43,7 +47,7 @@ public class CancelOrderDetailActivity extends AppCompatActivity {
     private LinearLayout layoutProducts;
     private Button btnReorder;
     private Order order;
-    private FirebaseFirestore db;
+    private CartViewModel cartViewModel;
     private String userEmail;
     private final DecimalFormat formatter = new DecimalFormat("###,###,###");
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
@@ -53,7 +57,7 @@ public class CancelOrderDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cancel_order_detail);
 
-        db = FirebaseFirestore.getInstance();
+        cartViewModel = new ViewModelProvider(this).get(CartViewModel.class);
         SharedPrefManager prefManager = SharedPrefManager.getInstance(this);
         userEmail = prefManager.getUserEmail();
 
@@ -133,22 +137,24 @@ public class CancelOrderDetailActivity extends AppCompatActivity {
 
         int totalItems = order.getItems().size();
         final int[] completedCount = {0};
+        final boolean[] hasError = {false};
 
         for (CartItem item : order.getItems()) {
-            // Logic thêm vào giỏ hàng: Giả định lưu vào collection "cart" của user
-            Map<String, Object> cartData = new java.util.HashMap<>();
-            cartData.put("userEmail", userEmail);
-            cartData.put("productId", item.getProductId());
-            cartData.put("productName", item.getProductName());
-            cartData.put("productPrice", item.getProductPrice());
-            cartData.put("productImageUrl", item.getProductImageUrl());
-            cartData.put("quantity", item.getQuantity());
-            cartData.put("timestamp", System.currentTimeMillis());
+            item.setUserEmail(userEmail);
+            cartViewModel.addToCart(item).observe(this, state -> {
+                if (state.getStatus() == AuthResultState.Status.SUCCESS) {
+                    completedCount[0]++;
+                } else if (state.getStatus() == AuthResultState.Status.ERROR) {
+                    completedCount[0]++;
+                    hasError[0] = true;
+                }
 
-            db.collection("cart").add(cartData).addOnCompleteListener(task -> {
-                completedCount[0]++;
                 if (completedCount[0] == totalItems) {
-                    Toast.makeText(this, "Đã thêm tất cả sản phẩm vào giỏ hàng!", Toast.LENGTH_LONG).show();
+                    if (hasError[0]) {
+                        Toast.makeText(this, "Có lỗi xảy ra khi thêm một số sản phẩm", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Đã thêm tất cả sản phẩm vào giỏ hàng!", Toast.LENGTH_LONG).show();
+                    }
                     Intent intent = new Intent(this, CartActivity.class);
                     startActivity(intent);
                     finish();

@@ -12,22 +12,24 @@ import android.view.View;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.WriteBatch;
+
+import com.zendo.apps.data.models.AuthResultState;
+import com.zendo.apps.viewmodels.CartViewModel;
 import com.zendo.apps.databinding.ActivityCartBinding;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CartActivity extends AppCompatActivity implements CartAdapter.OnCartItemChangeListener {
 
     private ActivityCartBinding binding;
     private CartAdapter adapter;
     private List<CartItem> cartItemList = new ArrayList<>();
-    private FirebaseFirestore db;
+    private CartViewModel viewModel;
     private String userEmail;
     private DecimalFormat formatter = new DecimalFormat("###,###,###");
     private boolean isEditMode = false;
@@ -38,7 +40,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
         binding = ActivityCartBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        db = FirebaseFirestore.getInstance();
+        viewModel = new ViewModelProvider(this).get(CartViewModel.class);
         SharedPrefManager prefManager = SharedPrefManager.getInstance(this);
         userEmail = prefManager.getUserEmail();
 
@@ -83,43 +85,36 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
     private void loadCartItems() {
         if (userEmail.isEmpty()) return;
 
-        db.collection("cart")
-                .whereEqualTo("userEmail", userEmail)
-                .addSnapshotListener((value, error) -> {
-                    if (error != null) return;
-                    if (value != null) {
-                        List<CartItem> newList = new ArrayList<>();
-                        for (QueryDocumentSnapshot doc : value) {
-                            CartItem item = doc.toObject(CartItem.class);
-                            item.setId(doc.getId());
-                            for(CartItem oldItem : cartItemList) {
-                                if(oldItem.getId().equals(item.getId())) {
-                                    item.setSelected(oldItem.isSelected());
-                                    break;
-                                }
-                            }
-                            newList.add(item);
-                        }
-                        cartItemList.clear();
-                        cartItemList.addAll(newList);
-                        adapter.notifyDataSetChanged();
-                        onSelectionChange(); 
-                        
-                        if (cartItemList.isEmpty()) {
-                            binding.tvEmptyCart.setVisibility(View.VISIBLE);
-                            binding.tvEdit.setVisibility(View.GONE);
-                        } else {
-                            binding.tvEmptyCart.setVisibility(View.GONE);
-                            binding.tvEdit.setVisibility(View.VISIBLE);
+        viewModel.getCartItems(userEmail).observe(this, items -> {
+            if (items != null) {
+                // Preserve selection state
+                for (CartItem newItem : items) {
+                    for (CartItem oldItem : cartItemList) {
+                        if (oldItem.getId().equals(newItem.getId())) {
+                            newItem.setSelected(oldItem.isSelected());
+                            break;
                         }
                     }
-                });
+                }
+                cartItemList.clear();
+                cartItemList.addAll(items);
+                adapter.notifyDataSetChanged();
+                onSelectionChange();
+
+                if (cartItemList.isEmpty()) {
+                    binding.tvEmptyCart.setVisibility(View.VISIBLE);
+                    binding.tvEdit.setVisibility(View.GONE);
+                } else {
+                    binding.tvEmptyCart.setVisibility(View.GONE);
+                    binding.tvEdit.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     @Override
     public void onQuantityChange(CartItem item, int newQuantity) {
-        db.collection("cart").document(item.getId())
-                .update("quantity", newQuantity);
+        viewModel.updateQuantity(item.getId(), newQuantity);
     }
 
     @Override
@@ -166,26 +161,24 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
     }
 
     private void handleDeleteSelected() {
-        List<CartItem> selectedItems = new ArrayList<>();
-        for (CartItem item : cartItemList) {
-            if (item.isSelected()) selectedItems.add(item);
-        }
+        List<String> selectedIds = cartItemList.stream()
+                .filter(CartItem::isSelected)
+                .map(CartItem::getId)
+                .collect(Collectors.toList());
 
-        if (selectedItems.isEmpty()) {
+        if (selectedIds.isEmpty()) {
             Toast.makeText(this, "Vui lòng chọn sản phẩm để xóa", Toast.LENGTH_SHORT).show();
             return;
         }
 
         new AlertDialog.Builder(this)
                 .setTitle("Xác nhận xóa")
-                .setMessage("Bạn có chắc chắn muốn xóa " + selectedItems.size() + " sản phẩm đã chọn?")
+                .setMessage("Bạn có chắc chắn muốn xóa " + selectedIds.size() + " sản phẩm đã chọn?")
                 .setPositiveButton("Xóa", (dialog, which) -> {
-                    WriteBatch batch = db.batch();
-                    for (CartItem item : selectedItems) {
-                        batch.delete(db.collection("cart").document(item.getId()));
-                    }
-                    batch.commit().addOnSuccessListener(aVoid -> {
-                        Toast.makeText(CartActivity.this, "Đã xóa sản phẩm", Toast.LENGTH_SHORT).show();
+                    viewModel.deleteItems(selectedIds).observe(this, state -> {
+                        if (state.getStatus() == AuthResultState.Status.SUCCESS) {
+                            Toast.makeText(CartActivity.this, "Đã xóa sản phẩm", Toast.LENGTH_SHORT).show();
+                        }
                     });
                 })
                 .setNegativeButton("Hủy", null)

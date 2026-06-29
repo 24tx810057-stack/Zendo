@@ -38,6 +38,10 @@ public class ProductViewModel extends AndroidViewModel {
         return repository.getProductById(productId);
     }
 
+    public LiveData<List<Product>> getSimilarProducts(String category, String currentProductId) {
+        return repository.getSimilarProducts(category, currentProductId);
+    }
+
     public LiveData<AuthResultState<Void>> toggleFavorite(String productId, String userEmail, boolean isLiked) {
         return repository.toggleFavorite(productId, userEmail, isLiked);
     }
@@ -72,6 +76,10 @@ public class ProductViewModel extends AndroidViewModel {
 
     public LiveData<AuthResultState<Void>> deleteBrand(String id) {
         return repository.deleteBrand(id);
+    }
+
+    public LiveData<AuthResultState<Void>> deleteProduct(String productId) {
+        return repository.deleteProduct(productId);
     }
 
     private static class FilterParams {

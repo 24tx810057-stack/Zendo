@@ -141,11 +141,13 @@ public class ZendoPayActivity extends AppCompatActivity {
             Map<String, Object> updates = new HashMap<>();
             if ("BANK".equals(type)) {
                 updates.put("isLinkedBank", false);
+                updates.put("linkedBank", false);
                 updates.put("bankName", null);
                 updates.put("accountNo", null);
                 updates.put("accountName", null);
             } else {
                 updates.put("isLinkedMoMo", false);
+                updates.put("linkedMoMo", false);
                 updates.put("momoPhone", null);
             }
 
@@ -255,6 +257,7 @@ public class ZendoPayActivity extends AppCompatActivity {
                 }
 
                 updates.put("isLinkedBank", true);
+                updates.put("linkedBank", true);
                 updates.put("bankName", spinner.getSelectedItem().toString());
                 updates.put("accountNo", accNo);
                 updates.put("accountName", accName);
@@ -266,6 +269,7 @@ public class ZendoPayActivity extends AppCompatActivity {
                 }
 
                 updates.put("isLinkedMoMo", true);
+                updates.put("linkedMoMo", true);
                 updates.put("momoPhone", momoPhone);
             }
             

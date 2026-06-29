@@ -145,7 +145,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         binding.tvReceiverAddress.setText(order.getAddress());
         binding.tvOrderNote.setText((order.getNote() == null || order.getNote().isEmpty()) ? "Không có ghi chú" : order.getNote());
 
-        // Logic fix cho giá tiền: Nếu subtotal = 0 nhưng có items, tính toán lại để hiển thị
+        //  fix cho giá tiền: Nếu subtotal = 0 nhưng có items, tính toán lại để hiển thị
         double subtotal = order.getSubtotal();
         double shipping = order.getShippingFee();
         double voucher = order.getVoucherDiscount();
@@ -178,8 +178,6 @@ public class OrderDetailActivity extends AppCompatActivity {
         displayProducts(order.getItems());
         setupReturnBanner();
 
-        // Still using Firebase for warranty requests check, 
-        // will ideally move this to OrderRepository too if needed.
         com.google.firebase.firestore.FirebaseFirestore.getInstance().collection("warranty_requests")
                 .whereEqualTo("orderId", order.getId())
                 .get()

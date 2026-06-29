@@ -33,6 +33,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -41,6 +42,12 @@ import android.widget.PopupMenu;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.TranslateAnimation;
+import android.view.animation.ScaleAnimation;
+import android.widget.FrameLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -50,6 +57,7 @@ import com.zendo.apps.data.models.AuthResultState;
 import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
 import com.zendo.apps.viewmodels.ProductViewModel;
+import com.zendo.apps.viewmodels.CartViewModel;
 import com.zendo.apps.databinding.ActivityDetailBinding;
 
 import java.text.DecimalFormat;
@@ -65,6 +73,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private ActivityDetailBinding binding;
     private ProductViewModel viewModel;
+    private CartViewModel cartViewModel;
     private DecimalFormat formatter = new DecimalFormat("###,###,###");
     private String productId;
     private Product product;
@@ -85,6 +94,7 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         viewModel = new ViewModelProvider(this).get(ProductViewModel.class);
+        cartViewModel = new ViewModelProvider(this).get(CartViewModel.class);
         SharedPrefManager prefManager = SharedPrefManager.getInstance(this);
         userEmail = prefManager.getUserEmail();
         userRole = prefManager.getUserRole();
@@ -209,10 +219,28 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void observeCartBadge() {
-        if (userEmail == null || userEmail.isEmpty()) return;
-        // Keep direct Firestore for real-time badge if no repository method exists, 
-        // but the plan says "remove direct Firebase dependencies".
-        // I should check if there's a cart repository.
+        if (userEmail == null || userEmail.isEmpty()) {
+            binding.tvCartBadgeDetail.setVisibility(View.GONE);
+            return;
+        }
+        cartViewModel.getCartItems(userEmail).observe(this, items -> {
+            if (items != null) {
+                int totalCount = 0;
+                for (CartItem item : items) {
+                    totalCount += item.getQuantity();
+                }
+                
+                if (totalCount > 0) {
+                    binding.tvCartBadgeDetail.setText(String.valueOf(totalCount));
+                    binding.tvCartBadgeDetail.setVisibility(View.VISIBLE);
+                } else {
+                    binding.tvCartBadgeDetail.setVisibility(View.GONE);
+                }
+            } else {
+                binding.tvCartBadgeDetail.setVisibility(View.GONE);
+                Log.e("DetailActivity", "Failed to load cart items for badge");
+            }
+        });
     }
 
     private void shareProduct() {
@@ -235,8 +263,28 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void loadSimilarProducts() {
-        if (productId == null) return;
-        // This still uses db... I should move this to repository too.
+        if (product == null || product.getCategory() == null) {
+            binding.layoutSimilarProducts.setVisibility(View.GONE);
+            return;
+        }
+
+        // Lấy pool sản phẩm cùng danh mục để Engine tính toán
+        viewModel.getSimilarProducts(product.getCategory(), productId).observe(this, allInCategory -> {
+            if (allInCategory != null && !allInCategory.isEmpty()) {
+                // SỬ DỤNG ENGINE CÓ SẴN CỦA BẠN
+                List<Product> recommended = RecommendationEngine.recommendSimilarProducts(product, allInCategory, 10);
+                
+                if (!recommended.isEmpty()) {
+                    HorizontalProductAdapter adapter = new HorizontalProductAdapter(this, recommended);
+                    binding.rvSimilarProducts.setAdapter(adapter);
+                    binding.layoutSimilarProducts.setVisibility(View.VISIBLE);
+                } else {
+                    binding.layoutSimilarProducts.setVisibility(View.GONE);
+                }
+            } else {
+                binding.layoutSimilarProducts.setVisibility(View.GONE);
+            }
+        });
     }
 
     @Override
@@ -533,8 +581,26 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void addToCart() {
-        if (product == null || userEmail.isEmpty()) return;
-        // Should also move this to a CartRepository.
+        if (userEmail == null || userEmail.isEmpty()) {
+            Toast.makeText(this, "Vui lòng đăng nhập để thực hiện!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (product == null) return;
+
+        CartItem item = new CartItem(null, productId, product.getName(),
+                product.getPrice(), product.getImageUrl(), 1, userEmail);
+        item.setWarranty(product.getWarranty());
+
+        cartViewModel.addToCart(item).observe(this, state -> {
+            if (state != null) {
+                if (state.getStatus() == AuthResultState.Status.SUCCESS) {
+                    Toast.makeText(DetailActivity.this, "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                } else if (state.getStatus() == AuthResultState.Status.ERROR) {
+                    Toast.makeText(DetailActivity.this, "Lỗi: " + state.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void showDeleteDialog() {
@@ -548,7 +614,14 @@ public class DetailActivity extends AppCompatActivity {
 
     private void deleteProduct() {
         if (productId == null) return;
-        // Should also move this to ProductRepository.
+        viewModel.deleteProduct(productId).observe(this, state -> {
+            if (state.getStatus() == AuthResultState.Status.SUCCESS) {
+                Toast.makeText(this, "Đã xóa sản phẩm thành công", Toast.LENGTH_SHORT).show();
+                finish();
+            } else if (state.getStatus() == AuthResultState.Status.ERROR) {
+                Toast.makeText(this, "Lỗi: " + state.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
 

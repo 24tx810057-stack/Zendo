@@ -11,6 +11,12 @@ public interface ProductDao {
     @Query("SELECT * FROM products")
     List<ProductEntity> getAllProducts();
 
+    @Query("SELECT * FROM products WHERE category = :category")
+    List<ProductEntity> getProductsByCategory(String category);
+
+    @Query("SELECT * FROM products WHERE brand = :brand")
+    List<ProductEntity> getProductsByBrand(String brand);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<ProductEntity> products);
 

@@ -88,6 +88,45 @@ public class ProductRepository {
         return productsLiveData;
     }
 
+    public LiveData<List<Product>> getSimilarProducts(String category, String currentProductId) {
+        MutableLiveData<List<Product>> productsLiveData = new MutableLiveData<>();
+        
+        executor.execute(() -> {
+            List<ProductEntity> entities = productDao.getProductsByCategory(category);
+            if (!entities.isEmpty()) {
+                List<Product> localList = new ArrayList<>();
+                for (ProductEntity e : entities) {
+                    if (currentProductId == null || !e.getId().equals(currentProductId)) {
+                        localList.add(mapToDomain(e));
+                    }
+                }
+                productsLiveData.postValue(localList);
+            }
+        });
+
+        if (category == null) return productsLiveData;
+
+        db.collection("products")
+            .whereEqualTo("category", category)
+            .limit(20)
+            .addSnapshotListener((value, error) -> {
+                if (error != null) return;
+
+                List<Product> productList = new ArrayList<>();
+                if (value != null) {
+                    for (QueryDocumentSnapshot doc : value) {
+                        if (currentProductId != null && doc.getId().equals(currentProductId)) continue;
+                        Product product = doc.toObject(Product.class);
+                        product.setId(doc.getId());
+                        productList.add(product);
+                    }
+                    productsLiveData.setValue(productList);
+                }
+            });
+
+        return productsLiveData;
+    }
+
     public LiveData<Product> getProductById(String productId) {
         MutableLiveData<Product> productLiveData = new MutableLiveData<>();
         db.collection("products").document(productId).addSnapshotListener((value, error) -> {
@@ -225,6 +264,15 @@ public class ProductRepository {
         MutableLiveData<AuthResultState<Void>> result = new MutableLiveData<>();
         result.setValue(AuthResultState.loading());
         db.collection("brands").document(id).delete()
+                .addOnSuccessListener(aVoid -> result.setValue(AuthResultState.success(null)))
+                .addOnFailureListener(e -> result.setValue(AuthResultState.error(e.getMessage())));
+        return result;
+    }
+
+    public LiveData<AuthResultState<Void>> deleteProduct(String productId) {
+        MutableLiveData<AuthResultState<Void>> result = new MutableLiveData<>();
+        result.setValue(AuthResultState.loading());
+        db.collection("products").document(productId).delete()
                 .addOnSuccessListener(aVoid -> result.setValue(AuthResultState.success(null)))
                 .addOnFailureListener(e -> result.setValue(AuthResultState.error(e.getMessage())));
         return result;

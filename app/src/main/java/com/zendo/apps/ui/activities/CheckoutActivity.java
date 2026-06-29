@@ -114,6 +114,7 @@ public class CheckoutActivity extends AppCompatActivity {
         } else if (editAddress == null || editAddress.isEmpty()) {
             loadDefaultAddress();
         }
+        checkWalletAndSelect();
     }
 
     private void initViews() {
@@ -161,8 +162,9 @@ public class CheckoutActivity extends AppCompatActivity {
     private void checkWalletAndSelect() {
         if (userEmail == null) return;
         
-        db.collection("wallets").document(userEmail).get().addOnSuccessListener(doc -> {
-            if (doc.exists()) {
+        db.collection("wallets").document(userEmail).addSnapshotListener((doc, error) -> {
+            if (error != null) return;
+            if (doc != null && doc.exists()) {
                 binding.rbSelectZendo.setChecked(true);
                 binding.layoutPayZendo.setSelected(true);
                 binding.tvWalletStatus.setVisibility(View.GONE);
@@ -443,14 +445,20 @@ public class CheckoutActivity extends AppCompatActivity {
         String orderId = db.collection("orders").document().getId();
         order.setId(orderId);
         batch.set(db.collection("orders").document(orderId), order);
+        if (binding.rbSelectZendo.isChecked()) {
+            batch.update(db.collection("wallets").document(userEmail), "balance", FieldValue.increment(-finalTotal));
+        }
 
         batch.commit().addOnSuccessListener(aVoid -> {
             // Gửi thông báo cho Admin qua OrderManager (Centralized)
             new OrderManager().sendNewOrderNotification(order);
             
             Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(this, ListActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+
+            Intent intent = new Intent(this, OrderListActivity.class);
+            intent.putExtra("tab_index", 1); 
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
             finish();
         });
     }

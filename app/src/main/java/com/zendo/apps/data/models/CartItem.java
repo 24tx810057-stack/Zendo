@@ -11,7 +11,8 @@ public class CartItem implements Serializable {
     private String productImageUrl;
     private int quantity;
     private String userEmail;
-    private String warranty; // Lưu thông tin bảo hành tại thời điểm đặt hàng
+    private String warranty;
+    private long timestamp;
     
     @Exclude
     private boolean isSelected = false;
@@ -52,6 +53,9 @@ public class CartItem implements Serializable {
 
     public String getWarranty() { return warranty; }
     public void setWarranty(String warranty) { this.warranty = warranty; }
+
+    public long getTimestamp() { return timestamp; }
+    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 
     @Exclude
     public boolean isSelected() { return isSelected; }
