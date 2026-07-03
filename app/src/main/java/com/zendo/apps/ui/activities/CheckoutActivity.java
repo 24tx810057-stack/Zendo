@@ -421,7 +421,8 @@ public class CheckoutActivity extends AppCompatActivity {
         WriteBatch batch = db.batch();
         for (CartItem item : checkoutItems) {
             if (item.getProductId() != null) {
-                batch.update(db.collection("products").document(item.getProductId()), "stock", FieldValue.increment(-item.getQuantity()));
+                batch.update(db.collection("products").document(item.getProductId()),
+                        "stock", FieldValue.increment(-item.getQuantity()));
             }
             if (item.getId() != null) {
                 batch.delete(db.collection("cart").document(item.getId()));
