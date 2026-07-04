@@ -1,70 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="@drawable/bg_white_top_round"
+    android:orientation="vertical">
 
     <!-- Header -->
     <RelativeLayout
-        android:id="@+id/chatHeader"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="#FFFFFF"
-        android:paddingHorizontal="16dp"
-        android:elevation="2dp">
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
-        <ImageView
-            android:id="@+id/btnBackChat"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_back"
-            app:tint="#2196F3" />
+        <View
+            android:layout_width="40dp"
+            android:layout_height="4dp"
+            android:layout_centerHorizontal="true"
+            android:background="#E0E0E0" />
 
         <TextView
             android:id="@+id/tvChatTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Zendo - CSKH"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="12dp"
+            android:text="Shop Name"
             android:textColor="#212121"
             android:textSize="18sp"
             android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/btnCloseChat"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:tint="#757575" />
     </RelativeLayout>
 
     <!-- Chat Messages -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvChatMessages"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/rvQuickReplies"
-        android:layout_below="@id/chatHeader"
-        android:padding="12dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="12dp"
         android:clipToPadding="false"/>
 
-    <!-- Quick Replies -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvQuickReplies"
+    <!-- Quick Replies Container (dùng HorizontalScrollView thay vì RecyclerView để dễ dàng add Chip thủ công) -->
+    <HorizontalScrollView
+        android:id="@+id/hsvQuickReplies"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/layoutInput"
-        android:orientation="horizontal"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="4dp"
-        android:clipToPadding="false"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+        android:paddingVertical="8dp"
+        android:scrollbars="none">
+        <LinearLayout
+            android:id="@+id/layoutQuickReplies"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="8dp" />
+    </HorizontalScrollView>
 
     <!-- Input Area -->
     <LinearLayout
-        android:id="@+id/layoutInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:background="#FFFFFF"
         android:elevation="8dp"
         android:orientation="horizontal"
-        android:padding="8dp"
+        android:padding="12dp"
         android:gravity="center_vertical">
 
         <EditText
@@ -85,7 +91,7 @@
             android:layout_marginStart="8dp"
             android:padding="8dp"
             android:src="@android:drawable/ic_menu_send"
-            app:tint="#29B6F6" />
+            app:tint="#2196F3" />
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

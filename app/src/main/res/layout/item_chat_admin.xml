@@ -17,4 +17,15 @@
         android:text="Admin message"
         android:textColor="#212121"
         android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tvAutoReplyTag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout_marginStart="4dp"
+        android:text="Trả lời tự động"
+        android:textColor="#9E9E9E"
+        android:textSize="10sp"
+        android:visibility="gone" />
 </LinearLayout>

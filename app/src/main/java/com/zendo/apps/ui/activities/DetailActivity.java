@@ -138,13 +138,24 @@ public class DetailActivity extends AppCompatActivity {
 
         binding.btnBuyNow.setOnClickListener(v -> handleBuyNow());
         binding.btnAddToCart.setOnClickListener(v -> addToCart());
-        binding.btnChatNowDetail.setOnClickListener(v -> startActivity(new Intent(this, ChatActivity.class)));
+        binding.btnChatNowDetail.setOnClickListener(v -> openChat(false));
+        binding.fabShopChat.setOnClickListener(v -> openChat(true));
 
         binding.ivFavorite.setOnClickListener(v -> toggleFavorite());
 
         binding.btnViewWarrantyPolicy.setOnClickListener(v -> {
             startActivity(new Intent(this, WarrantyPolicyActivity.class));
         });
+    }
+
+    private void openChat(boolean isBot) {
+        String shopName = "Phone Store"; // Tên Shop cố định theo yêu cầu
+        ChatBottomSheetFragment chatSheet = ChatBottomSheetFragment.newInstance(
+                product != null ? product.getId() : "general",
+                shopName,
+                isBot
+        );
+        chatSheet.show(getSupportFragmentManager(), "ChatBottomSheet");
     }
 
     private void checkIfLiked() {

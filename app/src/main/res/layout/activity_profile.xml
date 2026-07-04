@@ -300,175 +300,213 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- MODERN GRID 2x2 CỦA ADMIN -->
+                    <!-- MODERN GRID 4 CỘT CỦA ADMIN -->
                     <GridLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:columnCount="2"
+                        android:columnCount="4"
                         android:alignmentMode="alignMargins"
                         android:clipChildren="false"
                         android:clipToPadding="false">
 
                         <!-- Đơn hàng -->
-                        <RelativeLayout
+                        <LinearLayout
                             android:id="@+id/btnAdminOrders"
                             android:layout_width="0dp"
-                            android:layout_height="100dp"
+                            android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_margin="6dp"
-                            android:background="@drawable/bg_tile_item">
-                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_orders" app:tint="@color/white"/>
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Đơn hàng" android:textStyle="bold" android:textSize="13sp" android:textColor="?attr/colorOnSurfaceVariant"/>
-                            </LinearLayout>
-                            <TextView
-                                android:id="@+id/tvAdminOrderBadge"
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_alignParentEnd="true"
-                                android:layout_margin="10dp"
-                                android:background="@drawable/bg_circle_red_badge"
-                                android:gravity="center"
-                                android:textColor="#FFFFFF"
-                                android:textSize="9sp"
-                                android:textStyle="bold"
-                                android:visibility="gone"/>
-                        </RelativeLayout>
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="12dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clipChildren="false"
+                            android:clipToPadding="false">
+                            <RelativeLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:clipChildren="false"
+                                android:clipToPadding="false">
+                                <ImageView
+                                    android:id="@+id/ivAdminOrderIcon"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:src="@drawable/ic_dash_orders"
+                                    app:tint="@color/blue_modern_primary"/>
+                                <TextView
+                                    android:id="@+id/tvAdminOrderBadge"
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:layout_alignTop="@+id/ivAdminOrderIcon"
+                                    android:layout_alignEnd="@+id/ivAdminOrderIcon"
+                                    android:layout_marginTop="-6dp"
+                                    android:layout_marginEnd="-6dp"
+                                    android:background="@drawable/bg_circle_red_badge"
+                                    android:gravity="center"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="8sp"
+                                    android:textStyle="bold"
+                                    android:elevation="4dp"
+                                    android:visibility="gone"/>
+                            </RelativeLayout>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Đơn hàng" android:textSize="11sp" android:textColor="?attr/colorOnSurfaceVariant"/>
+                        </LinearLayout>
 
                         <!-- Sản phẩm -->
-                        <RelativeLayout
+                        <LinearLayout
                             android:id="@+id/btnAdminProducts"
                             android:layout_width="0dp"
-                            android:layout_height="100dp"
+                            android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_margin="6dp"
-                            android:background="@drawable/bg_tile_item">
-                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_products" app:tint="?attr/colorOnSurfaceVariant"/>
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Sản phẩm" android:textStyle="bold" android:textSize="13sp" android:textColor="?attr/colorOnSurfaceVariant"/>
-                            </LinearLayout>
-                        </RelativeLayout>
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="12dp"
+                            android:background="?attr/selectableItemBackground">
+                            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_dash_products" app:tint="?attr/colorOnSurfaceVariant"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Sản phẩm" android:textSize="11sp" android:textColor="?attr/colorOnSurfaceVariant"/>
+                        </LinearLayout>
 
                         <!-- Khuyến mãi -->
-                        <RelativeLayout
+                        <LinearLayout
                             android:id="@+id/btnAdminVouchers"
                             android:layout_width="0dp"
-                            android:layout_height="100dp"
+                            android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_margin="6dp"
-                            android:background="@drawable/bg_tile_item">
-                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_vouchers" app:tint="?attr/colorOnSurfaceVariant"/>
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Khuyến mãi" android:textStyle="bold" android:textSize="13sp" android:textColor="?attr/colorOnSurfaceVariant"/>
-                            </LinearLayout>
-                        </RelativeLayout>
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="12dp"
+                            android:background="?attr/selectableItemBackground">
+                            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_dash_vouchers" app:tint="?attr/colorOnSurfaceVariant"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Khuyến mãi" android:textSize="11sp" android:textColor="?attr/colorOnSurfaceVariant"/>
+                        </LinearLayout>
 
                         <!-- Đánh giá -->
-                        <RelativeLayout
+                        <LinearLayout
                             android:id="@+id/btnAdminReviews"
                             android:layout_width="0dp"
-                            android:layout_height="100dp"
+                            android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_margin="6dp"
-                            android:background="@drawable/bg_tile_item">
-                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_reviews" app:tint="?attr/colorOnSurfaceVariant"/>
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Đánh giá" android:textStyle="bold" android:textSize="13sp" android:textColor="?attr/colorOnSurfaceVariant"/>
-                            </LinearLayout>
-                            <TextView
-                                android:id="@+id/tvAdminReviewBadge"
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_alignParentEnd="true"
-                                android:layout_margin="10dp"
-                                android:background="@drawable/bg_circle_red_badge"
-                                android:gravity="center"
-                                android:text="0"
-                                android:textColor="#FFFFFF"
-                                android:textSize="9sp"
-                                android:textStyle="bold"
-                                android:visibility="gone" />
-                        </RelativeLayout>
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="12dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clipChildren="false"
+                            android:clipToPadding="false">
+                            <RelativeLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:clipChildren="false"
+                                android:clipToPadding="false">
+                                <ImageView
+                                    android:id="@+id/ivAdminReviewIcon"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:src="@drawable/ic_dash_reviews"
+                                    app:tint="?attr/colorOnSurfaceVariant"/>
+                                <TextView
+                                    android:id="@+id/tvAdminReviewBadge"
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:layout_alignTop="@+id/ivAdminReviewIcon"
+                                    android:layout_alignEnd="@+id/ivAdminReviewIcon"
+                                    android:layout_marginTop="-6dp"
+                                    android:layout_marginEnd="-6dp"
+                                    android:background="@drawable/bg_circle_red_badge"
+                                    android:gravity="center"
+                                    android:text="0"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="8sp"
+                                    android:textStyle="bold"
+                                    android:elevation="4dp"
+                                    android:visibility="gone" />
+                            </RelativeLayout>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Đánh giá" android:textSize="11sp" android:textColor="?attr/colorOnSurfaceVariant"/>
+                        </LinearLayout>
 
                         <!-- Khiếu nại -->
-                        <RelativeLayout
+                        <LinearLayout
                             android:id="@+id/btnAdminReturnRequests"
                             android:layout_width="0dp"
-                            android:layout_height="100dp"
+                            android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_margin="6dp"
-                            android:background="@drawable/bg_tile_item">
-                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_complaints" app:tint="@color/rose_600"/>
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Khiếu nại" android:textStyle="bold" android:textSize="13sp" android:textColor="@color/slate_700"/>
-                            </LinearLayout>
-                            <TextView
-                                android:id="@+id/tvReturnBadge"
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_alignParentEnd="true"
-                                android:layout_margin="10dp"
-                                android:background="@drawable/bg_circle_red_badge"
-                                android:gravity="center"
-                                android:textColor="#FFFFFF"
-                                android:textSize="9sp"
-                                android:textStyle="bold"
-                                android:visibility="gone"/>
-                        </RelativeLayout>
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="12dp"
+                            android:background="?attr/selectableItemBackground">
+                            <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
+                                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_dash_complaints" app:tint="@color/rose_600"/>
+                                <TextView
+                                    android:id="@+id/tvReturnBadge"
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_marginTop="-4dp"
+                                    android:layout_marginEnd="-4dp"
+                                    android:background="@drawable/bg_circle_red_badge"
+                                    android:gravity="center"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="8sp"
+                                    android:textStyle="bold"
+                                    android:visibility="gone"/>
+                            </RelativeLayout>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Khiếu nại" android:textSize="11sp" android:textColor="?attr/colorOnSurfaceVariant"/>
+                        </LinearLayout>
 
                         <!-- Bảo hành -->
-                        <RelativeLayout
+                        <LinearLayout
                             android:id="@+id/btnAdminWarrantyRequests"
                             android:layout_width="0dp"
-                            android:layout_height="100dp"
+                            android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_margin="6dp"
-                            android:background="@drawable/bg_tile_item">
-                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_warranty" app:tint="?attr/colorOnSurfaceVariant"/>
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Bảo hành" android:textStyle="bold" android:textSize="13sp" android:textColor="?attr/colorOnSurfaceVariant"/>
-                            </LinearLayout>
-                            <TextView
-                                android:id="@+id/tvWarrantyBadge"
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_alignParentEnd="true"
-                                android:layout_margin="10dp"
-                                android:background="@drawable/bg_circle_red_badge"
-                                android:gravity="center"
-                                android:textColor="#FFFFFF"
-                                android:textSize="9sp"
-                                android:textStyle="bold"
-                                android:visibility="gone"/>
-                        </RelativeLayout>
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="12dp"
+                            android:background="?attr/selectableItemBackground">
+                            <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
+                                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_dash_warranty" app:tint="?attr/colorOnSurfaceVariant"/>
+                                <TextView
+                                    android:id="@+id/tvWarrantyBadge"
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_marginTop="-4dp"
+                                    android:layout_marginEnd="-4dp"
+                                    android:background="@drawable/bg_circle_red_badge"
+                                    android:gravity="center"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="8sp"
+                                    android:textStyle="bold"
+                                    android:visibility="gone"/>
+                            </RelativeLayout>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Bảo hành" android:textSize="11sp" android:textColor="?attr/colorOnSurfaceVariant"/>
+                        </LinearLayout>
 
                         <!-- Thanh toán -->
-                        <RelativeLayout
+                        <LinearLayout
                             android:id="@+id/btnAdminPaymentSettings"
                             android:layout_width="0dp"
-                            android:layout_height="100dp"
+                            android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_margin="6dp"
-                            android:background="@drawable/bg_tile_item">
-                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_payment" app:tint="@color/emerald_600"/>
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Thanh toán" android:textStyle="bold" android:textSize="13sp" android:textColor="@color/slate_700"/>
-                            </LinearLayout>
-                        </RelativeLayout>
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="12dp"
+                            android:background="?attr/selectableItemBackground">
+                            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_dash_payment" app:tint="@color/emerald_600"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Thanh toán" android:textSize="11sp" android:textColor="?attr/colorOnSurfaceVariant"/>
+                        </LinearLayout>
 
                         <!-- Ngành hàng -->
-                        <RelativeLayout
+                        <LinearLayout
                             android:id="@+id/btnAdminAttributes"
                             android:layout_width="0dp"
-                            android:layout_height="100dp"
+                            android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
-                            android:layout_margin="6dp"
-                            android:background="@drawable/bg_tile_item">
-                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                                <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_dash_categories" app:tint="?attr/colorOnSurfaceVariant"/>
-                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Ngành hàng" android:textStyle="bold" android:textSize="13sp" android:textColor="?attr/colorOnSurfaceVariant"/>
-                            </LinearLayout>
-                        </RelativeLayout>
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:paddingVertical="12dp"
+                            android:background="?attr/selectableItemBackground">
+                            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_dash_categories" app:tint="?attr/colorOnSurfaceVariant"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Ngành hàng" android:textSize="11sp" android:textColor="?attr/colorOnSurfaceVariant"/>
+                        </LinearLayout>
 
                     </GridLayout>
                 </LinearLayout>

@@ -51,7 +51,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (holder instanceof UserViewHolder) {
             ((UserViewHolder) holder).tvMessage.setText(message.getMessage());
         } else {
-            ((AdminViewHolder) holder).tvMessage.setText(message.getMessage());
+            AdminViewHolder adminHolder = (AdminViewHolder) holder;
+            adminHolder.tvMessage.setText(message.getMessage());
+            adminHolder.tvAutoTag.setVisibility(message.isAutoReply() ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -70,9 +72,11 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     static class AdminViewHolder extends RecyclerView.ViewHolder {
         TextView tvMessage;
+        TextView tvAutoTag;
         AdminViewHolder(@NonNull View itemView) {
             super(itemView);
             tvMessage = itemView.findViewById(R.id.tvChatAdminMessage);
+            tvAutoTag = itemView.findViewById(R.id.tvAutoReplyTag);
         }
     }
 }

@@ -99,6 +99,15 @@ public class ListActivity extends AppCompatActivity {
             startActivity(new Intent(this, NotificationActivity.class));
         });
 
+        binding.fabHomeChat.setOnClickListener(v -> {
+            ChatBottomSheetFragment chatSheet = ChatBottomSheetFragment.newInstance(
+                    "general",
+                    "Phone Store",
+                    true
+            );
+            chatSheet.show(getSupportFragmentManager(), "ChatBottomSheet");
+        });
+
         binding.bottomNav.setSelectedItemId(R.id.nav_home);
         binding.bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();

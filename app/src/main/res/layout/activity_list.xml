@@ -343,4 +343,18 @@
         app:menu="@menu/bottom_nav_menu"
         app:itemActiveIndicatorStyle="@null" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabHomeChat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@id/bottomNav"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/ic_chat_fixed"
+        app:backgroundTint="#FFFFFF"
+        app:tint="@null"
+        app:fabSize="normal"
+        android:contentDescription="Chat hỗ trợ" />
+
 </RelativeLayout>
